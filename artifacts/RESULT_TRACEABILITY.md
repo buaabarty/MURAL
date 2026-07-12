@@ -42,7 +42,7 @@ The verifier checks:
 - the target-mapping table;
 - RQ-1 controlled source, selector, fusion, and paired statistics;
 - RQ-2 fixed-prefix controls and paired statistics;
-- RQ-3 mapped edit-target coverage;
+- RQ-3 mapped edit-target coverage and paired uncertainty;
 - supplementary budget-sensitivity values; and
 - leakage and external-artifact sensitivity statements.
 
@@ -84,6 +84,8 @@ The verifier checks:
   `artifacts/results/patch_derived_context_summary_20260702.tsv` and `.json`.
 - Deterministic mapped targets:
   `artifacts/results/patch_derived_context_targets_20260702.json`.
+- Paired bootstrap intervals and exact complete-coverage tests:
+  `artifacts/results/edit_target_paired_stats_20260713.tsv`.
 
 ### Threats to Validity
 
@@ -222,6 +224,28 @@ python3 artifacts/scripts/evaluate_patch_derived_context.py \
   --row "GLM-5 + BM25 files + file-local=glm5_bm25_filelocal=temp_run/private_bm25_filelocal_20260704/budget_fusions/GLM5_BM25FileLocal_b20_p10" \
   --row "GLM-5 + BM25+KG RRF file-local=glm5_bm25_kg_rrf_filelocal=temp_run/private_bm25_filelocal_20260704/hybrid_rrf/deterministic_budget_fusions/GLM5_Hybrid_b20_p10" \
   --top-k 20
+```
+
+### Paired Edit-Target Statistics
+
+```bash
+python3 artifacts/scripts/analyze_edit_target_paired_stats.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --target-cache artifacts/results/patch_derived_context_targets_20260702.json \
+  --group BM25=runs/text_baselines_nohints/2000 \
+  --group BM25_filelocal=temp_run/private_bm25_filelocal_20260704/bm25_top20_files_filelocal \
+  --group KG_grounded=runs/kg_verified_evidence_graph/tse_timesafe_main_20260529_v6 \
+  --group KG_filelocal=runs/kg_verified_evidence_graph/tse_timesafe_main_20260531_pathunion_v1 \
+  --group MURAL=temp_run/private_bm25_filelocal_20260704/hybrid_rrf/BM25_KG_deterministic_rrf \
+  --group GLM5_BM25_filelocal=temp_run/private_bm25_filelocal_20260704/budget_fusions/GLM5_BM25FileLocal_b20_p10 \
+  --group GLM5_MURAL=temp_run/private_bm25_filelocal_20260704/hybrid_rrf/deterministic_budget_fusions/GLM5_Hybrid_b20_p10 \
+  --compare BM25=BM25_filelocal \
+  --compare KG_grounded=KG_filelocal \
+  --compare BM25_filelocal=MURAL \
+  --compare GLM5_BM25_filelocal=GLM5_MURAL \
+  --bootstrap-iters 10000 \
+  --seed 7 \
+  --output artifacts/results/edit_target_paired_stats_20260713.tsv
 ```
 
 The exact GLM-5 endpoint identifier, evaluation snapshot, and frozen

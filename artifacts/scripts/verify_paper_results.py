@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "artifacts" / "results"
 
 EXPECTED_RESULT_FILES = {
+    "edit_target_paired_stats_20260713.tsv",
     "glm5_baseline_fusion_controls_top10_20260614.tsv",
     "kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json",
     "path_mining_file_expansion_ablation_20260531.tsv",
@@ -401,6 +402,35 @@ def verify_patch_derived_context() -> None:
         0,
         target_source,
     )
+
+    paired_source = "edit_target_paired_stats_20260713.tsv"
+    paired_rows = read_tsv(paired_source)
+    expected_paired = {
+        ("BM25", "BM25_filelocal", "edit_recall"): (10.9, 6.6, 15.1, 121, 54, None),
+        ("BM25", "BM25_filelocal", "complete_edit"): (9.6, 5.4, 14.0, 88, 40, 2.6629957497431587e-05),
+        ("KG_grounded", "KG_filelocal", "edit_recall"): (11.7, 8.8, 14.6, 79, 10, None),
+        ("KG_grounded", "KG_filelocal", "complete_edit"): (10.6, 7.6, 13.8, 60, 7, 1.3280368233066497e-11),
+        ("BM25_filelocal", "MURAL", "edit_recall"): (5.2, 2.6, 7.9, 49, 21, None),
+        ("BM25_filelocal", "MURAL", "complete_edit"): (4.4, 1.8, 7.2, 35, 13, 0.0020881073339964473),
+        ("GLM5_BM25_filelocal", "GLM5_MURAL", "edit_recall"): (1.6, -0.2, 3.6, 27, 17, None),
+        ("GLM5_BM25_filelocal", "GLM5_MURAL", "complete_edit"): (2.0, 0.0, 4.0, 19, 9, 0.08715855330228806),
+    }
+    observed_keys = [(row["baseline"], row["treatment"], row["metric"]) for row in paired_rows]
+    expect_equal("Patch context paired row set", observed_keys, list(expected_paired), paired_source)
+    for row in paired_rows:
+        key = (row["baseline"], row["treatment"], row["metric"])
+        delta, low, high, wins, losses, p_value = expected_paired[key]
+        prefix = f"Patch context paired {key[0]}->{key[1]} {key[2]}"
+        expect_equal(f"{prefix} N", int(row["N"]), 500, paired_source)
+        expect_close(f"{prefix} delta", pct(row["delta"]), delta, paired_source)
+        expect_close(f"{prefix} CI low", pct(row["ci95_low"]), low, paired_source)
+        expect_close(f"{prefix} CI high", pct(row["ci95_high"]), high, paired_source)
+        expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
+        expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
+        if p_value is None:
+            expect_equal(f"{prefix} exact p", row["exact_mcnemar_p"], "NA", paired_source)
+        else:
+            expect_close(f"{prefix} exact p", float(row["exact_mcnemar_p"]), p_value, paired_source, tol=1e-15)
 
 
 def verify_boundary() -> None:

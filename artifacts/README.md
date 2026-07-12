@@ -30,6 +30,8 @@ unchanged so archived commands and checksums stay stable.
   paired bootstrap intervals, exact McNemar tests, and disagreement records.
 - `scripts/evaluate_patch_derived_context.py`: computes mapped edit-target
   recall and complete edit-target coverage.
+- `scripts/analyze_edit_target_paired_stats.py`: computes paired bootstrap
+  intervals and exact McNemar tests for the primary RQ-3 comparisons.
 
 ## Main-Manuscript Ledgers
 
@@ -50,6 +52,8 @@ unchanged so archived commands and checksums stay stable.
   coverage used in RQ-3.
 - `patch_derived_context_targets_20260702.json`: deterministic edit-target
   cache used by the patch-derived evaluation.
+- `edit_target_paired_stats_20260713.tsv`: paired uncertainty for edit-target
+  recall and complete edit-target coverage in the primary RQ-3 comparisons.
 - `time_boundary_external_artifact_sensitivity_20260531.tsv`: external-artifact
   sensitivity statement in threats to validity.
 - `kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json`: final
