@@ -110,6 +110,14 @@ The verifier checks:
 - Paired bootstrap intervals, win/loss counts, and exact binary tests:
   `artifacts/results/selector_ablation_paired_20260714.tsv`.
 
+### RRF Sensitivity
+
+- Four constant settings and the symmetric source-weight sweep:
+  `artifacts/results/rrf_sensitivity_summary_20260714.tsv`.
+- Paired bootstrap intervals, win/loss counts, and exact binary tests against
+  the predefined equal-weight (k=60) row:
+  `artifacts/results/rrf_sensitivity_paired_20260714.tsv`.
+
 ### Reproduction Settings
 
 - Exact localization prompt:
@@ -250,6 +258,59 @@ python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
   --output-summary artifacts/results/selector_ablation_summary_20260714.tsv \
   --output-paired artifacts/results/selector_ablation_paired_20260714.tsv \
   --output-disagreements temp_run/selector_ablation_disagreements_20260714.tsv
+```
+
+### RRF Sensitivity
+
+The primary source is BM25-local and the secondary source is KG-local. The
+main row uses the script defaults (`k=60`, weights `1/1`). The sweep below does
+not replace that predefined row.
+
+```bash
+RRF_SWEEP=temp_run/mural_experiment_additions/rrf_sensitivity
+
+run_rrf () {
+  label="$1"; k="$2"; bm25_weight="$3"; kg_weight="$4"
+  python3 artifacts/scripts/export_equal_rrf_fusion.py \
+    --primary-dir temp_run/private_bm25_filelocal_20260704/bm25_top20_files_filelocal \
+    --secondary-dir runs/kg_verified_evidence_graph/tse_timesafe_main_20260531_pathunion_v1 \
+    --output-dir "$RRF_SWEEP/$label" \
+    --top-k 50 --rrf-k "$k" \
+    --primary-weight "$bm25_weight" --secondary-weight "$kg_weight" \
+    --force
+}
+
+run_rrf k10_w50_50  10  1.0 1.0
+run_rrf k30_w50_50  30  1.0 1.0
+run_rrf k60_w50_50  60  1.0 1.0
+run_rrf k100_w50_50 100 1.0 1.0
+run_rrf k60_w30_70  60  0.3 0.7
+run_rrf k60_w40_60  60  0.4 0.6
+run_rrf k60_w60_40  60  0.6 0.4
+run_rrf k60_w70_30  60  0.7 0.3
+
+python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
+  --top-k 20 --bootstrap-iters 10000 --seed 7 \
+  --group k10_equal="$RRF_SWEEP/k10_w50_50" \
+  --group k30_equal="$RRF_SWEEP/k30_w50_50" \
+  --group k60_equal="$RRF_SWEEP/k60_w50_50" \
+  --group k100_equal="$RRF_SWEEP/k100_w50_50" \
+  --group k60_bm25_30_kg_70="$RRF_SWEEP/k60_w30_70" \
+  --group k60_bm25_40_kg_60="$RRF_SWEEP/k60_w40_60" \
+  --group k60_bm25_60_kg_40="$RRF_SWEEP/k60_w60_40" \
+  --group k60_bm25_70_kg_30="$RRF_SWEEP/k60_w70_30" \
+  --compare k60_equal=k10_equal \
+  --compare k60_equal=k30_equal \
+  --compare k60_equal=k100_equal \
+  --compare k60_equal=k60_bm25_30_kg_70 \
+  --compare k60_equal=k60_bm25_40_kg_60 \
+  --compare k60_equal=k60_bm25_60_kg_40 \
+  --compare k60_equal=k60_bm25_70_kg_30 \
+  --output-summary artifacts/results/rrf_sensitivity_summary_20260714.tsv \
+  --output-paired artifacts/results/rrf_sensitivity_paired_20260714.tsv \
+  --output-disagreements temp_run/rrf_sensitivity_disagreements_20260714.tsv
 ```
 
 ### Patch-Derived Coverage

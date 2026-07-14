@@ -27,7 +27,8 @@ unchanged so archived commands and checksums stay stable.
 - `scripts/export_fixed_prefix_fusion.py`: builds prefix-preserving context
   windows under a fixed output budget.
 - `scripts/export_equal_rrf_fusion.py`: combines BM25-local and KG-local
-  rankings with equal-weight reciprocal-rank fusion (RRF).
+  rankings with deterministic RRF; defaults reproduce equal weighting and
+  optional source weights support the reported sensitivity sweep.
 - `scripts/analyze_retrieve_localize_controls.py`: computes aggregate metrics,
   paired bootstrap intervals, exact McNemar tests, and disagreement records.
 - `scripts/evaluate_patch_derived_context.py`: computes mapped edit-target
@@ -70,6 +71,10 @@ unchanged so archived commands and checksums stay stable.
   `selector_ablation_paired_20260714.tsv`: BM25-local Full and five
   leave-one-signal-family-out selector variants, including paired uncertainty
   and exact Hit@20 tests.
+- `rrf_sensitivity_summary_20260714.tsv` and
+  `rrf_sensitivity_paired_20260714.tsv`: four RRF constants and a symmetric
+  five-setting BM25/KG weight sweep, with all variants paired against the
+  predefined equal-weight (k=60) row.
 
 ## Verifier
 

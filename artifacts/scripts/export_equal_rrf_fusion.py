@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fuse two ranked code-entity sources with deterministic equal-weight RRF."""
+"""Fuse two ranked code-entity sources with deterministic weighted RRF."""
 
 from __future__ import annotations
 
@@ -46,6 +46,8 @@ def fuse_entities(
     secondary: list[dict[str, Any]],
     rrf_k: int,
     limit: int,
+    primary_weight: float = 1.0,
+    secondary_weight: float = 1.0,
 ) -> list[dict[str, Any]]:
     primary_map = rank_map(primary)
     secondary_map = rank_map(secondary)
@@ -58,9 +60,9 @@ def fuse_entities(
         secondary_rank = secondary_entry[0] if secondary_entry else None
         score = 0.0
         if primary_rank is not None:
-            score += 1.0 / (rrf_k + primary_rank)
+            score += primary_weight / (rrf_k + primary_rank)
         if secondary_rank is not None:
-            score += 1.0 / (rrf_k + secondary_rank)
+            score += secondary_weight / (rrf_k + secondary_rank)
 
         base = primary_entry[1] if primary_entry else secondary_entry[1]
         fused = dict(base)
@@ -68,6 +70,8 @@ def fuse_entities(
         fused["fusion_evidence"] = {
             "primary_rank": primary_rank,
             "secondary_rank": secondary_rank,
+            "primary_weight": primary_weight,
+            "secondary_weight": secondary_weight,
             "rrf_score": score,
         }
         present_count = int(primary_rank is not None) + int(secondary_rank is not None)
@@ -95,6 +99,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--top-k", type=int, default=50)
     parser.add_argument("--rrf-k", type=int, default=60)
+    parser.add_argument("--primary-weight", type=float, default=1.0)
+    parser.add_argument("--secondary-weight", type=float, default=1.0)
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
@@ -103,6 +109,10 @@ def main() -> int:
     args = parse_args()
     if args.top_k <= 0 or args.rrf_k < 0:
         raise ValueError("Require top-k > 0 and rrf-k >= 0")
+    if args.primary_weight < 0 or args.secondary_weight < 0:
+        raise ValueError("RRF source weights must be non-negative")
+    if args.primary_weight == 0 and args.secondary_weight == 0:
+        raise ValueError("At least one RRF source weight must be positive")
 
     primary_ids = {path.stem for path in args.primary_dir.glob("*.json")}
     secondary_ids = {path.stem for path in args.secondary_dir.glob("*.json")}
@@ -128,12 +138,16 @@ def main() -> int:
                     ranked_entities(secondary_payload, "methods"),
                     args.rrf_k,
                     args.top_k,
+                    args.primary_weight,
+                    args.secondary_weight,
                 ),
                 "classes": fuse_entities(
                     ranked_entities(primary_payload, "classes"),
                     ranked_entities(secondary_payload, "classes"),
                     args.rrf_k,
                     args.top_k,
+                    args.primary_weight,
+                    args.secondary_weight,
                 ),
                 "issues": primary_related.get("issues") or secondary_related.get("issues") or [],
             },
@@ -142,8 +156,14 @@ def main() -> int:
                 "secondary": secondary_payload.get("artifact_stats") or {},
             },
             "fusion_params": {
-                "strategy": "equal_weight_reciprocal_rank_fusion",
+                "strategy": (
+                    "equal_weight_reciprocal_rank_fusion"
+                    if args.primary_weight == args.secondary_weight
+                    else "weighted_reciprocal_rank_fusion"
+                ),
                 "rrf_k": args.rrf_k,
+                "primary_weight": args.primary_weight,
+                "secondary_weight": args.secondary_weight,
                 "top_k": args.top_k,
                 "tie_break": "source_count,best_rank,primary_source,file_path,start_line,entity_id",
                 "primary_dir": str(args.primary_dir),
@@ -153,7 +173,10 @@ def main() -> int:
         destination.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
         written += 1
 
-    print(f"wrote {written} equal-weight RRF fusions to {args.output_dir}")
+    print(
+        f"wrote {written} RRF fusions to {args.output_dir} "
+        f"(k={args.rrf_k}, weights={args.primary_weight:g}/{args.secondary_weight:g})"
+    )
     return 0
 
 

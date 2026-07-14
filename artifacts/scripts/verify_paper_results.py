@@ -36,6 +36,8 @@ EXPECTED_RESULT_FILES = {
     "retrieve_then_localize_disagreements_20260711.tsv",
     "retrieve_then_localize_paired_20260711.tsv",
     "retrieve_then_localize_top20_20260711.tsv",
+    "rrf_sensitivity_paired_20260714.tsv",
+    "rrf_sensitivity_summary_20260714.tsv",
     "selector_ablation_paired_20260714.tsv",
     "selector_ablation_summary_20260714.tsv",
     "time_boundary_external_artifact_sensitivity_20260531.tsv",
@@ -159,6 +161,7 @@ def verify_rq1() -> None:
 
     verify_retrieve_then_localize_controls()
     verify_selector_ablation()
+    verify_rrf_sensitivity()
 
 
 def verify_selector_ablation() -> None:
@@ -197,6 +200,58 @@ def verify_selector_ablation() -> None:
         paired_source,
         tol=1e-15,
     )
+
+
+def verify_rrf_sensitivity() -> None:
+    source = "rrf_sensitivity_summary_20260714.tsv"
+    rows = read_tsv(source)
+    expected = {
+        "k10_equal": (79.8, 57.1, 32.5, 65.0),
+        "k30_equal": (77.6, 55.7, 32.1, 63.4),
+        "k60_equal": (77.0, 55.3, 32.0, 62.8),
+        "k100_equal": (77.0, 55.1, 32.0, 62.6),
+        "k60_bm25_30_kg_70": (68.8, 52.2, 31.7, 58.0),
+        "k60_bm25_40_kg_60": (67.8, 51.4, 31.2, 57.4),
+        "k60_bm25_60_kg_40": (71.8, 51.8, 31.3, 58.8),
+        "k60_bm25_70_kg_30": (72.4, 52.0, 31.2, 59.2),
+    }
+    expect_row_set("RRF sensitivity row set", rows, "name", list(expected), source)
+    for name, values in expected.items():
+        expect_metric_row(source, row_by(rows, "name", name), values, f"RRF sensitivity {name}")
+
+    paired_source = "rrf_sensitivity_paired_20260714.tsv"
+    paired = read_tsv(paired_source)
+    hit_rows = {
+        row["treatment"]: row
+        for row in paired
+        if row["baseline"] == "k60_equal" and row["metric"] == "hit"
+    }
+    expected_paired = {
+        "k10_equal": (2.2, 0.6, 4.0, 15, 4, 0.0192108154296875),
+        "k30_equal": (0.6, 0.0, 1.4, 3, 0, 0.25),
+        "k100_equal": (-0.2, -0.6, 0.0, 0, 1, 1.0),
+        "k60_bm25_30_kg_70": (-4.8, -7.6, -2.2, 12, 36, 0.0007172696733945827),
+        "k60_bm25_40_kg_60": (-5.4, -8.0, -3.0, 7, 34, 2.532080361561384e-05),
+        "k60_bm25_60_kg_40": (-4.0, -6.4, -1.8, 7, 27, 0.0008213953115046024),
+        "k60_bm25_70_kg_30": (-3.6, -6.0, -1.4, 9, 27, 0.00393317302223295),
+    }
+    expect_equal("RRF sensitivity paired treatments", list(hit_rows), list(expected_paired), paired_source)
+    for treatment, values in expected_paired.items():
+        delta, low, high, wins, losses, p_value = values
+        row = hit_rows[treatment]
+        prefix = f"RRF sensitivity k60_equal->{treatment} Hit"
+        expect_close(f"{prefix} delta", pct(row["delta"]), delta, paired_source)
+        expect_close(f"{prefix} CI low", pct(row["ci95_low"]), low, paired_source)
+        expect_close(f"{prefix} CI high", pct(row["ci95_high"]), high, paired_source)
+        expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
+        expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
+        expect_close(
+            f"{prefix} exact p",
+            float(row["exact_mcnemar_p"]),
+            p_value,
+            paired_source,
+            tol=1e-15,
+        )
 
 
 def verify_retrieve_then_localize_controls() -> None:
