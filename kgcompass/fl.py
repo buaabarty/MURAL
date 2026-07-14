@@ -779,8 +779,21 @@ class CodeAnalyzer:
                             parsed_created_at_str = dt_object.strftime("%Y-%m-%dT%H:%M:%SZ")
                     
                     if not parsed_created_at_str:
-                        print(f"Warning: 'created_at' field for multi-swe-bench not processed correctly or was missing for {target_sample_from_dataset.get('instance_id')}. Using current UTC time as placeholder.")
-                        parsed_created_at_str = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                        base_commit = target_sample_from_dataset.get('base_commit')
+                        try:
+                            commit_time = self.repo.commit(base_commit).committed_datetime
+                            parsed_created_at_str = commit_time.astimezone(timezone.utc).strftime(
+                                "%Y-%m-%dT%H:%M:%SZ"
+                            )
+                            print(
+                                "Warning: missing Multi-SWE-bench created_at; "
+                                f"using base-commit time {parsed_created_at_str}."
+                            )
+                        except Exception as error:
+                            raise ValueError(
+                                "Multi-SWE-bench row lacks a reproducible created_at and "
+                                f"base-commit time could not be read: {base_commit}"
+                            ) from error
 
                     fetched_title_for_sample = ""
                     raw_issue_numbers = target_sample_from_dataset.get('issue_numbers')

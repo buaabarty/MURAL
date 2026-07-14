@@ -97,6 +97,7 @@ def main() -> int:
         "HF_HUB_OFFLINE": "1",
         "TRANSFORMERS_OFFLINE": "1",
         "TOKENIZERS_PARALLELISM": "false",
+        "KGCOMPASS_OFFLINE_ARTIFACTS": "1",
         "KGCOMPASS_MULTI_SWE_BENCH_FILE": str(dataset),
         "KGCOMPASS_RESULT_LIMIT": str(args.result_limit),
         "KGCOMPASS_ENABLE_METHOD_CALL_EXPANSION": (
