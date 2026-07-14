@@ -23,6 +23,7 @@ Environment variables needed:
     - QWEN_API_KEY: For Qwen API
 """
 
+import ast
 import os
 import json
 import re
@@ -77,16 +78,22 @@ MAX_INPUT_LENGTH_CONFIG = {
 MAX_TOKENS = 8192
 DEFAULT_COMPLETION_MAX_TOKENS = 4096
 DEFAULT_REQUEST_TIMEOUT = 240
+CONTEXT_PROFILE_VERSION = "rank_stratified_v3_allfiles"
 
 
 def load_instance_from_dataset(instance_id, benchmark_type="multi-swe-bench"):
     """从数据集加载实例信息，获取repo和commit信息"""
     try:
         local_file = os.getenv("SWE_BENCH_LOCAL_FILE")
-        if local_file and os.path.exists(local_file):
+        if local_file:
+            if not os.path.exists(local_file):
+                print(f"Configured dataset file does not exist: {local_file}")
+                return None
             try:
                 with open(local_file, "r", encoding="utf-8") as f:
                     for line in f:
+                        if not line.strip():
+                            continue
                         item = json.loads(line.strip())
                         if item.get("instance_id") == instance_id:
                             repo_name = item.get("repo", "")
@@ -98,6 +105,9 @@ def load_instance_from_dataset(instance_id, benchmark_type="multi-swe-bench"):
                             }
             except Exception as e:
                 print(f"Error reading local dataset file {local_file}: {e}")
+                return None
+            print(f"Instance {instance_id} not found in configured dataset {local_file}")
+            return None
 
         # 对于Java项目，优先从本地加载
         if benchmark_type == "multi-swe-bench":
@@ -406,6 +416,40 @@ def build_user_record(name):
         else:
             print(f"💾 结果已保存到: {jsonl_file} (无成功应用的patch)")
 
+    def _save_run_audit(self, result, output_dir):
+        audit = {
+            "instance_id": result.get("instance_id"),
+            "dataset_source": result.get("dataset_source"),
+            "problem_statement_tokens": result.get("problem_statement_tokens", 0),
+            "response_prefill": result.get("response_prefill", False),
+            "repair_profile": result.get("repair_profile"),
+            "context_profile_version": CONTEXT_PROFILE_VERSION,
+            "first_prompt_profile": result.get("first_prompt_profile"),
+            "candidate_entity_count": result.get("candidate_entity_count", 0),
+            "candidate_file_count": result.get("candidate_file_count", 0),
+            "candidate_class_scope_count": result.get(
+                "candidate_class_scope_count", 0
+            ),
+            "first_prompt_rendered_entity_count": result.get(
+                "first_prompt_rendered_entity_count", 0
+            ),
+            "first_prompt_source_entity_count": result.get(
+                "first_prompt_source_entity_count", 0
+            ),
+            "first_prompt_tokens": result.get("first_prompt_tokens", 0),
+            "generation_extra_body": self.extra_body,
+            "max_retries": self._get_max_retries(),
+            "first_attempt_status": result.get("first_attempt_status"),
+            "retry_attempts": result.get("retry_attempts", []),
+            "final_status": result.get("status"),
+            "applied_files": result.get("applied_files", []),
+            "failed_files": result.get("failed_files", []),
+        }
+        path = os.path.join(output_dir, f"{result.get('instance_id')}.run.json")
+        with open(path, "w", encoding="utf-8") as handle:
+            json.dump(audit, handle, ensure_ascii=False, indent=2, sort_keys=True)
+            handle.write("\n")
+
     def _build_error_summary(self, result):
         messages = []
         if result.get("error_summary"):
@@ -688,11 +732,75 @@ def build_user_record(name):
                 break
         return selected
 
+    def _build_ranked_context_items(
+        self, methods, split_rank=10, source_per_band=4, max_source_per_file=2
+    ):
+        """Represent the full window and reserve source excerpts for both rank bands."""
+        ranked_methods = [
+            item
+            for _, item in sorted(
+                enumerate(methods),
+                key=lambda value: (-value[1].get("similarity", 0), value[0]),
+            )
+        ][:20]
+        source_indexes = set()
+        seen_contexts = set()
+        bands = (range(0, min(split_rank, len(ranked_methods))), range(split_rank, len(ranked_methods)))
+        for band in bands:
+            file_counts = {}
+            selected_in_band = 0
+            for index in band:
+                item = ranked_methods[index]
+                file_path = (item.get("file_path") or "").replace("\\", "/").strip()
+                if not file_path or file_counts.get(file_path, 0) >= max_source_per_file:
+                    continue
+                context_identity = (
+                    ("class", item.get("_context_class"))
+                    if item.get("_context_class")
+                    else ("entity", self._method_identity(item))
+                )
+                dedup_key = (file_path, context_identity)
+                if dedup_key in seen_contexts:
+                    continue
+                seen_contexts.add(dedup_key)
+                source_indexes.add(index)
+                file_counts[file_path] = file_counts.get(file_path, 0) + 1
+                selected_in_band += 1
+                if selected_in_band >= source_per_band:
+                    break
+
+        selected = []
+        first_source = min(source_indexes) if source_indexes else None
+        for index, item in enumerate(ranked_methods):
+            item_copy = dict(item)
+            if index == first_source:
+                item_copy["_prompt_mode"] = "primary"
+            elif index in source_indexes:
+                item_copy["_prompt_mode"] = "secondary"
+            else:
+                item_copy["_prompt_mode"] = "metadata"
+            item_copy["_prompt_band"] = "prefix" if index < split_rank else "tail"
+            selected.append(item_copy)
+        return selected
+
     def _expanded_repair_profile(self):
         return os.environ.get("MURAL_REPAIR_PROFILE", "compact").strip().lower() == "expanded"
 
+    def _first_prompt_profile(self):
+        profile = os.environ.get("MURAL_REPAIR_FIRST_PROMPT_PROFILE", "auto").strip().lower()
+        allowed = {"auto", "ultra", "compact", "breadth", "full"}
+        if profile not in allowed:
+            raise ValueError(
+                "MURAL_REPAIR_FIRST_PROMPT_PROFILE must be one of "
+                + ", ".join(sorted(allowed))
+            )
+        return profile
+
     def _get_prompt_token_limit(self):
         base_limit = int(self.MAX_INPUT_LENGTH * 0.9)
+        override = os.environ.get("MURAL_REPAIR_PROMPT_TOKEN_LIMIT", "").strip()
+        if override:
+            return min(base_limit, max(1, int(override)))
         if self._expanded_repair_profile() and self.api_type == "openai_compat":
             return min(base_limit, 8000)
         model_name = (self.model or "").lower()
@@ -707,6 +815,9 @@ def build_user_record(name):
         return min(base_limit, 8000)
 
     def _get_completion_max_tokens(self):
+        override = os.environ.get("MURAL_REPAIR_COMPLETION_MAX_TOKENS", "").strip()
+        if override:
+            return max(1, int(override))
         model_name = (self.model or "").lower()
         if "qwen3-coder-30b" in model_name:
             return 1024
@@ -766,6 +877,12 @@ def build_user_record(name):
         )
 
     def _get_response_prefill(self):
+        setting = os.environ.get(
+            "MURAL_REPAIR_RESPONSE_PREFILL",
+            "off",
+        ).strip().lower()
+        if setting not in {"1", "true", "yes", "on"}:
+            return ""
         model_name = (self.model or "").lower()
         if "qwen3-coder" in model_name:
             return f"```{self.code_block_lang}\n"
@@ -774,6 +891,13 @@ def build_user_record(name):
         if "glm-5" in model_name:
             return f"```{self.code_block_lang}\n"
         return ""
+
+    def _get_max_retries(self):
+        value = os.environ.get("MURAL_REPAIR_MAX_RETRIES", "1").strip()
+        retries = int(value)
+        if retries < 0:
+            raise ValueError("MURAL_REPAIR_MAX_RETRIES must be non-negative")
+        return retries
 
     def _get_prompt_template(self):
         if self.api_type in ["openai_compat", "qwen", "deepseek", "openai"]:
@@ -836,6 +960,8 @@ def build_user_record(name):
             parts.append(f"- similarity : {similarity:.4f}")
         if item.get("_selection_role"):
             parts.append(f"- selection_role : {item.get('_selection_role')}")
+        if item.get("_context_class"):
+            parts.append(f"- context_class : {item.get('_context_class')}")
         if item.get("_kg_distance") is not None:
             parts.append(f"- kg_distance : {item.get('_kg_distance')}")
         if item.get("_kg_grounding"):
@@ -879,10 +1005,10 @@ def build_user_record(name):
             dataset_problem = (dataset_info["data"].get("problem_statement") or "").strip()
 
         locate_issue = (locate_result.get("issue") or "").strip() if locate_result else ""
-        if locate_issue:
-            return self._truncate_text_to_token_limit(locate_issue, 1200)
         if dataset_problem:
             return self._truncate_text_to_token_limit(dataset_problem, 1200)
+        if locate_issue:
+            return self._truncate_text_to_token_limit(locate_issue, 1200)
 
         related_issues = []
         if locate_result and locate_result.get("related_entities"):
@@ -938,46 +1064,161 @@ def build_user_record(name):
         combined = "\n\n".join(s for s in sections if s).strip()
         return self._truncate_text_to_token_limit(combined or main_issue, 1400)
 
-    def _enrich_methods_with_file_context(self, methods, repo_path, commit_id, max_files=6):
+    def _expand_python_entity_context(self, item, file_content):
+        """Expand a ranked method to its base-commit enclosing class scope."""
+        if self.language != "python" or not file_content:
+            return dict(item)
+
+        try:
+            tree = ast.parse(file_content)
+        except (SyntaxError, ValueError):
+            return dict(item)
+
+        classes = [node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+        if not classes:
+            return dict(item)
+
+        identity = str(item.get("signature") or item.get("name") or "")
+        identity = identity.split("(", 1)[0].split(":", 1)[0].strip()
+        components = [part for part in identity.split(".") if part]
+        class_names = {node.name for node in classes}
+        requested_class = next(
+            (part for part in reversed(components[:-1]) if part in class_names),
+            None,
+        )
+
+        start_line = int(item.get("start_line") or 0)
+        end_line = int(item.get("end_line") or start_line or 0)
+        candidates = []
+        if requested_class:
+            candidates = [node for node in classes if node.name == requested_class]
+        if not candidates and start_line:
+            candidates = [
+                node
+                for node in classes
+                if node.lineno
+                <= start_line
+                <= int(getattr(node, "end_lineno", node.lineno))
+            ]
+        if not candidates:
+            return dict(item)
+
+        node = min(
+            candidates,
+            key=lambda value: int(getattr(value, "end_lineno", value.lineno))
+            - value.lineno,
+        )
+        class_start = int(node.lineno)
+        class_end = int(getattr(node, "end_lineno", node.lineno))
+        lines = file_content.splitlines()
+
+        # A precise method body is more useful than a truncated very large
+        # class. Expand only compact classes, except when the qualified class
+        # identity contradicts the archived span (a stale-resolution case).
+        class_length = class_end - class_start + 1
+        span_inside_class = class_start <= start_line <= class_end
+        if class_length > 180 and span_inside_class and (
+            item.get("source_code") or ""
+        ).strip():
+            return dict(item)
+        if class_length > 180:
+            excerpt_start = class_start
+            excerpt_end = min(class_end, class_start + 179)
+        else:
+            excerpt_start, excerpt_end = class_start, class_end
+
+        expanded = dict(item)
+        expanded["source_code"] = "\n".join(lines[excerpt_start - 1 : excerpt_end])
+        expanded["start_line"] = excerpt_start
+        expanded["end_line"] = excerpt_end
+        expanded["_selection_role"] = "base-commit class scope for ranked entity"
+        expanded["_context_class"] = node.name
+        return expanded
+
+    def _rehydrate_python_entity_context(self, item, file_content):
+        """Replace archived snippets with exact source from the official base commit."""
+        expanded = self._expand_python_entity_context(item, file_content)
+        if self.language != "python" or not file_content or expanded.get("_context_class"):
+            return expanded
+
+        lines = file_content.splitlines()
+        start_line = max(1, int(item.get("start_line") or 1))
+        end_line = max(start_line, int(item.get("end_line") or start_line))
+        identity = str(item.get("name") or item.get("signature") or "")
+        identity = identity.split("(", 1)[0].split("=", 1)[0].strip()
+        target_name = identity.rsplit(".", 1)[-1]
+
+        try:
+            tree = ast.parse(file_content)
+        except (SyntaxError, ValueError):
+            tree = None
+        if tree is not None and target_name:
+            candidates = [
+                node
+                for node in ast.walk(tree)
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and node.name == target_name
+            ]
+            if candidates:
+                node = min(
+                    candidates,
+                    key=lambda value: abs(int(value.lineno) - start_line),
+                )
+                decorator_lines = [
+                    int(decorator.lineno)
+                    for decorator in node.decorator_list
+                    if getattr(decorator, "lineno", None)
+                ]
+                start_line = min([int(node.lineno), *decorator_lines])
+                end_line = int(getattr(node, "end_lineno", node.lineno))
+
+        start_line = min(start_line, max(1, len(lines)))
+        end_line = min(max(start_line, end_line), len(lines))
+        refreshed = dict(expanded)
+        refreshed["source_code"] = "\n".join(lines[start_line - 1 : end_line])
+        refreshed["start_line"] = start_line
+        refreshed["end_line"] = end_line
+        refreshed["_selection_role"] = "exact base-commit span for ranked entity"
+        return refreshed
+
+    def _enrich_methods_with_file_context(self, methods, repo_path, commit_id, max_files=20):
         if not methods or not repo_path:
             return methods or []
 
-        enriched = list(methods)
-        files_with_source = {
-            (m.get("file_path") or "").replace("\\", "/")
-            for m in methods
-            if (m.get("source_code") or "").strip()
-        }
-        injected_files = set()
-
-        sorted_methods = [
-            item
-            for _, item in sorted(
-                enumerate(methods),
-                key=lambda x: (-x[1].get("similarity", 0), x[0]),
-            )
-        ]
-
-        for item in sorted_methods:
-            file_path = (item.get("file_path") or "").replace("\\", "/").strip()
-            if not file_path or file_path in files_with_source or file_path in injected_files:
-                continue
-            content, _ = self._load_original_file_content(repo_path, file_path, commit_id)
-            if not content:
-                continue
-
+        enriched = []
+        content_cache = {}
+        loaded_files = set()
+        for item in methods:
             item_copy = dict(item)
-            item_copy["source_code"] = content
-            item_copy["start_line"] = item_copy.get("start_line") or 1
-            item_copy["end_line"] = item_copy.get("end_line") or len(content.splitlines())
+            file_path = (item.get("file_path") or "").replace("\\", "/").strip()
+            if not file_path:
+                enriched.append(item_copy)
+                continue
+            if file_path not in content_cache and (
+                file_path in loaded_files or len(loaded_files) < max_files
+            ):
+                content_cache[file_path], _ = self._load_original_file_content(
+                    repo_path, file_path, commit_id
+                )
+                loaded_files.add(file_path)
+            content = content_cache.get(file_path) or ""
+            if content:
+                item_copy = self._rehydrate_python_entity_context(item_copy, content)
+            if not (item_copy.get("source_code") or "").strip() and content:
+                lines = content.splitlines()
+                start_line = max(1, int(item_copy.get("start_line") or 1))
+                end_line = max(start_line, int(item_copy.get("end_line") or start_line))
+                excerpt_start = max(1, start_line - 60)
+                excerpt_end = min(len(lines), end_line + 60)
+                item_copy["source_code"] = "\n".join(
+                    lines[excerpt_start - 1 : excerpt_end]
+                )
+                item_copy["start_line"] = excerpt_start
+                item_copy["end_line"] = excerpt_end
+                item_copy["_selection_role"] = "base-commit window for ranked entity"
             if not (item_copy.get("signature") or "").strip():
-                item_copy["signature"] = f"{file_path} [file context]"
-            else:
-                item_copy["signature"] = f"{item_copy['signature']} [file context]"
+                item_copy["signature"] = file_path
             enriched.append(item_copy)
-            injected_files.add(file_path)
-            if len(injected_files) >= max_files:
-                break
 
         return enriched
 
@@ -1088,16 +1329,12 @@ def build_user_record(name):
         if not methods:
             return ""
 
-        selected = self._build_file_diverse_items(
-            methods,
-            max_files=5,
-            mode_plan=["primary", "secondary", "secondary", "metadata", "metadata"],
-        )
+        selected = self._build_ranked_context_items(methods)
 
         if not selected:
             return ""
 
-        prompt_limit = max(1200, int(self._get_prompt_token_limit() * 0.7))
+        prompt_limit = self._get_prompt_token_limit()
         while selected:
             candidate_content = self._render_method_context(selected)
             candidate_prompt = self._get_prompt_template().format(
@@ -1110,7 +1347,39 @@ def build_user_record(name):
             )
             if self.count_tokens(candidate_prompt) <= prompt_limit:
                 return candidate_content
-            selected = selected[:-1]
+
+            demoted = False
+            for band in ("tail", "prefix"):
+                source_items = [
+                    item
+                    for item in selected
+                    if item.get("_prompt_band") == band
+                    and item.get("_prompt_mode") in {"primary", "secondary"}
+                ]
+                if len(source_items) <= 1:
+                    continue
+                source_items[-1]["_prompt_mode"] = "metadata"
+                demoted = True
+            if demoted:
+                continue
+
+            # Metadata-only entries are compact, but unusually long signatures
+            # can still exceed the hard request limit. Remove the lowest-ranked
+            # tail and prefix entries in pairs while retaining both bands.
+            removable = []
+            for band in ("tail", "prefix"):
+                indexes = [
+                    index
+                    for index, item in enumerate(selected)
+                    if item.get("_prompt_band") == band
+                    and item.get("_prompt_mode") == "metadata"
+                ]
+                if indexes:
+                    removable.append(indexes[-1])
+            if not removable:
+                break
+            for index in sorted(removable, reverse=True):
+                selected.pop(index)
 
         return ""
 
@@ -1183,7 +1452,10 @@ def build_user_record(name):
         if not selected:
             return ""
 
-        prompt_limit = 1100
+        prompt_limit = max(
+            1,
+            int(os.environ.get("MURAL_REPAIR_ULTRA_PROMPT_TOKEN_LIMIT", "1100")),
+        )
         chosen = []
         for item in selected:
             candidate = chosen + [item]
@@ -1203,6 +1475,38 @@ def build_user_record(name):
             return self._render_method_context(chosen)
 
         return ""
+
+    def _build_first_repair_context(self, problem_statement, methods):
+        profile = self._first_prompt_profile()
+        if profile == "full":
+            return self._build_repair_context(problem_statement, methods)
+        if profile == "breadth":
+            return self._build_breadth_repair_context(problem_statement, methods)
+        if profile == "compact":
+            return self._build_compact_repair_context(problem_statement, methods)
+        if profile == "ultra":
+            return self._build_ultra_compact_repair_context(problem_statement, methods)
+
+        if self.api_type == "openai_compat" and not self._prefer_ultra_compact_first():
+            content = self._build_agentless_style_repair_context(problem_statement, methods)
+            if not content:
+                content = self._build_compact_repair_context(problem_statement, methods)
+            if not content:
+                content = self._build_repair_context(problem_statement, methods)
+            return content
+        if self._prefer_ultra_compact_first():
+            content = self._build_ultra_compact_repair_context(problem_statement, methods)
+            if not content:
+                content = self._build_compact_repair_context(problem_statement, methods)
+            if not content:
+                content = self._build_repair_context(problem_statement, methods)
+            return content
+        if self._prefer_compact_first():
+            content = self._build_compact_repair_context(problem_statement, methods)
+            if not content:
+                content = self._build_repair_context(problem_statement, methods)
+            return content
+        return self._build_repair_context(problem_statement, methods)
 
     def _build_retry_problem_statement(self, problem_statement, failure_reason, no_op_failure=False, refusal_failure=False):
         retry_note = [
@@ -2087,8 +2391,9 @@ def build_user_record(name):
         with open(location_file, 'r') as f:
             locate_result = json.load(f)
         
-        # repo信息和commit信息应该从数据集获取，而不是从locate_result获取
-        if not repo_name or not commit_id:
+        dataset_info = None
+        locate_issue = (locate_result.get("issue") or "").strip()
+        if not repo_name or not commit_id or not locate_issue:
             print(f"🔍 Loading dataset information for {instance_id}...")
             benchmark_type = "multi-swe-bench" if self.language == "java" else "swe-bench"
             dataset_info = load_instance_from_dataset(instance_id, benchmark_type)
@@ -2101,8 +2406,37 @@ def build_user_record(name):
                 repo_name = repo_name or ''
                 commit_id = commit_id or ''
 
+        result["dataset_source"] = (
+            os.path.abspath(os.environ["SWE_BENCH_LOCAL_FILE"])
+            if dataset_info and os.environ.get("SWE_BENCH_LOCAL_FILE")
+            else ("location_record" if locate_issue else None)
+        )
+        selected_problem = self._select_problem_statement(locate_result, dataset_info).strip()
+        if selected_problem == "No issue description provided.":
+            error = (
+                "Original issue description is unavailable; configure "
+                "SWE_BENCH_LOCAL_FILE or provide locate_result.issue"
+            )
+            print(f"Error: {error}")
+            result["status"] = "failed"
+            result["failed_files"].append({"error": error})
+            self._save_run_audit(result, output_dir)
+            if save_to_jsonl:
+                self._save_result_to_jsonl(result, output_dir)
+            return
+        if not repo_name or not commit_id:
+            error = "Repository name or base commit is unavailable from the benchmark record"
+            print(f"Error: {error}")
+            result["status"] = "failed"
+            result["failed_files"].append({"error": error})
+            self._save_run_audit(result, output_dir)
+            if save_to_jsonl:
+                self._save_result_to_jsonl(result, output_dir)
+            return
+
         problem_statement = self._build_issue_context(locate_result, dataset_info)
         problem_statement = problem_statement.replace('\r', '')
+        result["problem_statement_tokens"] = self.count_tokens(problem_statement)
 
         # Format related code entities, with file diversity and token-budgeted prompt assembly.
         methods = []
@@ -2112,24 +2446,7 @@ def build_user_record(name):
         resolved_repo_identifier = repo_identifier or instance_id.rsplit('-', 1)[0].replace('--', '__')
         resolved_repo_path = os.path.join(resolved_playground_dir, resolved_repo_identifier)
         methods = self._enrich_methods_with_file_context(methods, resolved_repo_path, commit_id)
-        if self.api_type == "openai_compat" and not self._prefer_ultra_compact_first():
-            content_all = self._build_agentless_style_repair_context(problem_statement, methods)
-            if not content_all:
-                content_all = self._build_compact_repair_context(problem_statement, methods)
-            if not content_all:
-                content_all = self._build_repair_context(problem_statement, methods)
-        elif self._prefer_ultra_compact_first():
-            content_all = self._build_ultra_compact_repair_context(problem_statement, methods)
-            if not content_all:
-                content_all = self._build_compact_repair_context(problem_statement, methods)
-            if not content_all:
-                content_all = self._build_repair_context(problem_statement, methods)
-        elif self._prefer_compact_first():
-            content_all = self._build_compact_repair_context(problem_statement, methods)
-            if not content_all:
-                content_all = self._build_repair_context(problem_statement, methods)
-        else:
-            content_all = self._build_repair_context(problem_statement, methods)
+        content_all = self._build_first_repair_context(problem_statement, methods)
 
         # Build the final prompt
         current_prompt = self._get_prompt_template().format(
@@ -2140,6 +2457,25 @@ def build_user_record(name):
             code_example=self.code_example,
             code_block_lang=self.code_block_lang
         )
+        result["repair_profile"] = (
+            "expanded" if self._expanded_repair_profile() else "compact"
+        )
+        result["response_prefill"] = bool(self._get_response_prefill())
+        result["first_prompt_profile"] = self._first_prompt_profile()
+        result["candidate_entity_count"] = len(methods)
+        result["candidate_file_count"] = len(
+            {item.get("file_path") for item in methods if item.get("file_path")}
+        )
+        result["candidate_class_scope_count"] = sum(
+            bool(item.get("_context_class")) for item in methods
+        )
+        result["first_prompt_rendered_entity_count"] = content_all.count(
+            "- signature :"
+        )
+        result["first_prompt_source_entity_count"] = content_all.count(
+            "- source_authority :"
+        )
+        result["first_prompt_tokens"] = self.count_tokens(current_prompt)
         
         print("Prompt constructed. Calling LLM to generate patch...")
 
@@ -2160,6 +2496,8 @@ def build_user_record(name):
         result["applied_files"] = first_attempt["applied_files"]
         result["failed_files"] = first_attempt["failed_files"]
         result["status"] = first_attempt["status"]
+        result["first_attempt_status"] = first_attempt["status"]
+        result["retry_attempts"] = []
 
         if result["status"] == "failed":
             failure_reason = "; ".join(
@@ -2212,10 +2550,9 @@ def build_user_record(name):
                     continue
                 seen_retry_contents.add(key)
                 deduped_retry_variants.append((retry_label, retry_content, no_op_failure))
-            if self._expanded_repair_profile():
-                deduped_retry_variants = deduped_retry_variants[:2]
-            elif self._prefer_ultra_compact_first():
-                deduped_retry_variants = deduped_retry_variants[:1]
+            deduped_retry_variants = deduped_retry_variants[
+                : self._get_max_retries()
+            ]
 
             for retry_label, retry_content, no_op_failure in deduped_retry_variants:
                 if not retry_content:
@@ -2240,6 +2577,13 @@ def build_user_record(name):
                     instance_id, retry_prompt, output_file, locations_dir, playground_dir,
                     repo_identifier, repo_name, commit_id
                 )
+                result["retry_attempts"].append(
+                    {
+                        "label": retry_label,
+                        "prompt_tokens": self.count_tokens(retry_prompt),
+                        "status": retry_attempt["status"],
+                    }
+                )
                 if retry_attempt["status"] != "failed" or retry_attempt["raw_patch_content"].strip():
                     result["raw_patch_content"] = retry_attempt["raw_patch_content"]
                     result["processed_patches"] = retry_attempt["processed_patches"]
@@ -2251,6 +2595,7 @@ def build_user_record(name):
 
         if result["status"] != "success":
             self._persist_failure_artifacts(result, output_file)
+        self._save_run_audit(result, output_dir)
         if save_to_jsonl:
             self._save_result_to_jsonl(result, output_dir)
 
@@ -2270,8 +2615,43 @@ if __name__ == "__main__":
     parser.add_argument("--base-url", type=str, default=None, help="Override base URL for OpenAI-compatible APIs")
     parser.add_argument("--api-key-env", type=str, default=None, help="Environment variable name that stores the API key")
     parser.add_argument("--extra-body-json", type=str, default=None, help="Extra JSON body for OpenAI-compatible APIs")
+    parser.add_argument(
+        "--dataset-file",
+        type=str,
+        help="Frozen benchmark JSONL used for repo, base commit, and issue text",
+    )
+    parser.add_argument(
+        "--first-prompt-profile",
+        choices=["auto", "ultra", "compact", "breadth", "full"],
+        help="Deterministic first-attempt context profile (default: legacy auto policy)",
+    )
+    parser.add_argument("--prompt-token-limit", type=int, help="Override the input prompt token ceiling")
+    parser.add_argument("--completion-max-tokens", type=int, help="Override the completion token ceiling")
+    parser.add_argument(
+        "--response-prefill",
+        choices=["on", "off"],
+        help="Enable or disable assistant-message response prefill",
+    )
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        help="Maximum number of failure-conditioned generation retries",
+    )
     
     args = parser.parse_args()
+
+    if args.first_prompt_profile:
+        os.environ["MURAL_REPAIR_FIRST_PROMPT_PROFILE"] = args.first_prompt_profile
+    if args.prompt_token_limit:
+        os.environ["MURAL_REPAIR_PROMPT_TOKEN_LIMIT"] = str(args.prompt_token_limit)
+    if args.completion_max_tokens:
+        os.environ["MURAL_REPAIR_COMPLETION_MAX_TOKENS"] = str(args.completion_max_tokens)
+    if args.dataset_file:
+        os.environ["SWE_BENCH_LOCAL_FILE"] = os.path.abspath(args.dataset_file)
+    if args.response_prefill:
+        os.environ["MURAL_REPAIR_RESPONSE_PREFILL"] = args.response_prefill
+    if args.max_retries is not None:
+        os.environ["MURAL_REPAIR_MAX_RETRIES"] = str(args.max_retries)
 
     # The output directory for patches will be inside the run directory
     patch_dir = os.path.join(os.path.dirname(args.final_locations_dir), "patches")
@@ -2284,7 +2664,10 @@ if __name__ == "__main__":
         model_name_override=args.model,
         base_url_override=args.base_url,
         api_key_env=args.api_key_env,
-        extra_body_json=args.extra_body_json,
+        extra_body_json=(
+            args.extra_body_json
+            or os.environ.get("MURAL_REPAIR_EXTRA_BODY_JSON")
+        ),
     )
 
     # Determine whether to save to JSONL

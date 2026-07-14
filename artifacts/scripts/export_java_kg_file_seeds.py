@@ -63,6 +63,7 @@ def ranked_files(payload: dict[str, Any], repo_id: str, depth: int, max_files: i
             0 if file_evidence[path]["direct_anchor"] else 1,
             file_evidence[path]["distance"],
             -file_evidence[path]["support"],
+            first_entity_rank.get(path, depth + 1),
             path,
         ),
     )

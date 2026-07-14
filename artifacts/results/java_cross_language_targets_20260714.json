@@ -24,7 +24,8 @@
         "dubbo-common/src/main/java/org/apache/dubbo/common/utils/CompatibleTypeUtils.java",
         "dubbo-common/src/main/java/org/apache/dubbo/common/utils/PojoUtils.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "apache__dubbo-11781",
@@ -34,7 +35,8 @@
       "patched_files": [
         "dubbo-common/src/main/java/org/apache/dubbo/common/URLStrParser.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "apache__dubbo-7041",
@@ -44,14 +46,14 @@
       "patched_files": [
         "dubbo-common/src/main/java/org/apache/dubbo/common/utils/ReflectUtils.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "apache__dubbo-9187",
       "targets": [
         "class|dubbo-common/src/main/java/org/apache/dubbo/common/extension/DisableInject.java|25|29|org.apache.dubbo.common.extension.DisableInject",
         "class|dubbo-common/src/main/java/org/apache/dubbo/common/extension/ExtensionLoader.java|84|1084|org.apache.dubbo.common.extension.ExtensionLoader",
-        "file:dubbo-common/src/main/java/org/apache/dubbo/common/extension/Inject.java",
         "method|dubbo-common/src/main/java/org/apache/dubbo/common/config/Environment.java|182|185|org.apache.dubbo.common.config.Environment.setConfigCenterFirst",
         "method|dubbo-common/src/main/java/org/apache/dubbo/common/config/Environment.java|191|194|org.apache.dubbo.common.config.Environment.setDynamicConfiguration",
         "method|dubbo-common/src/main/java/org/apache/dubbo/common/config/Environment.java|80|85|org.apache.dubbo.common.config.Environment.setExternalConfigMap",
@@ -77,7 +79,8 @@
         "dubbo-metadata/dubbo-metadata-report-zookeeper/src/main/java/org/apache/dubbo/metadata/store/zookeeper/ZookeeperMetadataReportFactory.java",
         "dubbo-registry/dubbo-registry-zookeeper/src/main/java/org/apache/dubbo/registry/zookeeper/ZookeeperRegistryFactory.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-1016",
@@ -93,7 +96,8 @@
         "src/main/java/com/fasterxml/jackson/core/json/UTF8DataInputJsonParser.java",
         "src/main/java/com/fasterxml/jackson/core/json/async/NonBlockingJsonParserBase.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-1053",
@@ -105,7 +109,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/core/Version.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-1133",
@@ -119,7 +124,6 @@
         "class|src/main/java/tools/jackson/core/json/ReaderBasedJsonParser.java|20|3044|tools.jackson.core.json.ReaderBasedJsonParser",
         "class|src/main/java/tools/jackson/core/json/UTF8DataInputJsonParser.java|36|3006|tools.jackson.core.json.UTF8DataInputJsonParser",
         "class|src/main/java/tools/jackson/core/json/UTF8StreamJsonParser.java|20|4231|tools.jackson.core.json.UTF8StreamJsonParser",
-        "file:src/main/java/tools/jackson/core/exc/JacksonIOException.java",
         "method|src/main/java/tools/jackson/core/JsonGenerator.java|2179|2181|tools.jackson.core.JsonGenerator._wrapIOFailure",
         "method|src/main/java/tools/jackson/core/TokenStreamFactory.java|1442|1444|tools.jackson.core.TokenStreamFactory._wrapIOFailure",
         "method|src/main/java/tools/jackson/core/base/ParserMinimalBase.java|1101|1103|tools.jackson.core.base.ParserMinimalBase._wrapIOFailure",
@@ -139,13 +143,13 @@
         "src/main/java/tools/jackson/core/json/UTF8DataInputJsonParser.java",
         "src/main/java/tools/jackson/core/json/UTF8StreamJsonParser.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-1142",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/core/Version.java|16|170|com.fasterxml.jackson.core.Version",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/Version.java|104|113|com.fasterxml.jackson.core.Version.toString",
         "method|src/main/java/com/fasterxml/jackson/core/Version.java|115|118|com.fasterxml.jackson.core.Version.hashCode",
         "method|src/main/java/com/fasterxml/jackson/core/Version.java|120|134|com.fasterxml.jackson.core.Version.equals",
@@ -155,13 +159,12 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/core/Version.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-1172",
       "targets": [
-        "file:release-notes/CREDITS-2.x",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/JsonPointer.java|367|383|com.fasterxml.jackson.core.JsonPointer.append",
         "method|src/main/java/com/fasterxml/jackson/core/JsonPointer.java|410|419|com.fasterxml.jackson.core.JsonPointer.appendProperty",
         "method|src/main/java/com/fasterxml/jackson/core/JsonPointer.java|435|445|com.fasterxml.jackson.core.JsonPointer.appendIndex",
@@ -174,14 +177,14 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/core/JsonPointer.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-core-1182",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/core/JsonParser.java|27|2556|com.fasterxml.jackson.core.JsonParser",
         "class|src/main/java/com/fasterxml/jackson/core/JsonParser.java|41|43|com.fasterxml.jackson.core.JsonParser.NumberType",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/util/JsonParserDelegate.java|247|248|com.fasterxml.jackson.core.util.JsonParserDelegate.getNumberValue"
       ],
       "patched_files": [
@@ -189,7 +192,8 @@
         "src/main/java/com/fasterxml/jackson/core/JsonParser.java",
         "src/main/java/com/fasterxml/jackson/core/util/JsonParserDelegate.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-1204",
@@ -200,7 +204,6 @@
         "class|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|242|297|com.fasterxml.jackson.core.util.RecyclerPool.LockFreePoolBase",
         "class|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|306|350|com.fasterxml.jackson.core.util.RecyclerPool.BoundedPoolBase",
         "class|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|41|351|com.fasterxml.jackson.core.util.RecyclerPool",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/json/ReaderBasedJsonParser.java|273|304|com.fasterxml.jackson.core.json.ReaderBasedJsonParser._loadMore"
       ],
       "patched_files": [
@@ -208,21 +211,22 @@
         "src/main/java/com/fasterxml/jackson/core/json/ReaderBasedJsonParser.java",
         "src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-1208",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/core/JsonFactory.java|46|2322|com.fasterxml.jackson.core.JsonFactory",
         "field|src/main/java/com/fasterxml/jackson/core/JsonFactory.java|225|225|com.fasterxml.jackson.core.JsonFactory._rootCharSymbols",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/JsonFactory.java|872|875|com.fasterxml.jackson.core.JsonFactory.setStreamReadConstraints"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/core/JsonFactory.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-1263",
@@ -234,7 +238,6 @@
         "class|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|41|400|com.fasterxml.jackson.core.util.RecyclerPool",
         "field|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|326|326|com.fasterxml.jackson.core.util.RecyclerPool.LockFreePoolBase.Node.value",
         "field|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|327|327|com.fasterxml.jackson.core.util.RecyclerPool.LockFreePoolBase.Node.next",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|265|269|com.fasterxml.jackson.core.util.RecyclerPool.ConcurrentDequePoolBase.clear",
         "method|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|329|331|com.fasterxml.jackson.core.util.RecyclerPool.LockFreePoolBase.Node.Node",
         "method|src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java|388|392|com.fasterxml.jackson.core.util.RecyclerPool.BoundedPoolBase.clear"
@@ -243,26 +246,25 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/core/util/RecyclerPool.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-1309",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/core/io/NumberInput.java|16|594|com.fasterxml.jackson.core.io.NumberInput",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/io/NumberInput.java|583|593|com.fasterxml.jackson.core.io.NumberInput.looksLikeValidNumber"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/core/io/NumberInput.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-150",
       "targets": [
-        "file:pom.xml",
-        "file:release-notes/VERSION",
         "method|src/main/java/com/fasterxml/jackson/core/json/UTF8StreamJsonParser.java|1189|1229|com.fasterxml.jackson.core.json.UTF8StreamJsonParser._parsePosNumber",
         "method|src/main/java/com/fasterxml/jackson/core/util/TextBuffer.java|580|588|com.fasterxml.jackson.core.util.TextBuffer.expandCurrentSegment"
       ],
@@ -272,7 +274,8 @@
         "src/main/java/com/fasterxml/jackson/core/json/UTF8StreamJsonParser.java",
         "src/main/java/com/fasterxml/jackson/core/util/TextBuffer.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-core-174",
@@ -282,7 +285,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/core/JsonPointer.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-183",
@@ -292,7 +296,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/core/util/TextBuffer.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-370",
@@ -304,7 +309,8 @@
         "src/main/java/com/fasterxml/jackson/core/json/ReaderBasedJsonParser.java",
         "src/main/java/com/fasterxml/jackson/core/json/UTF8DataInputJsonParser.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-380",
@@ -318,7 +324,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/core/filter/FilteringParserDelegate.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-566",
@@ -328,7 +335,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/core/JsonGenerator.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-729",
@@ -345,7 +353,8 @@
         "src/main/java/com/fasterxml/jackson/core/filter/TokenFilter.java",
         "src/main/java/com/fasterxml/jackson/core/filter/TokenFilterContext.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-891",
@@ -357,7 +366,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/core/filter/FilteringGeneratorDelegate.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-894",
@@ -369,7 +379,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/core/filter/FilteringGeneratorDelegate.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-922",
@@ -386,39 +397,39 @@
         "src/main/java/com/fasterxml/jackson/core/json/UTF8DataInputJsonParser.java",
         "src/main/java/com/fasterxml/jackson/core/json/UTF8StreamJsonParser.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-core-964",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/core/JsonFactory.java|44|2127|com.fasterxml.jackson.core.JsonFactory",
-        "field|src/main/java/com/fasterxml/jackson/core/JsonFactory.java|279|279|com.fasterxml.jackson.core.JsonFactory._streamReadConstraints",
-        "file:release-notes/VERSION-2.x"
+        "field|src/main/java/com/fasterxml/jackson/core/JsonFactory.java|279|279|com.fasterxml.jackson.core.JsonFactory._streamReadConstraints"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/core/JsonFactory.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-973",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/io/BigDecimalParser.java|171|182|com.fasterxml.jackson.core.io.BigDecimalParser.toBigDecimalRec"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/core/io/BigDecimalParser.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-core-980",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/core/StreamReadConstraints.java|25|286|com.fasterxml.jackson.core.StreamReadConstraints",
         "field|src/main/java/com/fasterxml/jackson/core/StreamReadConstraints.java|45|45|com.fasterxml.jackson.core.StreamReadConstraints._maxNestingDepth",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/core/base/ParserBase.java|1218|1221|com.fasterxml.jackson.core.base.ParserBase._convertBigDecimalToBigInteger"
       ],
       "patched_files": [
@@ -426,7 +437,8 @@
         "src/main/java/com/fasterxml/jackson/core/StreamReadConstraints.java",
         "src/main/java/com/fasterxml/jackson/core/base/ParserBase.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-1113",
@@ -436,7 +448,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/DeserializationContext.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-1650",
@@ -446,19 +459,20 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/type/ResolvedRecursiveType.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-1923",
       "targets": [
-        "file:release-notes/VERSION",
         "method|src/main/java/com/fasterxml/jackson/databind/jsontype/impl/SubTypeValidator.java|67|98|com.fasterxml.jackson.databind.jsontype.impl.SubTypeValidator.validateSubType"
       ],
       "patched_files": [
         "release-notes/VERSION",
         "src/main/java/com/fasterxml/jackson/databind/jsontype/impl/SubTypeValidator.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-2002",
@@ -468,7 +482,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-2036",
@@ -480,7 +495,8 @@
         "src/main/java/com/fasterxml/jackson/databind/DeserializationFeature.java",
         "src/main/java/com/fasterxml/jackson/databind/jsontype/impl/StdTypeResolverBuilder.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3371",
@@ -490,7 +506,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/deser/SettableBeanProperty.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3509",
@@ -508,13 +525,13 @@
         "src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java",
         "src/main/java/com/fasterxml/jackson/databind/type/LogicalType.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3560",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/deser/SettableAnyProperty.java|23|245|com.fasterxml.jackson.databind.deser.SettableAnyProperty",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/JsonMappingException.java|296|298|com.fasterxml.jackson.databind.JsonMappingException.from",
         "method|src/main/java/com/fasterxml/jackson/databind/JsonMappingException.java|303|305|com.fasterxml.jackson.databind.JsonMappingException.from",
         "method|src/main/java/com/fasterxml/jackson/databind/JsonMappingException.java|310|312|com.fasterxml.jackson.databind.JsonMappingException.from",
@@ -527,12 +544,12 @@
         "src/main/java/com/fasterxml/jackson/databind/JsonMappingException.java",
         "src/main/java/com/fasterxml/jackson/databind/deser/SettableAnyProperty.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-3621",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java|1085|1141|com.fasterxml.jackson.databind.deser.std.StdDeserializer._parseDoublePrimitive",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java|1244|1268|com.fasterxml.jackson.databind.deser.std.StdDeserializer._parseDateFromArray",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java|2042|2048|com.fasterxml.jackson.databind.deser.std.StdDeserializer._verifyEndArrayForSingle",
@@ -548,13 +565,13 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-3622",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/DeserializationFeature.java|20|514|com.fasterxml.jackson.databind.DeserializationFeature",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializer.java|602|641|com.fasterxml.jackson.databind.deser.BeanDeserializer._deserializeFromArray",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java|1041|1095|com.fasterxml.jackson.databind.deser.std.StdDeserializer._parseDoublePrimitive",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java|1199|1223|com.fasterxml.jackson.databind.deser.std.StdDeserializer._parseDateFromArray",
@@ -573,7 +590,8 @@
         "src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializer.java",
         "src/main/java/com/fasterxml/jackson/databind/deser/std/StdDeserializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-3625",
@@ -583,7 +601,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/cfg/CoercionConfigs.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3626",
@@ -594,7 +613,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/ObjectMapper.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3666",
@@ -606,7 +626,8 @@
         "src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializer.java",
         "src/main/java/com/fasterxml/jackson/databind/deser/std/FactoryBasedEnumDeserializer.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3701",
@@ -616,13 +637,12 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/node/NodeCursor.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3716",
       "targets": [
-        "file:release-notes/VERSION-2.x",
-        "file:src/main/java/com/fasterxml/jackson/databind/jsontype/impl/AsDeductionTypeSerializer.java",
         "method|src/main/java/com/fasterxml/jackson/databind/jsontype/impl/StdTypeResolverBuilder.java|98|134|com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder.buildTypeSerializer"
       ],
       "patched_files": [
@@ -630,7 +650,8 @@
         "src/main/java/com/fasterxml/jackson/databind/jsontype/impl/AsDeductionTypeSerializer.java",
         "src/main/java/com/fasterxml/jackson/databind/jsontype/impl/StdTypeResolverBuilder.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-databind-3851",
@@ -642,7 +663,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/deser/std/FactoryBasedEnumDeserializer.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-3860",
@@ -653,14 +675,14 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/deser/std/StdNodeBasedDeserializer.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4013",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/type/TypeParser.java|95|135|com.fasterxml.jackson.databind.type.TypeParser.MyTokenizer",
         "field|src/main/java/com/fasterxml/jackson/databind/type/TypeParser.java|17|17|com.fasterxml.jackson.databind.type.TypeParser._factory",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/type/TypeParser.java|30|39|com.fasterxml.jackson.databind.type.TypeParser.parse",
         "method|src/main/java/com/fasterxml/jackson/databind/type/TypeParser.java|41|61|com.fasterxml.jackson.databind.type.TypeParser.parseType",
         "method|src/main/java/com/fasterxml/jackson/databind/type/TypeParser.java|63|77|com.fasterxml.jackson.databind.type.TypeParser.parseTypes",
@@ -670,14 +692,13 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/type/TypeParser.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4015",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/DeserializationFeature.java|21|525|com.fasterxml.jackson.databind.DeserializationFeature",
-        "file:release-notes/CREDITS-2.x",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/cfg/CoercionConfigs.java|161|250|com.fasterxml.jackson.databind.cfg.CoercionConfigs.findCoercion",
         "method|src/main/java/com/fasterxml/jackson/databind/cfg/CoercionConfigs.java|329|334|com.fasterxml.jackson.databind.cfg.CoercionConfigs._isScalarType"
       ],
@@ -687,14 +708,13 @@
         "src/main/java/com/fasterxml/jackson/databind/DeserializationFeature.java",
         "src/main/java/com/fasterxml/jackson/databind/cfg/CoercionConfigs.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-databind-4048",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/MapperFeature.java|17|663|com.fasterxml.jackson.databind.MapperFeature",
-        "file:release-notes/CREDITS-2.x",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java|510|631|com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._addFields"
       ],
       "patched_files": [
@@ -703,7 +723,8 @@
         "src/main/java/com/fasterxml/jackson/databind/MapperFeature.java",
         "src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-databind-4050",
@@ -713,7 +734,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/ObjectMapper.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4072",
@@ -723,13 +745,13 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/deser/std/ThrowableDeserializer.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4087",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/util/BeanUtil.java|15|340|com.fasterxml.jackson.databind.util.BeanUtil",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/util/BeanUtil.java|297|317|com.fasterxml.jackson.databind.util.BeanUtil.checkUnsupportedType",
         "method|src/main/java/com/fasterxml/jackson/databind/util/BeanUtil.java|326|328|com.fasterxml.jackson.databind.util.BeanUtil.isJava8TimeClass",
         "method|src/main/java/com/fasterxml/jackson/databind/util/BeanUtil.java|337|339|com.fasterxml.jackson.databind.util.BeanUtil.isJodaTimeClass"
@@ -738,13 +760,13 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/util/BeanUtil.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4131",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/JsonNode.java|42|1506|com.fasterxml.jackson.databind.JsonNode",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/node/BaseJsonNode.java|182|201|com.fasterxml.jackson.databind.node.BaseJsonNode.withArray",
         "method|src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java|114|136|com.fasterxml.jackson.databind.node.ObjectNode._withObject",
         "method|src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java|92|112|com.fasterxml.jackson.databind.node.ObjectNode.withArray"
@@ -755,13 +777,13 @@
         "src/main/java/com/fasterxml/jackson/databind/node/BaseJsonNode.java",
         "src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4132",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/JsonNode.java|42|1566|com.fasterxml.jackson.databind.JsonNode",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/JsonNode.java|1154|1156|com.fasterxml.jackson.databind.JsonNode.withObject",
         "method|src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java|92|104|com.fasterxml.jackson.databind.node.ObjectNode.withObjectProperty"
       ],
@@ -770,7 +792,8 @@
         "src/main/java/com/fasterxml/jackson/databind/JsonNode.java",
         "src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4159",
@@ -781,19 +804,20 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/ObjectMapper.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4186",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializer.java|294|319|com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4189",
@@ -808,37 +832,37 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerBase.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4219",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/BasicDeserializerFactory.java|1328|1366|com.fasterxml.jackson.databind.deser.BasicDeserializerFactory.createArrayDeserializer"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/BasicDeserializerFactory.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4228",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerBase.java|27|1911|com.fasterxml.jackson.databind.deser.BeanDeserializerBase",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerBase.java|696|721|com.fasterxml.jackson.databind.deser.BeanDeserializerBase._findDelegateDeserializer"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerBase.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4230",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java|382|399|com.fasterxml.jackson.databind.node.ObjectNode.findValues",
         "method|src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java|401|418|com.fasterxml.jackson.databind.node.ObjectNode.findValuesAsText",
         "method|src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java|436|453|com.fasterxml.jackson.databind.node.ObjectNode.findParents"
@@ -847,12 +871,12 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4249",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/ThrowableDeserializer.java|78|198|com.fasterxml.jackson.databind.deser.std.ThrowableDeserializer.deserializeFromObject",
         "method|src/main/java/com/fasterxml/jackson/databind/util/ClassUtil.java|691|699|com.fasterxml.jackson.databind.util.ClassUtil.getTypeDescription"
       ],
@@ -861,7 +885,8 @@
         "src/main/java/com/fasterxml/jackson/databind/deser/std/ThrowableDeserializer.java",
         "src/main/java/com/fasterxml/jackson/databind/util/ClassUtil.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4257",
@@ -871,13 +896,13 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertyBuilder.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4265",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java|28|551|com.fasterxml.jackson.databind.deser.std.CollectionDeserializer",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java|336|379|com.fasterxml.jackson.databind.deser.std.CollectionDeserializer._deserializeFromArray",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java|386|425|com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.handleNonArray"
       ],
@@ -885,7 +910,8 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4304",
@@ -899,13 +925,12 @@
         "src/main/java/com/fasterxml/jackson/databind/jsontype/impl/ClassNameIdResolver.java",
         "src/main/java/com/fasterxml/jackson/databind/jsontype/impl/TypeNameIdResolver.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4311",
       "targets": [
-        "file:release-notes/CREDITS-2.x",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java|1123|1172|com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._renameUsing"
       ],
       "patched_files": [
@@ -913,13 +938,13 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-databind-4320",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java|30|580|com.fasterxml.jackson.databind.deser.std.CollectionDeserializer",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java|392|435|com.fasterxml.jackson.databind.deser.std.CollectionDeserializer.handleNonArray",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java|437|480|com.fasterxml.jackson.databind.deser.std.CollectionDeserializer._deserializeWithObjectId",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java|488|500|com.fasterxml.jackson.databind.deser.std.CollectionDeserializer._tryToAddNull"
@@ -928,51 +953,51 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/std/CollectionDeserializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4325",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/deser/std/ThrowableDeserializer.java|16|199|com.fasterxml.jackson.databind.deser.std.ThrowableDeserializer",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/ThrowableDeserializer.java|78|198|com.fasterxml.jackson.databind.deser.std.ThrowableDeserializer.deserializeFromObject"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/std/ThrowableDeserializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4338",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/ser/std/ReferenceTypeSerializer.java|197|281|com.fasterxml.jackson.databind.ser.std.ReferenceTypeSerializer.createContextual"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/ser/std/ReferenceTypeSerializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4360",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/util/EnumValues.java|110|139|com.fasterxml.jackson.databind.util.EnumValues.constructFromToString"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/util/EnumValues.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4365",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/AnnotationIntrospector.java|38|1621|com.fasterxml.jackson.databind.AnnotationIntrospector",
         "class|src/main/java/com/fasterxml/jackson/databind/introspect/AnnotationIntrospectorPair.java|35|854|com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/AnnotationIntrospector.java|426|429|com.fasterxml.jackson.databind.AnnotationIntrospector.findPropertiesToIgnore",
         "method|src/main/java/com/fasterxml/jackson/databind/AnnotationIntrospector.java|441|442|com.fasterxml.jackson.databind.AnnotationIntrospector.findIgnoreUnknownProperties",
         "method|src/main/java/com/fasterxml/jackson/databind/PropertyName.java|111|121|com.fasterxml.jackson.databind.PropertyName.internSimpleName",
@@ -992,13 +1017,12 @@
         "src/main/java/com/fasterxml/jackson/databind/PropertyName.java",
         "src/main/java/com/fasterxml/jackson/databind/introspect/AnnotationIntrospectorPair.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4426",
       "targets": [
-        "file:release-notes/CREDITS-2.x",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java|735|783|com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._addCreatorParam"
       ],
       "patched_files": [
@@ -1006,13 +1030,13 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-databind-4468",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/ext/CoreXMLDeserializers.java|20|143|com.fasterxml.jackson.databind.ext.CoreXMLDeserializers",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/FromStringDeserializer.java|245|262|com.fasterxml.jackson.databind.deser.std.FromStringDeserializer._deserializeFromEmptyString",
         "method|src/main/java/com/fasterxml/jackson/databind/ext/CoreXMLDeserializers.java|128|141|com.fasterxml.jackson.databind.ext.CoreXMLDeserializers.Std._gregorianFromDate"
       ],
@@ -1021,7 +1045,8 @@
         "src/main/java/com/fasterxml/jackson/databind/deser/std/FromStringDeserializer.java",
         "src/main/java/com/fasterxml/jackson/databind/ext/CoreXMLDeserializers.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4469",
@@ -1035,38 +1060,37 @@
         "src/main/java/com/fasterxml/jackson/databind/deser/impl/FieldProperty.java",
         "src/main/java/com/fasterxml/jackson/databind/deser/impl/MethodProperty.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-databind-4486",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/std/EnumDeserializer.java|488|491|com.fasterxml.jackson.databind.deser.std.EnumDeserializer.useNullForUnknownEnum"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/std/EnumDeserializer.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4487",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/type/TypeFactory.java|1618|1656|com.fasterxml.jackson.databind.type.TypeFactory._fromWellKnownClass"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/type/TypeFactory.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4609",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerBase.java|29|1986|com.fasterxml.jackson.databind.deser.BeanDeserializerBase",
-        "file:release-notes/CREDITS-2.x",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerBase.java|1482|1512|com.fasterxml.jackson.databind.deser.BeanDeserializerBase.deserializeFromObjectUsingNonDefault"
       ],
       "patched_files": [
@@ -1074,7 +1098,8 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerBase.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-databind-4615",
@@ -1086,7 +1111,6 @@
         "field|src/main/java/com/fasterxml/jackson/databind/introspect/PotentialCreator.java|22|22|com.fasterxml.jackson.databind.introspect.PotentialCreator.creatorMode",
         "field|src/main/java/com/fasterxml/jackson/databind/introspect/PotentialCreator.java|24|24|com.fasterxml.jackson.databind.introspect.PotentialCreator.implicitParamNames",
         "field|src/main/java/com/fasterxml/jackson/databind/introspect/PotentialCreator.java|26|26|com.fasterxml.jackson.databind.introspect.PotentialCreator.explicitParamNames",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java|642|730|com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._addCreators",
         "method|src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java|734|744|com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._isDelegatingConstructor",
         "method|src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java|746|758|com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector._collectCreators",
@@ -1114,7 +1138,8 @@
         "src/main/java/com/fasterxml/jackson/databind/introspect/POJOPropertiesCollector.java",
         "src/main/java/com/fasterxml/jackson/databind/introspect/PotentialCreator.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-databind-4641",
@@ -1124,7 +1149,8 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/databind/deser/BeanDeserializerFactory.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-dataformat-xml-531",
@@ -1135,8 +1161,6 @@
         "class|src/main/java/com/fasterxml/jackson/dataformat/xml/XmlMapper.java|48|111|com.fasterxml.jackson.dataformat.xml.XmlMapper.Builder",
         "class|src/main/java/com/fasterxml/jackson/dataformat/xml/deser/XmlTokenStream.java|26|809|com.fasterxml.jackson.dataformat.xml.deser.XmlTokenStream",
         "class|src/main/java/com/fasterxml/jackson/dataformat/xml/ser/ToXmlGenerator.java|32|1377|com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator",
-        "file:src/main/java/com/fasterxml/jackson/dataformat/xml/XmlTagProcessor.java",
-        "file:src/main/java/com/fasterxml/jackson/dataformat/xml/XmlTagProcessors.java",
         "method|src/main/java/com/fasterxml/jackson/dataformat/xml/XmlFactory.java|105|130|com.fasterxml.jackson.dataformat.xml.XmlFactory.XmlFactory",
         "method|src/main/java/com/fasterxml/jackson/dataformat/xml/XmlFactory.java|135|143|com.fasterxml.jackson.dataformat.xml.XmlFactory.XmlFactory",
         "method|src/main/java/com/fasterxml/jackson/dataformat/xml/XmlFactory.java|150|159|com.fasterxml.jackson.dataformat.xml.XmlFactory.XmlFactory",
@@ -1169,7 +1193,8 @@
         "src/main/java/com/fasterxml/jackson/dataformat/xml/deser/XmlTokenStream.java",
         "src/main/java/com/fasterxml/jackson/dataformat/xml/ser/ToXmlGenerator.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "fasterxml__jackson-dataformat-xml-544",
@@ -1181,38 +1206,37 @@
       "patched_files": [
         "src/main/java/com/fasterxml/jackson/dataformat/xml/ser/ToXmlGenerator.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "fasterxml__jackson-dataformat-xml-590",
       "targets": [
-        "class|src/main/java/com/fasterxml/jackson/dataformat/xml/JacksonXmlAnnotationIntrospector.java|20|227|com.fasterxml.jackson.dataformat.xml.JacksonXmlAnnotationIntrospector",
-        "file:release-notes/VERSION-2.x"
+        "class|src/main/java/com/fasterxml/jackson/dataformat/xml/JacksonXmlAnnotationIntrospector.java|20|227|com.fasterxml.jackson.dataformat.xml.JacksonXmlAnnotationIntrospector"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/dataformat/xml/JacksonXmlAnnotationIntrospector.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-dataformat-xml-638",
       "targets": [
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/dataformat/xml/JacksonXmlAnnotationIntrospector.java|117|130|com.fasterxml.jackson.dataformat.xml.JacksonXmlAnnotationIntrospector.findNamespace"
       ],
       "patched_files": [
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/dataformat/xml/JacksonXmlAnnotationIntrospector.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "fasterxml__jackson-dataformat-xml-644",
       "targets": [
         "class|src/main/java/com/fasterxml/jackson/dataformat/xml/ser/ToXmlGenerator.java|46|137|com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator.Feature",
-        "file:release-notes/CREDITS-2.x",
-        "file:release-notes/VERSION-2.x",
         "method|src/main/java/com/fasterxml/jackson/dataformat/xml/ser/ToXmlGenerator.java|1174|1200|com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator.writeNumber",
         "method|src/main/java/com/fasterxml/jackson/dataformat/xml/ser/ToXmlGenerator.java|1202|1228|com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator.writeNumber"
       ],
@@ -1221,7 +1245,8 @@
         "release-notes/VERSION-2.x",
         "src/main/java/com/fasterxml/jackson/dataformat/xml/ser/ToXmlGenerator.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "google__gson-1093",
@@ -1231,7 +1256,8 @@
       "patched_files": [
         "gson/src/main/java/com/google/gson/stream/JsonWriter.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "google__gson-1391",
@@ -1242,7 +1268,8 @@
       "patched_files": [
         "gson/src/main/java/com/google/gson/internal/$Gson$Types.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "google__gson-1555",
@@ -1257,7 +1284,8 @@
         "gson/src/main/java/com/google/gson/internal/bind/JsonAdapterAnnotationTypeAdapterFactory.java",
         "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "google__gson-1703",
@@ -1271,7 +1299,8 @@
       "patched_files": [
         "gson/src/main/java/com/google/gson/internal/Streams.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "google__gson-1787",
@@ -1279,8 +1308,6 @@
         "class|gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java|41|165|com.google.gson.internal.bind.TreeTypeAdapter",
         "class|gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java|28|82|com.google.gson.internal.bind.TypeAdapterRuntimeTypeWrapper",
         "field|gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java|42|42|com.google.gson.internal.bind.TreeTypeAdapter.serializer",
-        "file:gson/src/main/java/com/google/gson/Gson.java",
-        "file:gson/src/main/java/com/google/gson/internal/bind/SerializationDelegatingTypeAdapter.java",
         "method|gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java|44|70|com.google.gson.internal.bind.TypeAdapterRuntimeTypeWrapper.write",
         "method|gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java|75|81|com.google.gson.internal.bind.TypeAdapterRuntimeTypeWrapper.getRuntimeTypeIfMoreSpecific"
       ],
@@ -1290,14 +1317,12 @@
         "gson/src/main/java/com/google/gson/internal/bind/TreeTypeAdapter.java",
         "gson/src/main/java/com/google/gson/internal/bind/TypeAdapterRuntimeTypeWrapper.java"
       ],
-      "file_fallbacks": 2
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 2
     },
     {
       "instance_id": "googlecontainertools__jib-2536",
       "targets": [
-        "file:jib-core/CHANGELOG.md",
-        "file:jib-gradle-plugin/CHANGELOG.md",
-        "file:jib-maven-plugin/CHANGELOG.md",
         "method|jib-core/src/main/java/com/google/cloud/tools/jib/registry/credentials/DockerConfigCredentialRetriever.java|115|165|com.google.cloud.tools.jib.registry.credentials.DockerConfigCredentialRetriever.retrieve"
       ],
       "patched_files": [
@@ -1306,7 +1331,8 @@
         "jib-gradle-plugin/CHANGELOG.md",
         "jib-maven-plugin/CHANGELOG.md"
       ],
-      "file_fallbacks": 3
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 3
     },
     {
       "instance_id": "googlecontainertools__jib-2542",
@@ -1317,19 +1343,20 @@
       "patched_files": [
         "jib-core/src/main/java/com/google/cloud/tools/jib/registry/RegistryEndpointCaller.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "googlecontainertools__jib-2688",
       "targets": [
-        "file:jib-maven-plugin/CHANGELOG.md",
         "method|jib-maven-plugin/src/main/java/com/google/cloud/tools/jib/maven/MavenProjectProperties.java|561|576|com.google.cloud.tools.jib.maven.MavenProjectProperties.getSpringBootRepackageConfiguration"
       ],
       "patched_files": [
         "jib-maven-plugin/CHANGELOG.md",
         "jib-maven-plugin/src/main/java/com/google/cloud/tools/jib/maven/MavenProjectProperties.java"
       ],
-      "file_fallbacks": 1
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 1
     },
     {
       "instance_id": "googlecontainertools__jib-4035",
@@ -1339,15 +1366,13 @@
       "patched_files": [
         "jib-core/src/main/java/com/google/cloud/tools/jib/registry/RegistryAuthenticator.java"
       ],
-      "file_fallbacks": 0
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 0
     },
     {
       "instance_id": "googlecontainertools__jib-4144",
       "targets": [
         "class|jib-plugins-common/src/main/java/com/google/cloud/tools/jib/plugins/common/PluginConfigurationProcessor.java|77|1100|com.google.cloud.tools.jib.plugins.common.PluginConfigurationProcessor",
-        "file:docs/google-cloud-build.md",
-        "file:jib-gradle-plugin/README.md",
-        "file:jib-maven-plugin/README.md",
         "method|jib-cli/src/main/java/com/google/cloud/tools/jib/cli/jar/JarFiles.java|85|93|com.google.cloud.tools.jib.cli.jar.JarFiles.getDefaultBaseImage",
         "method|jib-plugins-common/src/main/java/com/google/cloud/tools/jib/plugins/common/PluginConfigurationProcessor.java|505|558|com.google.cloud.tools.jib.plugins.common.PluginConfigurationProcessor.getJavaContainerBuilderWithBaseImage",
         "method|jib-plugins-common/src/main/java/com/google/cloud/tools/jib/plugins/common/PluginConfigurationProcessor.java|762|777|com.google.cloud.tools.jib.plugins.common.PluginConfigurationProcessor.getDefaultBaseImage"
@@ -1359,7 +1384,8 @@
         "jib-maven-plugin/README.md",
         "jib-plugins-common/src/main/java/com/google/cloud/tools/jib/plugins/common/PluginConfigurationProcessor.java"
       ],
-      "file_fallbacks": 3
+      "file_fallbacks": 0,
+      "unmapped_patched_files": 3
     }
   ]
 }

@@ -31,6 +31,7 @@ CACHE_VERSION = 1
 RRF_K = 60
 TOP_K = 20
 SOURCE_DEPTH = 50
+FILE_FALLBACK_TARGET = "__file_fallback__"
 CLASS_NODE_TYPES = {
     "annotation_type_declaration",
     "class_declaration",
@@ -641,11 +642,11 @@ def patch_changed_lines(patch: str) -> dict[str, set[int]]:
 def map_targets(
     patch: str,
     entities_by_file: dict[str, list[dict[str, Any]]],
-) -> tuple[set[str], set[str], int]:
+) -> tuple[set[str], set[str], bool, int]:
     changed = patch_changed_lines(patch)
     targets: set[str] = set()
     patched_files = set(changed)
-    file_fallbacks = 0
+    unmapped_patched_files = 0
     for path, lines in changed.items():
         file_entities = entities_by_file.get(path) or []
         mapped_for_file = False
@@ -666,24 +667,37 @@ def map_targets(
             targets.add(chosen["id"])
             mapped_for_file = True
         if not mapped_for_file:
-            targets.add(f"file:{path}")
-            file_fallbacks += 1
-    return targets, patched_files, file_fallbacks
+            unmapped_patched_files += 1
+
+    # Match the Python evaluation contract: auxiliary files and entities that
+    # do not exist at the base commit do not enlarge an otherwise valid target
+    # set. Use one file-level target only when the whole patch is unmappable.
+    file_fallback = not targets
+    if file_fallback:
+        targets.add(FILE_FALLBACK_TARGET)
+    return targets, patched_files, file_fallback, unmapped_patched_files
 
 
 def candidate_target_ids(item: dict[str, Any]) -> set[str]:
-    return {item["id"], f"file:{item['file_path']}"}
+    return {item["id"]}
 
 
 def instance_metrics(
-    ranking: list[dict[str, Any]], targets: set[str], patched_files: set[str]
+    ranking: list[dict[str, Any]],
+    targets: set[str],
+    patched_files: set[str],
+    file_fallback: bool = False,
 ) -> dict[str, float]:
     window = ranking[:TOP_K]
     represented_files = {item["file_path"] for item in window}
     covered_targets: set[str] = set()
     first_rank: int | None = None
     for rank, item in enumerate(window, start=1):
-        overlap = targets & candidate_target_ids(item)
+        overlap = (
+            {FILE_FALLBACK_TARGET}
+            if file_fallback and item["file_path"] in patched_files
+            else targets & candidate_target_ids(item)
+        )
         if overlap:
             covered_targets.update(overlap)
             if first_rank is None:
@@ -778,7 +792,9 @@ def main() -> int:
             kg_local = localize_files(entities, kg_files, sections, {})
             mural = rrf_fuse(bm25_local, kg_local)
 
-            targets, patched_files, file_fallbacks = map_targets(str(item.get("fix_patch") or ""), by_file)
+            targets, patched_files, file_fallback, unmapped_patched_files = map_targets(
+                str(item.get("fix_patch") or ""), by_file
+            )
             rows = {
                 "BM25": bm25_ranking,
                 "BM25_local": bm25_local,
@@ -786,7 +802,12 @@ def main() -> int:
                 "MURAL": mural,
             }
             metrics = {
-                name: instance_metrics(ranking, targets, patched_files)
+                name: instance_metrics(
+                    ranking,
+                    targets,
+                    patched_files,
+                    file_fallback=file_fallback,
+                )
                 for name, ranking in rows.items()
             }
             per_instance.append(
@@ -799,7 +820,8 @@ def main() -> int:
                     "parse_error_files": corpus["parse_error_files"],
                     "target_count": len(targets),
                     "patched_file_count": len(patched_files),
-                    "file_fallbacks": file_fallbacks,
+                    "file_fallbacks": int(file_fallback),
+                    "unmapped_patched_files": unmapped_patched_files,
                     "bm25_source_files": len(bm25_files),
                     "kg_source_files": len(kg_files),
                     "metrics": metrics,
@@ -814,7 +836,8 @@ def main() -> int:
                     "instance_id": instance_id,
                     "targets": sorted(targets),
                     "patched_files": sorted(patched_files),
-                    "file_fallbacks": file_fallbacks,
+                    "file_fallbacks": int(file_fallback),
+                    "unmapped_patched_files": unmapped_patched_files,
                 }
             )
             print(
@@ -849,6 +872,7 @@ def main() -> int:
 
     comparisons = [
         ("BM25", "BM25_local"),
+        ("BM25_local", "KG_local"),
         ("BM25_local", "MURAL"),
         ("KG_local", "MURAL"),
     ]

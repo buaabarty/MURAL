@@ -7,32 +7,57 @@
     "repositories": 6
   },
   "structural_ranked_file_source": {
-    "generator_commit": "58e9e5be896fe2fcaebf93a3f17f39c0e01b290d",
-    "preexisting_instances": 78,
-    "completed_instances": 13,
-    "entity_depth": 50,
+    "raw_generator_commit": "c7ca5d860c2409ecc30991ce69c96edb1be1c71d",
+    "fresh_instances": 91,
+    "retried_after_neo4j_restart": 13,
+    "graph_search_depth": 50,
+    "ranked_entity_scan_limit": 200,
     "max_files": 20,
+    "offline_artifacts": true,
+    "live_github_search": false,
+    "method_call_expansion": false,
+    "patch_link_expansion": false,
+    "timeline_expansion": false,
+    "source_extensions": [
+      ".java"
+    ],
+    "ranked_file_tie_break": "direct anchor, graph distance, support, first structural entity rank, repository-relative path",
     "exporter": "artifacts/scripts/export_java_kg_file_seeds.py",
+    "exporter_sha256": "c43ff0ed59ae5fd50522c47f3f289e8daf9eb6a4112af0ee710a7a3c3cafe084",
     "output": "artifacts/inputs/java_kg_ranked_file_seeds_20260714.jsonl",
+    "output_sha256": "01c089fd5f39f2b236088a108ac7ae4786c686f3579736cc0afe1e50296c7ad6",
     "retained_fields": [
       "file_path",
       "rank",
       "support",
-      "first_entity_rank"
+      "first_entity_rank",
+      "graph_distance",
+      "direct_anchor"
     ],
     "raw_entity_source_and_path_records_retained": false,
-    "runtime_compatibility_note": "The 13 completion runs restored Transformers helpers required by the cached Jina remote code and forced local model loading; scoring and graph construction were unchanged."
+    "runtime_note": "All 91 rankings were regenerated from the frozen dataset and base commits with network-derived issue expansion disabled. Thirteen interrupted jobs were rerun after restarting their isolated Neo4j services."
   },
   "evaluation": {
     "script": "artifacts/scripts/evaluate_java_retrieve_localize.py",
+    "script_sha256": "70812aafbe82a20a04d76997f90a06ea59efdf4790e82b1675b3ef04e1671b2b",
     "dataset_schema": "official repo/base_commit/problem_statement/patch",
     "target_source": "official patch, read after rankings are frozen",
+    "target_mapping": "Map changed lines to base-commit Java entities. Auxiliary files and newly added entities do not enlarge an otherwise mapped target set; use one file-level fallback only if the entire patch has no mapped base-commit entity.",
+    "mapped_entity_targets": 342,
+    "unmapped_auxiliary_or_new_files": 65,
+    "instance_level_file_fallbacks": 0,
     "top_k": 20,
     "source_depth": 50,
     "rrf_k": 60,
     "bootstrap_iterations": 10000,
     "random_seed": 7,
     "completed_instances": 91,
-    "failures": 0
+    "failures": 0,
+    "output_sha256": {
+      "summary": "fb02d265a0b5689763e734f8307c4fda0abb9773379a5a89aee40b1ca3b12db6",
+      "paired": "3366c65a6c96182a91c9f0b82c1441dbbad1b5ff2a74ad273dee40dba5e46c3d",
+      "targets": "561853dbf8214bd231600dbea28a120451a72979420644d156a8babd2987b49d",
+      "instances": "37e34a3acbd268cf30d83de64856edf2dc48303ac53261d5328a8b31279ab932"
+    }
   }
 }

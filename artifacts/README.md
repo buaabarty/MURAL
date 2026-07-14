@@ -18,9 +18,9 @@ unchanged so archived commands and checksums stay stable.
 - `issue_comment_boundary.json`: input-boundary and leakage-audit note.
 - `prompts/llm_fault_location_prompt.md`: verbatim LLM localization prompt,
   reproduced in the supplementary material.
-- `prompts/qwen3_repair_prompt.md`: verbatim system and user repair templates.
-- `repair_protocol_qwen3_20260714.json`: checkpoint fingerprint, serving and
-  decoding settings, and compact/expanded retry contracts for RQ-4.
+- `prompts/glm5_repair_prompt.md`: verbatim system and user repair templates.
+- `repair_protocol_glm5_20260715.json`: dated endpoint, decoding, context
+  rendering, retry, deduplication, and official-test contracts for RQ-4.
 - `RESULT_TRACEABILITY.md`: file-to-claim mapping and reproduction commands.
 - `scripts/verify_paper_results.py`: strict result-inventory and value checker.
 - `scripts/export_ranked_file_seeds.py`: converts any ranked code-entity output
@@ -31,8 +31,8 @@ unchanged so archived commands and checksums stay stable.
 - `scripts/export_fixed_prefix_fusion.py`: builds prefix-preserving context
   windows under a fixed output budget.
 - `scripts/export_equal_rrf_fusion.py`: combines BM25-local and KG-local
-  rankings with deterministic RRF; defaults reproduce equal weighting and
-  optional source weights support the reported sensitivity sweep.
+  rankings with deterministic RRF; defaults reproduce the manuscript's
+  predefined equal-weight configuration.
 - `scripts/export_multi_source_rrf_fusion.py`: applies the same deterministic
   RRF contract to two or more named entity-ranking sources.
 - `scripts/analyze_retrieve_localize_controls.py`: computes aggregate metrics,
@@ -41,16 +41,30 @@ unchanged so archived commands and checksums stay stable.
   recall and complete edit-target coverage.
 - `scripts/analyze_edit_target_paired_stats.py`: computes paired bootstrap
   intervals and exact McNemar tests for the primary RQ-3 comparisons.
-- `scripts/assemble_iterative_repair_predictions.py`: preserves successful
-  compact predictions and fills only failed instances from the expanded
-  failure-conditioned fallback run.
-- `scripts/merge_iterative_repair_reports.py`: combines reused compact
-  official reports with reports for newly recovered fallback predictions.
+- `scripts/assemble_repair_profile_predictions.py`: validates every frozen
+  request audit and emits complete per-variant SWE-bench prediction ledgers.
+- `scripts/deduplicate_repair_predictions.py`: maps exact same-instance patch
+  hashes to canonical official-evaluation slots without consulting an oracle.
+- `scripts/collect_swebench_reports.py`: normalizes strict official reports,
+  records harness-confirmed patch-application failures and test timeouts as
+  unresolved, and fails closed on infrastructure failures.
+- `scripts/materialize_repair_variant_reports.py`: maps canonical reports back
+  to every context variant after verifying the exact patch hash.
 - `scripts/analyze_repair_outcomes.py`: builds the complete 500-by-3 outcome
   ledger and recomputes Resolved rates, paired intervals, and exact tests.
+- `scripts/run_repair_profile_batch.py`: reruns frozen location files with an
+  explicit first-attempt context profile and token limits, sequentially records
+  prompt/audit metadata, and resumes completed instances without sharing a
+  mutable repository checkout across workers.
+- `scripts/audit_repair_context_rendering.py`: audits candidate, rendered,
+  source-bearing, rank-band, and prompt-token counts without model calls.
+- `scripts/shard_repair_ids_by_repository.py`: creates repository-disjoint
+  generation shards so workers never mutate the same checkout.
 - `scripts/export_java_kg_file_seeds.py`: converts the archived Java structural
   source to the same ranked-file contract without retaining entity source text
-  or path-level records.
+  or graph traversal records; direct issue/PR-to-file provenance is retained as
+  aggregate file-level fields, with structural entity rank used to break tied
+  file-evidence records.
 - `scripts/evaluate_java_retrieve_localize.py`: rebuilds base-commit Java
   entities, applies BM25 and the shared selector, freezes rankings, and then
   maps official patches for the supplementary cross-language check.
@@ -79,10 +93,12 @@ unchanged so archived commands and checksums stay stable.
   cache used by the patch-derived evaluation.
 - `edit_target_paired_stats_20260713.tsv`: paired uncertainty for edit-target
   recall and complete edit-target coverage in the primary RQ-3 comparisons.
-- `repair_qwen3_compact_summary_20260714.tsv`: aggregate and paired RQ-4
-  statistics for the fixed compact Qwen3-Coder workflow.
-- `repair_qwen3_compact_outcomes_20260714.tsv`: all 1,500 per-instance
-  nonempty, applicable, and Resolved indicators underlying that table.
+- `repair_glm5_summary_20260715.tsv`: aggregate and paired RQ-4 statistics for
+  the fixed audited GLM-5 repair workflow.
+- `repair_glm5_outcomes_20260715.tsv`: all 1,500 per-instance nonempty,
+  applicable, Resolved, and terminal-error indicators underlying that table.
+- `repair_glm5_assembly_20260715.tsv`: per-request frozen-dataset, context,
+  prompt, retry, applicability, and patch-hash audit.
 - `time_boundary_external_artifact_sensitivity_20260531.tsv`: external-artifact
   sensitivity statement in threats to validity.
 - `kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json`: final
@@ -97,10 +113,6 @@ unchanged so archived commands and checksums stay stable.
   `selector_ablation_paired_20260714.tsv`: BM25-local Full and five
   leave-one-signal-family-out selector variants, including paired uncertainty
   and exact Hit@20 tests.
-- `rrf_sensitivity_summary_20260714.tsv` and
-  `rrf_sensitivity_paired_20260714.tsv`: four RRF constants and a symmetric
-  five-setting BM25/KG weight sweep, with all variants paired against the
-  predefined equal-weight (k=60) row.
 - `dense_third_source_summary_20260714.tsv` and
   `dense_third_source_paired_20260714.tsv`: the Jina code-embedding source,
   its shared-selector output, two- and three-source MURAL, and GLM-5
@@ -108,19 +120,16 @@ unchanged so archived commands and checksums stay stable.
 - `java_cross_language_summary_20260714.tsv` and
   `java_cross_language_paired_20260714.tsv`: the 91-instance
   Multi-SWE-bench Java check, including the BM25-to-BM25-local selector
-  comparison and the two-source diagnostic.
+  comparison and the corrected structural-source diagnostic.
 - `java_cross_language_instances_20260714.jsonl` and
   `java_cross_language_targets_20260714.json`: the per-instance ranking ledger
-  and deterministic patch-to-entity target cache for that Java check.
-- `repair_qwen3_expanded_assembly_20260714.tsv`: the 1,500-row no-oracle
-  selection ledger recording compact reuse, fallback activation, and patch
-  hashes without retaining patch text.
-- `repair_qwen3_expanded_summary_20260714.tsv` and
-  `repair_qwen3_expanded_outcomes_20260714.tsv`: aggregate, paired, and
-  per-instance outcomes for the expanded-fallback repair sensitivity.
-- `repair_qwen3_expanded_timeouts_20260714.tsv`: the explicit unresolved-outcome
-  policy record for the one official test run that reached the 1,800-second
-  cutoff after its patch had applied.
+  and deterministic patch-to-base-commit-entity target cache for that Java
+  check; auxiliary and newly added files are audited separately from targets.
+- `repair_glm5_context_rendering_20260715.tsv`: all 1,500 offline rendering
+  audits, including prefix/tail source-excerpt counts and prompt tokens.
+- `repair_glm5_prediction_mapping_20260715.tsv` and
+  `repair_glm5_deduplication_summary_20260715.json`: exact patch-hash mapping
+  from 1,319 nonempty variant predictions to 1,035 canonical official tests.
 
 ## Verifier
 

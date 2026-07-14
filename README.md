@@ -24,7 +24,7 @@ for compatibility; the artifact notes map them to the manuscript terminology.
 | `scripts/` | Workspace scripts used to build localization and summary ledgers. |
 | `artifacts/` | Submission-facing result ledgers, prompts, audit notes, and verifier. |
 | `artifacts/results/` | Small committed ledgers aligned with manuscript tables and claims. |
-| `artifacts/repair_protocol_qwen3_20260714.json` | Fingerprinted RQ-4 repair protocol. |
+| `artifacts/repair_protocol_glm5_20260715.json` | Fingerprinted RQ-4 repair protocol. |
 | `artifacts/RESULT_TRACEABILITY.md` | Mapping from manuscript claims to artifact files and rerun commands. |
 
 ## Quick Start
@@ -56,7 +56,7 @@ Expected result:
 The verifier reads only files committed under `artifacts/results/` and checks
 the ground-truth mapping, controlled context windows, fixed-prefix fusion,
 supplementary budget sensitivity, mapped edit-target coverage, the complete
-compact and expanded-fallback repair ledgers, and leakage/sensitivity statements.
+GLM-5 repair ledger and request audit, and leakage/sensitivity statements.
 
 ## Submission-Facing Results
 
@@ -69,11 +69,11 @@ The main ledgers are:
 - `artifacts/results/retrieve_then_localize_budget_curve_20260711.tsv`
 - `artifacts/results/glm5_baseline_fusion_controls_top10_20260614.tsv`
 - `artifacts/results/patch_derived_context_summary_20260702.tsv`
-- `artifacts/results/repair_qwen3_compact_summary_20260714.tsv`
-- `artifacts/results/repair_qwen3_compact_outcomes_20260714.tsv`
-- `artifacts/results/repair_qwen3_expanded_summary_20260714.tsv`
-- `artifacts/results/repair_qwen3_expanded_outcomes_20260714.tsv`
-- `artifacts/results/repair_qwen3_expanded_timeouts_20260714.tsv`
+- `artifacts/results/repair_glm5_summary_20260715.tsv`
+- `artifacts/results/repair_glm5_outcomes_20260715.tsv`
+- `artifacts/results/repair_glm5_assembly_20260715.tsv`
+- `artifacts/results/repair_glm5_context_rendering_20260715.tsv`
+- `artifacts/results/repair_glm5_prediction_mapping_20260715.tsv`
 
 See `artifacts/RESULT_TRACEABILITY.md` for the complete file-to-claim mapping
 and the full-workspace commands used to produce the ledgers.

@@ -44,7 +44,7 @@ The verifier checks:
 - RQ-2 fixed-prefix controls and paired statistics;
 - RQ-3 mapped edit-target coverage and paired uncertainty;
 - RQ-4 complete repair outcomes and paired uncertainty;
-- supplementary budget, selector, RRF, and third-source values; and
+- supplementary budget, selector, third-source, Java, and repair-audit values; and
 - leakage and external-artifact sensitivity statements.
 
 ## Main-Manuscript Mapping
@@ -55,8 +55,8 @@ The verifier checks:
   `artifacts/results/tse_gt_mapping_v6.tsv`.
 - Input-boundary record:
   `artifacts/issue_comment_boundary.json`.
-- Repair checkpoint and workflow record:
-  `artifacts/repair_protocol_qwen3_20260714.json`.
+- Repair endpoint and workflow record:
+  `artifacts/repair_protocol_glm5_20260715.json`.
 
 ### RQ-1: Controlled Context Windows
 
@@ -92,11 +92,24 @@ The verifier checks:
 
 ### RQ-4: Official Repair Outcomes
 
-- Complete 500-by-3 compact-workflow outcome ledger:
-  `artifacts/results/repair_qwen3_compact_outcomes_20260714.tsv`.
+- Complete 500-by-3 corrected-workflow outcome ledger:
+  `artifacts/results/repair_glm5_outcomes_20260715.tsv`.
 - Nonempty/applicable/Resolved totals, paired bootstrap intervals, win/loss
   counts, and exact McNemar tests:
-  `artifacts/results/repair_qwen3_compact_summary_20260714.tsv`.
+  `artifacts/results/repair_glm5_summary_20260715.tsv`.
+- Frozen issue, context-rendering, retry, and patch-hash request audit:
+  `artifacts/results/repair_glm5_assembly_20260715.tsv`.
+
+The fixed workflow resolves 112/500 (22.4%) with the GLM-only window, 134/500
+(26.8%) with GLM+BM25-local, and 146/500 (29.2%) with GLM+MURAL. Here
+GLM-only denotes the issue-conditioned upstream localizer; its repair prompt
+still renders base-commit source from those candidates. GLM+MURAL improves over
+GLM-only by 6.8 points (44 wins, 10 losses, 95% paired
+bootstrap CI [4.0, 9.6], exact McNemar p=3.39e-6). Its 2.4-point advantage
+over BM25-local is positive but inconclusive (29/17, CI [-0.2, 5.0], p=.104).
+RQ-4 uses three archived complete candidate pools under a common Top-20 ceiling;
+it does not reuse the exact prefix-preserving localization ledgers from RQ-2.
+The generation workflow is fixed while the complete supplied pool varies.
 
 ### Threats to Validity
 
@@ -114,17 +127,13 @@ The verifier checks:
 - Four-budget paired statistics:
   `artifacts/results/retrieve_then_localize_budget_paired_20260711.tsv`.
 
-### Expanded Repair Fallback
+### Repair Context and Evaluation Audit
 
-- Compact-reuse and fallback-activation ledger, including patch hashes but no
-  patch text:
-  `artifacts/results/repair_qwen3_expanded_assembly_20260714.tsv`.
-- Complete 500-by-3 outcome ledger and paired summary:
-  `artifacts/results/repair_qwen3_expanded_outcomes_20260714.tsv` and
-  `artifacts/results/repair_qwen3_expanded_summary_20260714.tsv`.
-- Explicit timeout disposition for the one applied patch whose official test
-  reached the 1,800-second cutoff:
-  `artifacts/results/repair_qwen3_expanded_timeouts_20260714.tsv`.
+- Candidate, rendered, source-bearing, rank-band, and prompt-token audit:
+  `artifacts/results/repair_glm5_context_rendering_20260715.tsv`.
+- Exact patch-hash mapping and aggregate deduplication counts:
+  `artifacts/results/repair_glm5_prediction_mapping_20260715.tsv` and
+  `artifacts/results/repair_glm5_deduplication_summary_20260715.json`.
 
 ### Selector Signal-Family Ablation
 
@@ -132,14 +141,6 @@ The verifier checks:
   `artifacts/results/selector_ablation_summary_20260714.tsv`.
 - Paired bootstrap intervals, win/loss counts, and exact binary tests:
   `artifacts/results/selector_ablation_paired_20260714.tsv`.
-
-### RRF Sensitivity
-
-- Four constant settings and the symmetric source-weight sweep:
-  `artifacts/results/rrf_sensitivity_summary_20260714.tsv`.
-- Paired bootstrap intervals, win/loss counts, and exact binary tests against
-  the predefined equal-weight (k=60) row:
-  `artifacts/results/rrf_sensitivity_paired_20260714.tsv`.
 
 ### Dense Third-Source Extension
 
@@ -153,8 +154,8 @@ The verifier checks:
 
 - Exact localization prompt:
   `artifacts/prompts/llm_fault_location_prompt.md`.
-- Exact Qwen3-Coder repair prompts:
-  `artifacts/prompts/qwen3_repair_prompt.md`.
+- Exact GLM-5 repair prompts:
+  `artifacts/prompts/glm5_repair_prompt.md`.
 
 ## Reproduction Commands
 
@@ -293,59 +294,6 @@ python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
   --output-disagreements temp_run/selector_ablation_disagreements_20260714.tsv
 ```
 
-### RRF Sensitivity
-
-The primary source is BM25-local and the secondary source is KG-local. The
-main row uses the script defaults (`k=60`, weights `1/1`). The sweep below does
-not replace that predefined row.
-
-```bash
-RRF_SWEEP=temp_run/mural_experiment_additions/rrf_sensitivity
-
-run_rrf () {
-  label="$1"; k="$2"; bm25_weight="$3"; kg_weight="$4"
-  python3 artifacts/scripts/export_equal_rrf_fusion.py \
-    --primary-dir temp_run/private_bm25_filelocal_20260704/bm25_top20_files_filelocal \
-    --secondary-dir runs/kg_verified_evidence_graph/tse_timesafe_main_20260531_pathunion_v1 \
-    --output-dir "$RRF_SWEEP/$label" \
-    --top-k 50 --rrf-k "$k" \
-    --primary-weight "$bm25_weight" --secondary-weight "$kg_weight" \
-    --force
-}
-
-run_rrf k10_w50_50  10  1.0 1.0
-run_rrf k30_w50_50  30  1.0 1.0
-run_rrf k60_w50_50  60  1.0 1.0
-run_rrf k100_w50_50 100 1.0 1.0
-run_rrf k60_w30_70  60  0.3 0.7
-run_rrf k60_w40_60  60  0.4 0.6
-run_rrf k60_w60_40  60  0.6 0.4
-run_rrf k60_w70_30  60  0.7 0.3
-
-python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
-  --top-k 20 --bootstrap-iters 10000 --seed 7 \
-  --group k10_equal="$RRF_SWEEP/k10_w50_50" \
-  --group k30_equal="$RRF_SWEEP/k30_w50_50" \
-  --group k60_equal="$RRF_SWEEP/k60_w50_50" \
-  --group k100_equal="$RRF_SWEEP/k100_w50_50" \
-  --group k60_bm25_30_kg_70="$RRF_SWEEP/k60_w30_70" \
-  --group k60_bm25_40_kg_60="$RRF_SWEEP/k60_w40_60" \
-  --group k60_bm25_60_kg_40="$RRF_SWEEP/k60_w60_40" \
-  --group k60_bm25_70_kg_30="$RRF_SWEEP/k60_w70_30" \
-  --compare k60_equal=k10_equal \
-  --compare k60_equal=k30_equal \
-  --compare k60_equal=k100_equal \
-  --compare k60_equal=k60_bm25_30_kg_70 \
-  --compare k60_equal=k60_bm25_40_kg_60 \
-  --compare k60_equal=k60_bm25_60_kg_40 \
-  --compare k60_equal=k60_bm25_70_kg_30 \
-  --output-summary artifacts/results/rrf_sensitivity_summary_20260714.tsv \
-  --output-paired artifacts/results/rrf_sensitivity_paired_20260714.tsv \
-  --output-disagreements temp_run/rrf_sensitivity_disagreements_20260714.tsv
-```
-
 ### Dense Third-Source Extension
 
 The dense entity source uses `jinaai/jina-embeddings-v2-base-code` revision
@@ -417,8 +365,15 @@ The supplementary Java check uses all 91 instances in the official
 official `repo`, `base_commit`, `problem_statement`, and `patch` fields. It
 rebuilds entities from each base commit, freezes every ranking, and only then
 reads the patch to derive evaluation targets. The committed structural input
-contains ranked-file records only; see
+contains ranked-file records only, including aggregate direct-anchor and graph
+distance fields; see
 `artifacts/inputs/java_cross_language_manifest_20260714.json` for provenance.
+Files tied on anchor, graph distance, and support are ordered by their first
+structural entity rank rather than by path text. Target mapping follows the
+Python contract: auxiliary files and entities absent from the base commit do
+not enlarge an otherwise mapped target set, and file-level fallback is used
+only when an entire patch has no mapped entity. All 91 patches map at least one
+base-commit entity; 65 auxiliary or newly added files are recorded separately.
 
 Export the official split without altering its fields:
 
@@ -439,6 +394,31 @@ with out.open("w", encoding="utf-8") as handle:
 PY
 ```
 
+Regenerate the structural rankings with the frozen offline runner before
+exporting ranked files. The graph traversal depth remains 50. The exporter may
+scan up to 200 ranked entities only to fill at most 20 unique file records after
+deduplication; this does not broaden graph traversal.
+
+```bash
+python3 artifacts/scripts/run_java_kg_batch.py \
+  --dataset temp_run/multi_swe_bench_java_verified/java_verified_dataset.jsonl \
+  --workdir temp_run/java_kg_work \
+  --repos-dir temp_run/java_cross_language/repos \
+  --output-dir temp_run/java_kg_raw \
+  --log-dir temp_run/java_kg_logs \
+  --embedding-cache temp_run/java_embedding_cache.sqlite \
+  --entity-depth 50 --result-limit 200 --reference-workers 4
+
+python3 artifacts/scripts/export_java_kg_file_seeds.py \
+  --input-dir temp_run/java_kg_raw \
+  --output artifacts/inputs/java_kg_ranked_file_seeds_20260714.jsonl \
+  --entity-depth 200 --max-files 20
+```
+
+`run_java_kg_batch.py` forces dataset, model, and Transformer offline modes;
+disables live GitHub search, patch/timeline expansion, and project-wide method
+call expansion; and restricts source parsing to `.java` files.
+
 Then run the frozen ranked-file source through the shared selector and
 equal-weight RRF:
 
@@ -456,61 +436,74 @@ python3 artifacts/scripts/evaluate_java_retrieve_localize.py \
 ```
 
 The evaluator clones missing repositories and caches parsed base-commit
-entities. BM25-local raises Hit@20 from 34.1% to 47.3%; MURAL reaches 48.4%,
-but its 1.1-point difference from BM25-local is not statistically clear.
+entities. BM25-local raises Hit@20 from 34.1% to 47.3%; corrected KG-local
+reaches 51.6%, and MURAL reaches 54.9%. The MURAL--BM25-local difference is
++7.7 points (11 wins, 4 losses), with a 95% interval [0.0, +16.5] and exact
+McNemar p=.1185; it remains inconclusive at N=91.
 
 ### Official Repair Outcomes
 
-The frozen prediction files retain all 500 instances per context condition,
-including empty patches. Official reports exist exactly for the nonempty
-predictions; the analyzer restores zero outcomes for empty predictions before
-computing paired statistics.
+Generation uses `run_repair_profile_batch.py` with the dated settings in
+`repair_protocol_glm5_20260715.json`. Repository-disjoint shards prevent
+workers from sharing a mutable checkout. The assembler then fails closed on a
+missing issue, wrong dataset, stale context profile, prompt overrun, response
+prefill, enabled thinking mode, or mismatched retry limit.
 
 ```bash
+RUN_ROOT=temp_run/mural_experiment_additions/repair_glm5_corrected_v3_20260715
+PRED="$RUN_ROOT/predictions"
+CANON="$RUN_ROOT/canonical"
+OFFICIAL="$RUN_ROOT/official"
+
+python3 artifacts/scripts/assemble_repair_profile_predictions.py \
+  --run-root "$RUN_ROOT" \
+  --ids-file temp_run/repair_corrected_ids.txt \
+  --output-root "$PRED" \
+  --variants issue bm25 mural --shards shard_0 shard_1 \
+  --model-prefix glm5_corrected \
+  --expected-dataset-source "$PWD/temp_run/generated/SWE-bench_Verified.jsonl" \
+  --dataset-label temp_run/generated/SWE-bench_Verified.jsonl \
+  --expected-context-profile rank_stratified_v3_allfiles \
+  --expected-max-retries 1 --max-prompt-tokens 5000 \
+  --require-no-prefill --require-thinking-disabled
+
+python3 artifacts/scripts/deduplicate_repair_predictions.py \
+  --predictions-root "$PRED" --output-root "$CANON" \
+  --variants issue bm25 mural --model-prefix glm5_corrected_unique
+
+for slot in 0 1 2; do
+  run_id="mural_glm5_corrected_slot_${slot}_20260715"
+  python3 -m swebench.harness.run_evaluation \
+    -d temp_run/generated/SWE-bench_Verified.jsonl -s test \
+    -p "$CANON/slot_${slot}/predictions.jsonl" \
+    --max_workers 5 --open_file_limit 8192 -t 1800 \
+    --cache_level env --clean False -id "$run_id"
+  python3 artifacts/scripts/collect_swebench_reports.py \
+    --predictions "$CANON/slot_${slot}/predictions.jsonl" \
+    --run-id "$run_id" \
+    --output "$CANON/slot_${slot}/official_results.jsonl" \
+    --normalize-terminal-errors
+done
+
+python3 artifacts/scripts/materialize_repair_variant_reports.py \
+  --canonical-root "$CANON" --output-root "$OFFICIAL" \
+  --variants issue bm25 mural
+
 python3 artifacts/scripts/analyze_repair_outcomes.py \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --predictions-root temp_run/mural_experiment_additions/repair_qwen3_30b_full_20260713 \
-  --official-root temp_run/mural_experiment_additions/repair_qwen3_30b_official \
-  --output-outcomes artifacts/results/repair_qwen3_compact_outcomes_20260714.tsv \
-  --output-summary artifacts/results/repair_qwen3_compact_summary_20260714.tsv
+  --ids-file temp_run/repair_corrected_ids.txt \
+  --predictions-root "$PRED" --official-root "$OFFICIAL" \
+  --output-outcomes artifacts/results/repair_glm5_outcomes_20260715.tsv \
+  --output-summary artifacts/results/repair_glm5_summary_20260715.tsv
 ```
 
-For the expanded sensitivity, every applicable compact patch is reused. Only
-compact-empty instances activate a fresh temperature-zero first attempt and at
-most two failure-conditioned retries. Official test oracles are applied only
-after the selected predictions are frozen.
-
-```bash
-EXPANDED_PRED=temp_run/mural_experiment_additions/repair_qwen3_30b_iterative_predictions
-EXPANDED_REPORTS=temp_run/mural_experiment_additions/repair_qwen3_30b_iterative_official_combined
-
-python3 artifacts/scripts/assemble_iterative_repair_predictions.py \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --compact-root temp_run/mural_experiment_additions/repair_qwen3_30b_full_20260713 \
-  --fallback-root temp_run/mural_experiment_additions/repair_qwen3_30b_expanded_fallback_20260714 \
-  --output-root "$EXPANDED_PRED" \
-  --require-complete-fallback
-
-python3 artifacts/scripts/merge_iterative_repair_reports.py \
-  --predictions-root "$EXPANDED_PRED" \
-  --compact-official-root temp_run/mural_experiment_additions/repair_qwen3_30b_official \
-  --fallback-official-root temp_run/mural_experiment_additions/repair_qwen3_30b_iterative_fallback_official \
-  --output-root "$EXPANDED_REPORTS"
-
-python3 artifacts/scripts/analyze_repair_outcomes.py \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --predictions-root "$EXPANDED_PRED" \
-  --official-root "$EXPANDED_REPORTS" \
-  --timeout-outcomes artifacts/results/repair_qwen3_expanded_timeouts_20260714.tsv \
-  --output-outcomes artifacts/results/repair_qwen3_expanded_outcomes_20260714.tsv \
-  --output-summary artifacts/results/repair_qwen3_expanded_summary_20260714.tsv
-```
-
-The expanded profile yields 164, 178, and 185 applicable patches and resolves
-29 (5.8%), 25 (5.0%), and 32 (6.4%) instances for issue-only, BM25-local, and
-MURAL, respectively. MURAL exceeds BM25-local by 1.4 points (95% CI 0.0 to
-2.8; 10/3 wins/losses; exact McNemar p=0.0923), which is not treated as a
-statistically clear gain.
+The hash mapping evaluates 1,035 distinct same-instance patches for the 1,319
+nonempty variant predictions; the 284 exact duplicates reuse the corresponding
+official report. Empty predictions remain in the 500-instance denominator.
+Across the 1,035 canonical evaluations, 1,018 produced standard harness
+reports; the collector records seven confirmed patch-application failures and
+ten confirmed 1,800-second test timeouts as unresolved. Any missing report
+caused by an image, network, or other infrastructure failure remains a hard
+error rather than an outcome.
 
 ### Patch-Derived Coverage
 

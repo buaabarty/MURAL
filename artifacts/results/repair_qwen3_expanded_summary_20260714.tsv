@@ -1,7 +1,0 @@
-kind	name	nonempty	applicable	resolved	resolved_percent	baseline	treatment	delta_pp	ci95_low	ci95_high	wins	losses	p_exact
-variant	issue	164	164	29	5.800	NA	NA	NA	NA	NA	NA	NA	NA
-variant	bm25	178	178	25	5.000	NA	NA	NA	NA	NA	NA	NA	NA
-variant	mural	185	185	32	6.400	NA	NA	NA	NA	NA	NA	NA	NA
-contrast	bm25_vs_issue					issue	bm25	-0.800	-2.400	0.800	6	10	0.454498291016
-contrast	mural_vs_issue					issue	mural	0.600	-1.000	2.200	10	7	0.629058837891
-contrast	mural_vs_bm25					bm25	mural	1.400	0.000	2.800	10	3	0.09228515625

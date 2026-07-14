@@ -16,9 +16,72 @@ from language_factory import JavaLanguageConfig
 
 sys.path.insert(0, str(Path(__file__).parent / "artifacts/scripts"))
 from export_java_kg_file_seeds import normalize_path, ranked_files
+from evaluate_java_retrieve_localize import (
+    FILE_FALLBACK_TARGET,
+    instance_metrics,
+    map_targets,
+)
 
 
 class JavaPathContractTest(unittest.TestCase):
+    def test_auxiliary_patch_files_do_not_dilute_mapped_entities(self):
+        entity = {
+            "id": "method|src/main/java/Service.java|2|4|Service.run",
+            "entity_type": "method",
+            "file_path": "src/main/java/Service.java",
+            "start_line": 2,
+            "end_line": 4,
+        }
+        patch_text = """diff --git a/src/main/java/Service.java b/src/main/java/Service.java
+--- a/src/main/java/Service.java
++++ b/src/main/java/Service.java
+@@ -2,1 +2,1 @@
+-old
++new
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,1 +1,1 @@
+-old
++new
+"""
+        targets, patched_files, fallback, unmapped = map_targets(
+            patch_text, {"src/main/java/Service.java": [entity]}
+        )
+        self.assertEqual(targets, {entity["id"]})
+        self.assertEqual(
+            patched_files,
+            {"src/main/java/Service.java", "CHANGELOG.md"},
+        )
+        self.assertFalse(fallback)
+        self.assertEqual(unmapped, 1)
+
+    def test_file_fallback_is_single_instance_level_target(self):
+        patch_text = """diff --git a/src/main/java/NewType.java b/src/main/java/NewType.java
+--- /dev/null
++++ b/src/main/java/NewType.java
+@@ -0,0 +1,1 @@
++class NewType {}
+"""
+        targets, patched_files, fallback, unmapped = map_targets(patch_text, {})
+        self.assertEqual(targets, {FILE_FALLBACK_TARGET})
+        self.assertTrue(fallback)
+        self.assertEqual(unmapped, 1)
+        ranking = [
+            {
+                "id": "class|src/main/java/NewType.java|1|1|NewType",
+                "file_path": "src/main/java/NewType.java",
+            }
+        ]
+        metric = instance_metrics(
+            ranking,
+            targets,
+            patched_files,
+            file_fallback=True,
+        )
+        self.assertEqual(metric["method"], 1.0)
+        self.assertEqual(metric["hit"], 1.0)
+
     def test_maven_source_root_and_member_resolution(self):
         with tempfile.TemporaryDirectory() as temporary:
             repository = Path(temporary)
@@ -136,6 +199,37 @@ class JavaPathContractTest(unittest.TestCase):
         ])
         self.assertTrue(rows[0]["direct_anchor"])
         self.assertIsNone(rows[0]["first_entity_rank"])
+
+    def test_direct_file_ties_preserve_entity_relevance(self):
+        payload = {
+            "related_entities": {
+                "files": [
+                    {
+                        "file_path": "src/Alphabetical.java",
+                        "distance": 1,
+                        "support": 1,
+                        "direct_anchor": True,
+                    },
+                    {
+                        "file_path": "src/Relevant.java",
+                        "distance": 1,
+                        "support": 1,
+                        "direct_anchor": True,
+                    },
+                ],
+                "methods": [
+                    {
+                        "file_path": "src/Relevant.java",
+                        "similarity": 0.9,
+                    }
+                ],
+            }
+        }
+        rows = ranked_files(payload, "example__repo", depth=50, max_files=20)
+        self.assertEqual(
+            [row["file_path"] for row in rows],
+            ["src/Relevant.java", "src/Alphabetical.java"],
+        )
 
     def test_call_edges_are_scoped_by_both_file_paths(self):
         class Result:

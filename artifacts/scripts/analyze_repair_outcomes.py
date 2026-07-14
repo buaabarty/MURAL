@@ -134,6 +134,7 @@ def main() -> None:
                     "nonempty": int(instance_id in nonempty),
                     "applied": int(bool(report.get("patch_successfully_applied"))),
                     "resolved": int(bool(report.get("resolved"))),
+                    "error": str(report.get("error") or "none"),
                 }
             )
         summaries[variant] = {
@@ -141,6 +142,12 @@ def main() -> None:
             "applicable": sum(bool(row.get("patch_successfully_applied")) for row in reports.values()),
             "resolved": int(resolved.sum()),
             "resolved_percent": float(resolved.mean() * 100),
+            "patch_apply_failed": sum(
+                row.get("error") == "patch_apply_failed" for row in reports.values()
+            ),
+            "test_timeout": sum(
+                row.get("error") == "test_timeout" for row in reports.values()
+            ),
         }
 
     summary_rows = []
@@ -191,7 +198,8 @@ def main() -> None:
 
     fields = [
         "kind", "name", "nonempty", "applicable", "resolved", "resolved_percent",
-        "baseline", "treatment", "delta_pp", "ci95_low", "ci95_high", "wins", "losses", "p_exact",
+        "patch_apply_failed", "test_timeout", "baseline", "treatment", "delta_pp",
+        "ci95_low", "ci95_high", "wins", "losses", "p_exact",
     ]
     with args.output_summary.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t", extrasaction="ignore")

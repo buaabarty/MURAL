@@ -1,9 +1,0 @@
-name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
-k10_equal	500	20	0.798	0.5705448412698413	0.3253954999592771	0.65	temp_run/mural_experiment_additions/rrf_sensitivity/k10_w50_50
-k30_equal	500	20	0.776	0.5572412698412699	0.32087895334799366	0.634	temp_run/mural_experiment_additions/rrf_sensitivity/k30_w50_50
-k60_equal	500	20	0.77	0.5528888888888888	0.31976817442103816	0.628	temp_run/mural_experiment_additions/rrf_sensitivity/k60_w50_50
-k100_equal	500	20	0.77	0.5508888888888889	0.31968309940833156	0.626	temp_run/mural_experiment_additions/rrf_sensitivity/k100_w50_50
-k60_bm25_30_kg_70	500	20	0.688	0.5220502525252524	0.31684441917731393	0.58	temp_run/mural_experiment_additions/rrf_sensitivity/k60_w30_70
-k60_bm25_40_kg_60	500	20	0.678	0.5144002525252525	0.3118856518008995	0.574	temp_run/mural_experiment_additions/rrf_sensitivity/k60_w40_60
-k60_bm25_60_kg_40	500	20	0.718	0.5183843434343435	0.3125496547570077	0.588	temp_run/mural_experiment_additions/rrf_sensitivity/k60_w60_40
-k60_bm25_70_kg_30	500	20	0.724	0.519955772005772	0.3116341303691149	0.592	temp_run/mural_experiment_additions/rrf_sensitivity/k60_w70_30

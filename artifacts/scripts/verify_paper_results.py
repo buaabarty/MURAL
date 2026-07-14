@@ -39,19 +39,17 @@ EXPECTED_RESULT_FILES = {
     "patch_derived_context_targets_20260702.json",
     "ranked_file_source_coverage_20260711.tsv",
     "ranked_file_source_paired_20260711.tsv",
-    "repair_qwen3_compact_outcomes_20260714.tsv",
-    "repair_qwen3_compact_summary_20260714.tsv",
-    "repair_qwen3_expanded_assembly_20260714.tsv",
-    "repair_qwen3_expanded_outcomes_20260714.tsv",
-    "repair_qwen3_expanded_summary_20260714.tsv",
-    "repair_qwen3_expanded_timeouts_20260714.tsv",
+    "repair_glm5_assembly_20260715.tsv",
+    "repair_glm5_context_rendering_20260715.tsv",
+    "repair_glm5_deduplication_summary_20260715.json",
+    "repair_glm5_outcomes_20260715.tsv",
+    "repair_glm5_prediction_mapping_20260715.tsv",
+    "repair_glm5_summary_20260715.tsv",
     "retrieve_then_localize_budget_curve_20260711.tsv",
     "retrieve_then_localize_budget_paired_20260711.tsv",
     "retrieve_then_localize_disagreements_20260711.tsv",
     "retrieve_then_localize_paired_20260711.tsv",
     "retrieve_then_localize_top20_20260711.tsv",
-    "rrf_sensitivity_paired_20260714.tsv",
-    "rrf_sensitivity_summary_20260714.tsv",
     "selector_ablation_paired_20260714.tsv",
     "selector_ablation_summary_20260714.tsv",
     "time_boundary_external_artifact_sensitivity_20260531.tsv",
@@ -90,6 +88,10 @@ def pct(value: str | float) -> float:
 
 
 def record(name: str, observed: Any, expected: Any, ok: bool, source: str) -> None:
+    if isinstance(observed, set):
+        observed = sorted(observed)
+    if isinstance(expected, set):
+        expected = sorted(expected)
     checks.append(
         {
             "name": name,
@@ -180,7 +182,6 @@ def verify_rq1() -> None:
 
     verify_retrieve_then_localize_controls()
     verify_selector_ablation()
-    verify_rrf_sensitivity()
     verify_dense_third_source()
     verify_java_cross_language()
 
@@ -221,58 +222,6 @@ def verify_selector_ablation() -> None:
         paired_source,
         tol=1e-15,
     )
-
-
-def verify_rrf_sensitivity() -> None:
-    source = "rrf_sensitivity_summary_20260714.tsv"
-    rows = read_tsv(source)
-    expected = {
-        "k10_equal": (79.8, 57.1, 32.5, 65.0),
-        "k30_equal": (77.6, 55.7, 32.1, 63.4),
-        "k60_equal": (77.0, 55.3, 32.0, 62.8),
-        "k100_equal": (77.0, 55.1, 32.0, 62.6),
-        "k60_bm25_30_kg_70": (68.8, 52.2, 31.7, 58.0),
-        "k60_bm25_40_kg_60": (67.8, 51.4, 31.2, 57.4),
-        "k60_bm25_60_kg_40": (71.8, 51.8, 31.3, 58.8),
-        "k60_bm25_70_kg_30": (72.4, 52.0, 31.2, 59.2),
-    }
-    expect_row_set("RRF sensitivity row set", rows, "name", list(expected), source)
-    for name, values in expected.items():
-        expect_metric_row(source, row_by(rows, "name", name), values, f"RRF sensitivity {name}")
-
-    paired_source = "rrf_sensitivity_paired_20260714.tsv"
-    paired = read_tsv(paired_source)
-    hit_rows = {
-        row["treatment"]: row
-        for row in paired
-        if row["baseline"] == "k60_equal" and row["metric"] == "hit"
-    }
-    expected_paired = {
-        "k10_equal": (2.2, 0.6, 4.0, 15, 4, 0.0192108154296875),
-        "k30_equal": (0.6, 0.0, 1.4, 3, 0, 0.25),
-        "k100_equal": (-0.2, -0.6, 0.0, 0, 1, 1.0),
-        "k60_bm25_30_kg_70": (-4.8, -7.6, -2.2, 12, 36, 0.0007172696733945827),
-        "k60_bm25_40_kg_60": (-5.4, -8.0, -3.0, 7, 34, 2.532080361561384e-05),
-        "k60_bm25_60_kg_40": (-4.0, -6.4, -1.8, 7, 27, 0.0008213953115046024),
-        "k60_bm25_70_kg_30": (-3.6, -6.0, -1.4, 9, 27, 0.00393317302223295),
-    }
-    expect_equal("RRF sensitivity paired treatments", list(hit_rows), list(expected_paired), paired_source)
-    for treatment, values in expected_paired.items():
-        delta, low, high, wins, losses, p_value = values
-        row = hit_rows[treatment]
-        prefix = f"RRF sensitivity k60_equal->{treatment} Hit"
-        expect_close(f"{prefix} delta", pct(row["delta"]), delta, paired_source)
-        expect_close(f"{prefix} CI low", pct(row["ci95_low"]), low, paired_source)
-        expect_close(f"{prefix} CI high", pct(row["ci95_high"]), high, paired_source)
-        expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
-        expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
-        expect_close(
-            f"{prefix} exact p",
-            float(row["exact_mcnemar_p"]),
-            p_value,
-            paired_source,
-            tol=1e-15,
-        )
 
 
 def verify_dense_third_source() -> None:
@@ -326,10 +275,10 @@ def verify_java_cross_language() -> None:
     source = "java_cross_language_summary_20260714.tsv"
     rows = read_tsv(source)
     expected = {
-        "BM25": (61.5, 15.5, 13.5, 34.1),
-        "BM25_local": (67.0, 24.2, 24.2, 47.3),
-        "KG_local": (52.7, 19.2, 22.3, 39.6),
-        "MURAL": (68.1, 22.6, 26.3, 48.4),
+        "BM25": (61.5, 19.9, 13.5, 34.1),
+        "BM25_local": (67.0, 32.2, 24.2, 47.3),
+        "KG_local": (63.7, 35.3, 24.9, 51.6),
+        "MURAL": (70.3, 35.1, 26.5, 54.9),
     }
     expect_row_set("Java cross-language row set", rows, "name", list(expected), source)
     for name, values in expected.items():
@@ -341,8 +290,9 @@ def verify_java_cross_language() -> None:
     paired = read_tsv(paired_source)
     expected_hit = {
         ("BM25", "BM25_local"): (13.2, 1.1, 25.3, 23, 11, 0.05761267291381955),
-        ("BM25_local", "MURAL"): (1.1, -4.4, 6.6, 4, 3, 1.0),
-        ("KG_local", "MURAL"): (8.8, 2.2, 16.5, 10, 2, 0.03857421875),
+        ("BM25_local", "KG_local"): (4.4, -6.6, 15.4, 15, 11, 0.557197093963623),
+        ("BM25_local", "MURAL"): (7.7, 0.0, 16.5, 11, 4, 0.11846923828125),
+        ("KG_local", "MURAL"): (3.3, -4.4, 11.0, 8, 5, 0.5810546875),
     }
     observed_hit = {
         (row["baseline"], row["treatment"]): row
@@ -371,6 +321,24 @@ def verify_java_cross_language() -> None:
     expect_equal("Java cross-language RRF k", targets["meta"]["rrf_k"], 60, targets_source)
     expect_equal("Java cross-language bootstrap iterations", targets["meta"]["bootstrap_iterations"], 10000, targets_source)
     expect_equal("Java cross-language random seed", targets["meta"]["seed"], 7, targets_source)
+    expect_equal(
+        "Java cross-language mapped target count",
+        sum(len(row["targets"]) for row in targets["items"]),
+        342,
+        targets_source,
+    )
+    expect_equal(
+        "Java cross-language instance fallbacks",
+        sum(int(row["file_fallbacks"]) for row in targets["items"]),
+        0,
+        targets_source,
+    )
+    expect_equal(
+        "Java cross-language unmapped auxiliary or new files",
+        sum(int(row["unmapped_patched_files"]) for row in targets["items"]),
+        65,
+        targets_source,
+    )
 
     instance_source = "java_cross_language_instances_20260714.jsonl"
     instances = read_jsonl(RESULTS / instance_source)
@@ -385,7 +353,14 @@ def verify_java_cross_language() -> None:
     seed_source = "java_kg_ranked_file_seeds_20260714.jsonl"
     seeds = read_jsonl(INPUTS / seed_source)
     expect_equal("Java structural seed rows", len(seeds), 91, seed_source)
-    allowed = {"file_path", "rank", "support", "first_entity_rank"}
+    allowed = {
+        "file_path",
+        "rank",
+        "support",
+        "first_entity_rank",
+        "graph_distance",
+        "direct_anchor",
+    }
     observed_fields = {
         key
         for row in seeds
@@ -398,6 +373,34 @@ def verify_java_cross_language() -> None:
         sorted(allowed),
         seed_source,
     )
+    for row in seeds:
+        expect_equal(
+            f"Java structural entity scan limit {row['instance_id']}",
+            row["entity_depth"],
+            200,
+            seed_source,
+        )
+        expect_equal(
+            f"Java structural file limit {row['instance_id']}",
+            row["max_files"],
+            20,
+            seed_source,
+        )
+        ranked_files = row.get("ranked_files", [])
+        expect_equal(
+            f"Java structural file count {row['instance_id']}",
+            len(ranked_files) <= 20,
+            True,
+            seed_source,
+        )
+        for file_record in ranked_files:
+            file_path = file_record["file_path"]
+            expect_equal(
+                f"Java structural repository-relative path {row['instance_id']}:{file_path}",
+                Path(file_path).is_absolute() or ".." in Path(file_path).parts,
+                False,
+                seed_source,
+            )
 
 
 def verify_retrieve_then_localize_controls() -> None:
@@ -588,240 +591,331 @@ def verify_rq2() -> None:
 
 
 def verify_rq4() -> None:
-    summary_source = "repair_qwen3_compact_summary_20260714.tsv"
+    summary_source = "repair_glm5_summary_20260715.tsv"
     rows = read_tsv(summary_source)
-    expect_row_set(
-        "RQ4 compact summary row set",
-        rows,
-        "name",
-        ["issue", "bm25", "mural", "bm25_vs_issue", "mural_vs_issue", "mural_vs_bm25"],
-        summary_source,
-    )
+    names = [
+        "issue",
+        "bm25",
+        "mural",
+        "bm25_vs_issue",
+        "mural_vs_issue",
+        "mural_vs_bm25",
+    ]
+    expect_row_set("RQ4 summary row set", rows, "name", names, summary_source)
     variants = {
-        "issue": (133, 133, 28, 5.6),
-        "bm25": (128, 128, 22, 4.4),
-        "mural": (134, 134, 27, 5.4),
+        "issue": (416, 415, 112, 22.4, 1, 5),
+        "bm25": (453, 451, 134, 26.8, 2, 4),
+        "mural": (450, 446, 146, 29.2, 4, 3),
     }
     for name, expected in variants.items():
         row = row_by(rows, "name", name)
-        expect_equal(f"RQ4 compact {name} nonempty", int(row["nonempty"]), expected[0], summary_source)
-        expect_equal(f"RQ4 compact {name} applicable", int(row["applicable"]), expected[1], summary_source)
-        expect_equal(f"RQ4 compact {name} resolved", int(row["resolved"]), expected[2], summary_source)
-        expect_close(f"RQ4 compact {name} Resolved", float(row["resolved_percent"]), expected[3], summary_source)
+        fields = (
+            "nonempty",
+            "applicable",
+            "resolved",
+            "resolved_percent",
+            "patch_apply_failed",
+            "test_timeout",
+        )
+        for field, value in zip(fields, expected):
+            observed = float(row[field]) if field == "resolved_percent" else int(row[field])
+            if field == "resolved_percent":
+                expect_close(f"RQ4 {name} {field}", observed, value, summary_source)
+            else:
+                expect_equal(f"RQ4 {name} {field}", observed, value, summary_source)
 
     contrasts = {
-        "bm25_vs_issue": (-1.2, -2.6, 0.2, 4, 10, 0.1795654296875),
-        "mural_vs_issue": (-0.2, -1.8, 1.4, 9, 10, 1.0),
-        "mural_vs_bm25": (1.0, -0.2, 2.2, 7, 2, 0.1796875),
+        "bm25_vs_issue": (4.4, 1.6, 7.2, 36, 14, 0.00260217145672),
+        "mural_vs_issue": (6.8, 4.0, 9.6, 44, 10, 3.38568595337e-06),
+        "mural_vs_bm25": (2.4, -0.2, 5.0, 29, 17, 0.103805355504),
     }
     for name, expected in contrasts.items():
         row = row_by(rows, "name", name)
-        prefix = f"RQ4 compact {name}"
+        prefix = f"RQ4 {name}"
         expect_close(f"{prefix} delta", float(row["delta_pp"]), expected[0], summary_source)
         expect_close(f"{prefix} CI low", float(row["ci95_low"]), expected[1], summary_source)
         expect_close(f"{prefix} CI high", float(row["ci95_high"]), expected[2], summary_source)
         expect_equal(f"{prefix} wins", int(row["wins"]), expected[3], summary_source)
         expect_equal(f"{prefix} losses", int(row["losses"]), expected[4], summary_source)
-        expect_close(f"{prefix} exact p", float(row["p_exact"]), expected[5], summary_source, tol=1e-15)
+        expect_close(
+            f"{prefix} exact p",
+            float(row["p_exact"]),
+            expected[5],
+            summary_source,
+            tol=1e-12,
+        )
 
-    outcomes_source = RESULTS / "repair_qwen3_compact_outcomes_20260714.tsv"
-    with outcomes_source.open(newline="", encoding="utf-8") as handle:
-        outcomes = list(csv.DictReader(handle, delimiter="\t"))
-    expect_equal("RQ4 compact outcome rows", len(outcomes), 1500, outcomes_source.name)
+    outcomes_source = "repair_glm5_outcomes_20260715.tsv"
+    outcomes = read_tsv(outcomes_source)
+    expect_equal("RQ4 outcome rows", len(outcomes), 1500, outcomes_source)
+    expect_equal(
+        "RQ4 outcome keys",
+        len({(row["instance_id"], row["variant"]) for row in outcomes}),
+        1500,
+        outcomes_source,
+    )
     for name, expected in variants.items():
         variant_rows = [row for row in outcomes if row["variant"] == name]
-        expect_equal(f"RQ4 compact {name} outcome instances", len(variant_rows), 500, outcomes_source.name)
-        expect_equal(
-            f"RQ4 compact {name} unique IDs",
-            len({row["instance_id"] for row in variant_rows}),
-            500,
-            outcomes_source.name,
-        )
+        expect_equal(f"RQ4 {name} outcome instances", len(variant_rows), 500, outcomes_source)
         for field, value in zip(("nonempty", "applied", "resolved"), expected[:3]):
             expect_equal(
-                f"RQ4 compact {name} ledger {field}",
+                f"RQ4 {name} ledger {field}",
                 sum(int(row[field]) for row in variant_rows),
                 value,
-                outcomes_source.name,
+                outcomes_source,
             )
         expect_equal(
-            f"RQ4 compact {name} resolved implies applied",
-            sum(int(row["resolved"]) and not int(row["applied"]) for row in variant_rows),
-            0,
-            outcomes_source.name,
-        )
-
-    assembly_source = RESULTS / "repair_qwen3_expanded_assembly_20260714.tsv"
-    with assembly_source.open(newline="", encoding="utf-8") as handle:
-        assembly = list(csv.DictReader(handle, delimiter="\t"))
-    expect_equal("RQ4 expanded assembly rows", len(assembly), 1500, assembly_source.name)
-    assembly_expected = {
-        "issue": (133, 367, 31, 336),
-        "bm25": (128, 372, 50, 322),
-        "mural": (134, 366, 51, 315),
-    }
-    for name, expected in assembly_expected.items():
-        variant_rows = [row for row in assembly if row["variant"] == name]
-        expect_equal(f"RQ4 expanded {name} assembly instances", len(variant_rows), 500, assembly_source.name)
-        expect_equal(
-            f"RQ4 expanded {name} assembly unique IDs",
-            len({row["instance_id"] for row in variant_rows}),
-            500,
-            assembly_source.name,
+            f"RQ4 {name} patch-application failures",
+            sum(row["error"] == "patch_apply_failed" for row in variant_rows),
+            expected[4],
+            outcomes_source,
         )
         expect_equal(
-            f"RQ4 expanded {name} compact reuse",
-            sum(row["selected_source"] == "compact" for row in variant_rows),
-            expected[0],
-            assembly_source.name,
+            f"RQ4 {name} test timeouts",
+            sum(row["error"] == "test_timeout" for row in variant_rows),
+            expected[5],
+            outcomes_source,
         )
-        expect_equal(
-            f"RQ4 expanded {name} fallback attempts",
-            sum(int(row["fallback_attempted"]) for row in variant_rows),
-            expected[1],
-            assembly_source.name,
-        )
-        expect_equal(
-            f"RQ4 expanded {name} recovered patches",
-            sum(row["selected_source"] == "expanded_fallback" for row in variant_rows),
-            expected[2],
-            assembly_source.name,
-        )
-        expect_equal(
-            f"RQ4 expanded {name} empty predictions",
-            sum(row["selected_source"] == "empty" for row in variant_rows),
-            expected[3],
-            assembly_source.name,
-        )
-        expect_equal(
-            f"RQ4 expanded {name} patch/hash consistency",
-            sum(
-                (int(row["patch_chars"]) > 0) == bool(row["patch_sha256"])
-                for row in variant_rows
-            ),
-            500,
-            assembly_source.name,
-        )
-
-    expanded_summary_source = "repair_qwen3_expanded_summary_20260714.tsv"
-    expanded_rows = read_tsv(expanded_summary_source)
-    expect_row_set(
-        "RQ4 expanded summary row set",
-        expanded_rows,
-        "name",
-        ["issue", "bm25", "mural", "bm25_vs_issue", "mural_vs_issue", "mural_vs_bm25"],
-        expanded_summary_source,
+    expect_equal(
+        "RQ4 outcome error vocabulary",
+        sorted({row["error"] for row in outcomes}),
+        ["none", "patch_apply_failed", "test_timeout"],
+        outcomes_source,
     )
-    expanded_variants = {
-        "issue": (164, 164, 29, 5.8),
-        "bm25": (178, 178, 25, 5.0),
-        "mural": (185, 185, 32, 6.4),
-    }
-    for name, expected in expanded_variants.items():
-        row = row_by(expanded_rows, "name", name)
-        expect_equal(f"RQ4 expanded {name} nonempty", int(row["nonempty"]), expected[0], expanded_summary_source)
-        expect_equal(f"RQ4 expanded {name} applicable", int(row["applicable"]), expected[1], expanded_summary_source)
-        expect_equal(f"RQ4 expanded {name} resolved", int(row["resolved"]), expected[2], expanded_summary_source)
-        expect_close(f"RQ4 expanded {name} Resolved", float(row["resolved_percent"]), expected[3], expanded_summary_source)
+    expect_equal(
+        "RQ4 resolved implies applied",
+        sum(int(row["resolved"]) and not int(row["applied"]) for row in outcomes),
+        0,
+        outcomes_source,
+    )
+    expect_equal(
+        "RQ4 patch-application failure contract",
+        sum(
+            row["error"] == "patch_apply_failed"
+            and (int(row["applied"]) or int(row["resolved"]))
+            for row in outcomes
+        ),
+        0,
+        outcomes_source,
+    )
+    expect_equal(
+        "RQ4 timeout contract",
+        sum(
+            row["error"] == "test_timeout"
+            and (not int(row["applied"]) or int(row["resolved"]))
+            for row in outcomes
+        ),
+        0,
+        outcomes_source,
+    )
 
-    expanded_contrasts = {
-        "bm25_vs_issue": (-0.8, -2.4, 0.8, 6, 10, 0.454498291015625),
-        "mural_vs_issue": (0.6, -1.0, 2.2, 10, 7, 0.629058837890625),
-        "mural_vs_bm25": (1.4, 0.0, 2.8, 10, 3, 0.09228515625),
-    }
-    for name, expected in expanded_contrasts.items():
-        row = row_by(expanded_rows, "name", name)
-        prefix = f"RQ4 expanded {name}"
-        expect_close(f"{prefix} delta", float(row["delta_pp"]), expected[0], expanded_summary_source)
-        expect_close(f"{prefix} CI low", float(row["ci95_low"]), expected[1], expanded_summary_source)
-        expect_close(f"{prefix} CI high", float(row["ci95_high"]), expected[2], expanded_summary_source)
-        expect_equal(f"{prefix} wins", int(row["wins"]), expected[3], expanded_summary_source)
-        expect_equal(f"{prefix} losses", int(row["losses"]), expected[4], expanded_summary_source)
-        expect_close(f"{prefix} exact p", float(row["p_exact"]), expected[5], expanded_summary_source, tol=1e-15)
+    assembly_source = "repair_glm5_assembly_20260715.tsv"
+    assembly = read_tsv(assembly_source)
+    expect_equal("RQ4 assembly rows", len(assembly), 1500, assembly_source)
+    assembly_by = {(row["instance_id"], row["variant"]): row for row in assembly}
+    expect_equal("RQ4 assembly keys", len(assembly_by), 1500, assembly_source)
+    expect_equal(
+        "RQ4 frozen dataset source",
+        {row["dataset_source"] for row in assembly},
+        {"temp_run/generated/SWE-bench_Verified.jsonl"},
+        assembly_source,
+    )
+    expect_equal(
+        "RQ4 nonempty issue text",
+        sum(int(row["problem_statement_tokens"]) > 0 for row in assembly),
+        1500,
+        assembly_source,
+    )
+    expect_equal(
+        "RQ4 context profile",
+        {row["context_profile_version"] for row in assembly},
+        {"rank_stratified_v3_allfiles"},
+        assembly_source,
+    )
+    expect_equal(
+        "RQ4 no assistant prefill",
+        {row["response_prefill"] for row in assembly},
+        {"0"},
+        assembly_source,
+    )
+    expect_equal(
+        "RQ4 retry contract",
+        {row["max_retries"] for row in assembly},
+        {"1"},
+        assembly_source,
+    )
+    expect_equal(
+        "RQ4 thinking disabled",
+        {json.loads(row["generation_extra_body"])["enable_thinking"] for row in assembly},
+        {False},
+        assembly_source,
+    )
+    expect_equal(
+        "RQ4 prompt ceiling",
+        max(int(row["first_prompt_tokens"]) for row in assembly),
+        4998,
+        assembly_source,
+    )
+    expect_equal(
+        "RQ4 per-request retry ceiling",
+        max(int(row["retry_count"]) for row in assembly),
+        1,
+        assembly_source,
+    )
 
-    expanded_outcomes_source = RESULTS / "repair_qwen3_expanded_outcomes_20260714.tsv"
-    with expanded_outcomes_source.open(newline="", encoding="utf-8") as handle:
-        expanded_outcomes = list(csv.DictReader(handle, delimiter="\t"))
-    expect_equal("RQ4 expanded outcome rows", len(expanded_outcomes), 1500, expanded_outcomes_source.name)
-    for name, expected in expanded_variants.items():
-        variant_rows = [row for row in expanded_outcomes if row["variant"] == name]
-        expect_equal(f"RQ4 expanded {name} outcome instances", len(variant_rows), 500, expanded_outcomes_source.name)
+    context_source = "repair_glm5_context_rendering_20260715.tsv"
+    context = read_tsv(context_source)
+    context_by = {(row["instance_id"], row["variant"]): row for row in context}
+    expect_equal("RQ4 context audit rows", len(context), 1500, context_source)
+    expect_equal("RQ4 context audit keys", set(context_by), set(assembly_by), context_source)
+    field_pairs = {
+        "candidate_entities": "candidate_entity_count",
+        "rendered_entities": "first_prompt_rendered_entity_count",
+        "source_entities": "first_prompt_source_entity_count",
+        "prompt_tokens": "first_prompt_tokens",
+    }
+    for context_field, assembly_field in field_pairs.items():
         expect_equal(
-            f"RQ4 expanded {name} unique IDs",
-            len({row["instance_id"] for row in variant_rows}),
-            500,
-            expanded_outcomes_source.name,
-        )
-        for field, value in zip(("nonempty", "applied", "resolved"), expected[:3]):
-            expect_equal(
-                f"RQ4 expanded {name} ledger {field}",
-                sum(int(row[field]) for row in variant_rows),
-                value,
-                expanded_outcomes_source.name,
-            )
-        expect_equal(
-            f"RQ4 expanded {name} resolved implies applied",
-            sum(int(row["resolved"]) and not int(row["applied"]) for row in variant_rows),
+            f"RQ4 context/assembly {context_field}",
+            sum(
+                int(row[context_field])
+                != int(assembly_by[key][assembly_field])
+                for key, row in context_by.items()
+            ),
             0,
-            expanded_outcomes_source.name,
+            context_source,
         )
+    context_expected = {
+        "issue": (1879, 1879, 1195, 1008457, 6),
+        "bm25": (8914, 8593, 3319, 2034218, 453),
+        "mural": (8921, 8715, 3249, 1957560, 465),
+    }
+    for name, expected in context_expected.items():
+        variant_rows = [row for row in context if row["variant"] == name]
+        observed = (
+            sum(int(row["candidate_entities"]) for row in variant_rows),
+            sum(int(row["rendered_entities"]) for row in variant_rows),
+            sum(int(row["source_entities"]) for row in variant_rows),
+            sum(int(row["prompt_tokens"]) for row in variant_rows),
+            sum(int(row["tail_source_entities"]) > 0 for row in variant_rows),
+        )
+        expect_equal(f"RQ4 {name} context audit totals", observed, expected, context_source)
 
-    timeout_source = "repair_qwen3_expanded_timeouts_20260714.tsv"
-    timeout_rows = read_tsv(timeout_source)
-    expect_equal("RQ4 expanded timeout rows", len(timeout_rows), 1, timeout_source)
-    timeout_row = timeout_rows[0]
-    expect_equal("RQ4 expanded timeout instance", timeout_row["instance_id"], "psf__requests-1766", timeout_source)
-    expect_equal("RQ4 expanded timeout variant", timeout_row["variant"], "mural", timeout_source)
-    expect_equal("RQ4 expanded timeout seconds", int(timeout_row["timeout_seconds"]), 1800, timeout_source)
-    expect_equal("RQ4 expanded timeout applied", int(timeout_row["patch_successfully_applied"]), 1, timeout_source)
-    expect_equal("RQ4 expanded timeout unresolved", int(timeout_row["resolved"]), 0, timeout_source)
+    mapping_source = "repair_glm5_prediction_mapping_20260715.tsv"
+    mapping = read_tsv(mapping_source)
+    expect_equal("RQ4 prediction mapping rows", len(mapping), 1500, mapping_source)
+    mapping_by = {(row["instance_id"], row["variant"]): row for row in mapping}
+    expect_equal("RQ4 prediction mapping keys", len(mapping_by), 1500, mapping_source)
+    expect_equal(
+        "RQ4 mapping nonempty contract",
+        sum(
+            int(row["nonempty"]) != int(assembly_by[key]["nonempty"])
+            for key, row in mapping_by.items()
+        ),
+        0,
+        mapping_source,
+    )
+    expect_equal(
+        "RQ4 mapping hash contract",
+        sum(bool(row["patch_sha256"]) != bool(int(row["nonempty"])) for row in mapping),
+        0,
+        mapping_source,
+    )
+    nonempty_mapping = [row for row in mapping if int(row["nonempty"])]
+    canonical_mapping = [
+        row for row in nonempty_mapping if not int(row["reused_identical_patch"])
+    ]
+    expect_equal("RQ4 nonempty mapping rows", len(nonempty_mapping), 1319, mapping_source)
+    expect_equal("RQ4 canonical mapping rows", len(canonical_mapping), 1035, mapping_source)
+    expect_equal(
+        "RQ4 identical patch reuses",
+        sum(int(row["reused_identical_patch"]) for row in mapping),
+        284,
+        mapping_source,
+    )
+    for slot, expected in (("0", 471), ("1", 359), ("2", 205)):
+        expect_equal(
+            f"RQ4 canonical slot {slot}",
+            sum(row["slot"] == slot for row in canonical_mapping),
+            expected,
+            mapping_source,
+        )
+    patch_slots: dict[tuple[str, str], set[str]] = {}
+    for row in nonempty_mapping:
+        patch_slots.setdefault((row["instance_id"], row["patch_sha256"]), set()).add(
+            row["slot"]
+        )
+    expect_equal(
+        "RQ4 same-instance hash slot consistency",
+        sum(len(slots) != 1 for slots in patch_slots.values()),
+        0,
+        mapping_source,
+    )
 
-    protocol_source = "artifacts/repair_protocol_qwen3_20260714.json"
+    dedup_source = "repair_glm5_deduplication_summary_20260715.json"
+    dedup = read_json(dedup_source)
+    expect_equal("RQ4 dedup variant predictions", dedup["variant_predictions"], 1500, dedup_source)
+    expect_equal("RQ4 dedup nonempty", dedup["nonempty_variant_predictions"], 1319, dedup_source)
+    expect_equal("RQ4 dedup canonical", dedup["canonical_predictions"], 1035, dedup_source)
+    expect_equal("RQ4 dedup reuses", dedup["identical_patch_reuses"], 284, dedup_source)
+    expect_equal(
+        "RQ4 dedup slot counts",
+        dedup["slot_counts"],
+        {"slot_0": 471, "slot_1": 359, "slot_2": 205},
+        dedup_source,
+    )
+
+    protocol_source = "artifacts/repair_protocol_glm5_20260715.json"
     protocol = json.loads((ROOT / protocol_source).read_text(encoding="utf-8"))
     expect_equal("RQ4 protocol instances", protocol["instances"], 500, protocol_source)
+    expect_equal("RQ4 protocol model", protocol["model"]["alias"], "glm-5", protocol_source)
     expect_equal("RQ4 protocol temperature", protocol["decoding"]["temperature"], 0.0, protocol_source)
-    expect_equal("RQ4 protocol requested top-p", protocol["decoding"]["requested_top_p"], 0.95, protocol_source)
-    expect_equal("RQ4 protocol effective top-p", protocol["decoding"]["effective_top_p"], 1.0, protocol_source)
-    expect_equal("RQ4 protocol output cap", protocol["decoding"]["max_output_tokens"], 1024, protocol_source)
+    expect_equal("RQ4 protocol top-p", protocol["decoding"]["top_p"], 0.95, protocol_source)
+    expect_equal("RQ4 protocol thinking", protocol["decoding"]["enable_thinking"], False, protocol_source)
+    expect_equal("RQ4 protocol prefill", protocol["decoding"]["assistant_response_prefill"], False, protocol_source)
+    expect_equal("RQ4 protocol output cap", protocol["decoding"]["max_output_tokens"], 2048, protocol_source)
+    expect_equal("RQ4 protocol context profile", protocol["context"]["profile"], "rank_stratified_v3_allfiles", protocol_source)
+    expect_equal("RQ4 protocol prompt ceiling", protocol["context"]["prompt_token_ceiling"], 5000, protocol_source)
+    expect_equal("RQ4 protocol retry count", protocol["retry"]["maximum_failure_conditioned_retries"], 1, protocol_source)
+    expect_equal("RQ4 protocol harness", protocol["official_harness"], "swe-bench 4.1.0", protocol_source)
     expect_equal("RQ4 protocol test timeout", protocol["test_timeout_seconds"], 1800, protocol_source)
+    expect_equal("RQ4 protocol timeout outcome", protocol["timeout_outcome"], "Unresolved", protocol_source)
     expect_equal(
-        "RQ4 protocol timeout outcome",
-        protocol["timeout_outcome"],
-        "Unresolved; preserve the harness-confirmed patch-application status",
-        protocol_source,
-    )
-    expect_equal(
-        "RQ4 protocol oracle boundary",
-        protocol["test_oracle_use"],
-        "Official evaluation only; never used in generation, retry activation, or patch selection",
-        protocol_source,
-    )
-    expect_equal(
-        "RQ4 compact retry count",
-        protocol["compact_profile"]["maximum_failure_conditioned_retries"],
-        1,
-        protocol_source,
-    )
-    expect_equal(
-        "RQ4 expanded retry count",
-        protocol["expanded_fallback_profile"]["maximum_failure_conditioned_retries"],
-        2,
+        "RQ4 protocol official outcome counts",
+        protocol["official_evaluation_outcomes"],
+        {
+            "canonical_predictions": 1035,
+            "standard_harness_reports": 1018,
+            "patch_application_failures_recorded_unresolved": 7,
+            "test_timeouts_recorded_unresolved": 10,
+            "infrastructure_failures_recorded_as_outcomes": 0,
+        },
         protocol_source,
     )
 
-    source_tree = ast.parse((ROOT / "kgcompass" / "repair_claude.py").read_text(encoding="utf-8"))
+    source_tree = ast.parse(
+        (ROOT / "kgcompass" / "repair_claude.py").read_text(encoding="utf-8")
+    )
     prompt_constants = {}
     for node in source_tree.body:
-        if not isinstance(node, ast.Assign) or len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
+        if (
+            not isinstance(node, ast.Assign)
+            or len(node.targets) != 1
+            or not isinstance(node.targets[0], ast.Name)
+        ):
             continue
         name = node.targets[0].id
         if name in {"OPEN_MODEL_SYSTEM_PROMPT", "OPEN_MODEL_PROMPT_TEMPLATE"}:
             prompt_constants[name] = ast.literal_eval(node.value)
-    prompt_source = "artifacts/prompts/qwen3_repair_prompt.md"
+    prompt_source = "artifacts/prompts/glm5_repair_prompt.md"
     prompt_text = (ROOT / prompt_source).read_text(encoding="utf-8")
     tick = chr(96)
-    archived_system = prompt_text.split(tick * 3 + "text\n", 1)[1].split("\n" + tick * 3, 1)[0]
-    archived_user = prompt_text.split(tick * 4 + "text\n", 1)[1].rsplit("\n" + tick * 4, 1)[0]
+    archived_system = prompt_text.split(tick * 3 + "text\n", 1)[1].split(
+        "\n" + tick * 3, 1
+    )[0]
+    archived_user = prompt_text.split(tick * 4 + "text\n", 1)[1].rsplit(
+        "\n" + tick * 4, 1
+    )[0]
     expect_equal(
         "RQ4 archived system prompt",
         archived_system,
@@ -834,6 +928,7 @@ def verify_rq4() -> None:
         prompt_constants["OPEN_MODEL_PROMPT_TEMPLATE"].strip(),
         prompt_source,
     )
+
 
 def verify_patch_derived_context() -> None:
     source = "patch_derived_context_summary_20260702.tsv"
