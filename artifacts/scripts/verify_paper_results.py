@@ -20,12 +20,17 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "artifacts" / "results"
+INPUTS = ROOT / "artifacts" / "inputs"
 
 EXPECTED_RESULT_FILES = {
     "dense_third_source_paired_20260714.tsv",
     "dense_third_source_summary_20260714.tsv",
     "edit_target_paired_stats_20260713.tsv",
     "glm5_baseline_fusion_controls_top10_20260614.tsv",
+    "java_cross_language_instances_20260714.jsonl",
+    "java_cross_language_paired_20260714.tsv",
+    "java_cross_language_summary_20260714.tsv",
+    "java_cross_language_targets_20260714.json",
     "kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json",
     "path_mining_file_expansion_ablation_20260531.tsv",
     "patch_derived_context_summary_20260702.json",
@@ -59,6 +64,11 @@ def read_json(name: str) -> Any:
     path = RESULTS / name
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    with path.open(encoding="utf-8") as handle:
+        return [json.loads(line) for line in handle if line.strip()]
 
 
 def row_by(rows: list[dict[str, str]], key: str, value: str) -> dict[str, str]:
@@ -165,6 +175,7 @@ def verify_rq1() -> None:
     verify_selector_ablation()
     verify_rrf_sensitivity()
     verify_dense_third_source()
+    verify_java_cross_language()
 
 
 def verify_selector_ablation() -> None:
@@ -302,6 +313,84 @@ def verify_dense_third_source() -> None:
         expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
         expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
         expect_close(f"{prefix} exact p", float(row["exact_mcnemar_p"]), p_value, paired_source, tol=1e-15)
+
+
+def verify_java_cross_language() -> None:
+    source = "java_cross_language_summary_20260714.tsv"
+    rows = read_tsv(source)
+    expected = {
+        "BM25": (61.5, 15.5, 13.5, 34.1),
+        "BM25_local": (67.0, 24.2, 24.2, 47.3),
+        "KG_local": (52.7, 19.2, 22.3, 39.6),
+        "MURAL": (68.1, 22.6, 26.3, 48.4),
+    }
+    expect_row_set("Java cross-language row set", rows, "name", list(expected), source)
+    for name, values in expected.items():
+        row = row_by(rows, "name", name)
+        expect_equal(f"Java cross-language {name} N", int(row["N"]), 91, source)
+        expect_metric_row(source, row, values, f"Java cross-language {name}")
+
+    paired_source = "java_cross_language_paired_20260714.tsv"
+    paired = read_tsv(paired_source)
+    expected_hit = {
+        ("BM25", "BM25_local"): (13.2, 1.1, 25.3, 23, 11, 0.05761267291381955),
+        ("BM25_local", "MURAL"): (1.1, -4.4, 6.6, 4, 3, 1.0),
+        ("KG_local", "MURAL"): (8.8, 2.2, 16.5, 10, 2, 0.03857421875),
+    }
+    observed_hit = {
+        (row["baseline"], row["treatment"]): row
+        for row in paired
+        if row["metric"] == "hit"
+    }
+    expect_equal("Java cross-language paired Hit set", list(observed_hit), list(expected_hit), paired_source)
+    for comparison, values in expected_hit.items():
+        delta, low, high, wins, losses, p_value = values
+        row = observed_hit[comparison]
+        prefix = f"Java cross-language {comparison[0]}->{comparison[1]} Hit"
+        expect_equal(f"{prefix} N", int(row["N"]), 91, paired_source)
+        expect_close(f"{prefix} delta", pct(row["delta"]), delta, paired_source)
+        expect_close(f"{prefix} CI low", pct(row["ci95_low"]), low, paired_source)
+        expect_close(f"{prefix} CI high", pct(row["ci95_high"]), high, paired_source)
+        expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
+        expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
+        expect_close(f"{prefix} exact p", float(row["exact_mcnemar_p"]), p_value, paired_source, tol=1e-15)
+
+    targets_source = "java_cross_language_targets_20260714.json"
+    targets = read_json(targets_source)
+    expect_equal("Java cross-language target instances", targets["meta"]["N"], 91, targets_source)
+    expect_equal("Java cross-language failures", targets["meta"]["failure_count"], 0, targets_source)
+    expect_equal("Java cross-language target rows", len(targets["items"]), 91, targets_source)
+    expect_equal("Java cross-language top-k", targets["meta"]["top_k"], 20, targets_source)
+    expect_equal("Java cross-language RRF k", targets["meta"]["rrf_k"], 60, targets_source)
+    expect_equal("Java cross-language bootstrap iterations", targets["meta"]["bootstrap_iterations"], 10000, targets_source)
+    expect_equal("Java cross-language random seed", targets["meta"]["seed"], 7, targets_source)
+
+    instance_source = "java_cross_language_instances_20260714.jsonl"
+    instances = read_jsonl(RESULTS / instance_source)
+    expect_equal("Java cross-language instance ledger rows", len(instances), 91, instance_source)
+    expect_equal(
+        "Java cross-language unique instance ids",
+        len({row["instance_id"] for row in instances}),
+        91,
+        instance_source,
+    )
+
+    seed_source = "java_kg_ranked_file_seeds_20260714.jsonl"
+    seeds = read_jsonl(INPUTS / seed_source)
+    expect_equal("Java structural seed rows", len(seeds), 91, seed_source)
+    allowed = {"file_path", "rank", "support", "first_entity_rank"}
+    observed_fields = {
+        key
+        for row in seeds
+        for record in row.get("ranked_files", [])
+        for key in record
+    }
+    expect_equal(
+        "Java structural retained file fields",
+        sorted(observed_fields),
+        sorted(allowed),
+        seed_source,
+    )
 
 
 def verify_retrieve_then_localize_controls() -> None:

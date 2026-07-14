@@ -1,0 +1,38 @@
+{
+  "benchmark": {
+    "dataset": "Daoguang/Multi-SWE-bench",
+    "paper": "arXiv:2504.02605",
+    "split": "java_verified",
+    "instances": 91,
+    "repositories": 6
+  },
+  "structural_ranked_file_source": {
+    "generator_commit": "58e9e5be896fe2fcaebf93a3f17f39c0e01b290d",
+    "preexisting_instances": 78,
+    "completed_instances": 13,
+    "entity_depth": 50,
+    "max_files": 20,
+    "exporter": "artifacts/scripts/export_java_kg_file_seeds.py",
+    "output": "artifacts/inputs/java_kg_ranked_file_seeds_20260714.jsonl",
+    "retained_fields": [
+      "file_path",
+      "rank",
+      "support",
+      "first_entity_rank"
+    ],
+    "raw_entity_source_and_path_records_retained": false,
+    "runtime_compatibility_note": "The 13 completion runs restored Transformers helpers required by the cached Jina remote code and forced local model loading; scoring and graph construction were unchanged."
+  },
+  "evaluation": {
+    "script": "artifacts/scripts/evaluate_java_retrieve_localize.py",
+    "dataset_schema": "official repo/base_commit/problem_statement/patch",
+    "target_source": "official patch, read after rankings are frozen",
+    "top_k": 20,
+    "source_depth": 50,
+    "rrf_k": 60,
+    "bootstrap_iterations": 10000,
+    "random_seed": 7,
+    "completed_instances": 91,
+    "failures": 0
+  }
+}

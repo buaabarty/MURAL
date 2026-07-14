@@ -385,6 +385,55 @@ python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
   --output-disagreements temp_run/dense_third_source_disagreements_20260714.tsv
 ```
 
+### Java Cross-Language Diagnostic
+
+The supplementary Java check uses all 91 instances in the official
+`Daoguang/Multi-SWE-bench` `java_verified` split. The evaluator accepts the
+official `repo`, `base_commit`, `problem_statement`, and `patch` fields. It
+rebuilds entities from each base commit, freezes every ranking, and only then
+reads the patch to derive evaluation targets. The committed structural input
+contains ranked-file records only; see
+`artifacts/inputs/java_cross_language_manifest_20260714.json` for provenance.
+
+Export the official split without altering its fields:
+
+```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+from datasets import load_dataset
+
+out = Path("temp_run/multi_swe_bench_java_verified/java_verified_dataset.jsonl")
+out.parent.mkdir(parents=True, exist_ok=True)
+rows = sorted(load_dataset("Daoguang/Multi-SWE-bench", split="java_verified"),
+              key=lambda row: row["instance_id"])
+with out.open("w", encoding="utf-8") as handle:
+    for row in rows:
+        handle.write(json.dumps(dict(row), ensure_ascii=True,
+                                sort_keys=True, default=str) + "\n")
+PY
+```
+
+Then run the frozen ranked-file source through the shared selector and
+equal-weight RRF:
+
+```bash
+python3 artifacts/scripts/evaluate_java_retrieve_localize.py \
+  --dataset-dir temp_run/multi_swe_bench_java_verified \
+  --kg-seeds artifacts/inputs/java_kg_ranked_file_seeds_20260714.jsonl \
+  --repos-dir temp_run/java_cross_language/repos \
+  --cache-dir temp_run/java_cross_language/entity_cache \
+  --output-summary artifacts/results/java_cross_language_summary_20260714.tsv \
+  --output-paired artifacts/results/java_cross_language_paired_20260714.tsv \
+  --output-instances artifacts/results/java_cross_language_instances_20260714.jsonl \
+  --output-targets artifacts/results/java_cross_language_targets_20260714.json \
+  --bootstrap-iters 10000 --seed 7
+```
+
+The evaluator clones missing repositories and caches parsed base-commit
+entities. BM25-local raises Hit@20 from 34.1% to 47.3%; MURAL reaches 48.4%,
+but its 1.1-point difference from BM25-local is not statistically clear.
+
 ### Patch-Derived Coverage
 
 ```bash

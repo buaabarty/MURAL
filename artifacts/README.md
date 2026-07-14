@@ -38,6 +38,15 @@ unchanged so archived commands and checksums stay stable.
   recall and complete edit-target coverage.
 - `scripts/analyze_edit_target_paired_stats.py`: computes paired bootstrap
   intervals and exact McNemar tests for the primary RQ-3 comparisons.
+- `scripts/export_java_kg_file_seeds.py`: converts the archived Java structural
+  source to the same ranked-file contract without retaining entity source text
+  or path-level records.
+- `scripts/evaluate_java_retrieve_localize.py`: rebuilds base-commit Java
+  entities, applies BM25 and the shared selector, freezes rankings, and then
+  maps official patches for the supplementary cross-language check.
+- `inputs/java_cross_language_manifest_20260714.json` and
+  `inputs/java_kg_ranked_file_seeds_20260714.jsonl`: provenance and the 91
+  ranked-file inputs for the Java structural source.
 
 ## Main-Manuscript Ledgers
 
@@ -82,6 +91,13 @@ unchanged so archived commands and checksums stay stable.
   `dense_third_source_paired_20260714.tsv`: the Jina code-embedding source,
   its shared-selector output, two- and three-source MURAL, and GLM-5
   fixed-prefix controls with paired uncertainty and exact Hit@20 tests.
+- `java_cross_language_summary_20260714.tsv` and
+  `java_cross_language_paired_20260714.tsv`: the 91-instance
+  Multi-SWE-bench Java check, including the BM25-to-BM25-local selector
+  comparison and the two-source diagnostic.
+- `java_cross_language_instances_20260714.jsonl` and
+  `java_cross_language_targets_20260714.json`: the per-instance ranking ledger
+  and deterministic patch-to-entity target cache for that Java check.
 
 ## Verifier
 
