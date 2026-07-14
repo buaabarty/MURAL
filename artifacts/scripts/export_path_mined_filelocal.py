@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Expand existing KG file paths into file-local method paths.
+"""Expand ranked files into file-local code-entity rankings.
 
 This script is intentionally export-only: it does not query Neo4j and it does
-not use ground-truth patches. It starts from an existing KGCompass JSON export,
-keeps the issue->file evidence discovered by KGCompass, and then mines local
-source structure inside those files to rank candidate methods/classes.
+not use ground-truth patches. It starts from a ranked-file JSON export, keeps
+the source's issue-to-file evidence, and mines local source structure inside
+those files to rank candidate methods/classes.
 """
 
 from __future__ import annotations
@@ -27,6 +27,19 @@ from datasets import Dataset
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "kgcompass"))
 import utils  # type: ignore  # noqa: E402
+
+
+SELECTOR_GROUPS = {"G1", "G2", "G3", "G4", "G5"}
+_selector_ablation_raw = os.environ.get("MURAL_ABLATE", "").strip().upper()
+if _selector_ablation_raw in {"", "FULL"}:
+    SELECTOR_ABLATION = None
+elif _selector_ablation_raw in SELECTOR_GROUPS:
+    SELECTOR_ABLATION = _selector_ablation_raw
+else:
+    raise ValueError(
+        "MURAL_ABLATE must be empty, FULL, or one of "
+        f"{', '.join(sorted(SELECTOR_GROUPS))}; got {_selector_ablation_raw!r}"
+    )
 
 
 STOPWORDS = {
@@ -487,27 +500,48 @@ def score_item(item: dict, file_ev: dict, sections: dict, original_rank: int | N
         "source_only_matches": sorted(source_only_signal),
         "original_kg_rank": original_rank,
     }
-    # Lexicographic and parameter-free: issue title/source agreement dominates,
-    # KG file support constrains the search space, then original KG order breaks ties.
-    key = [
-        -len(title_symbol),
-        -len(title_source),
-        -len(exact_symbol),
-        -len(exact_source),
-        -len(narrative_symbol),
-        -len(source_only_signal),
-        -len(narrative_source),
-        -int(file_ev.get("support") or 0),
-        int(file_ev.get("distance") or 999),
-        0 if file_ev.get("anchor_match") else 1,
+    # The named groups match Table II in the manuscript. Concatenating every
+    # group preserves the released Full key exactly; MURAL_ABLATE removes one
+    # complete group for a leave-one-group-out analysis.
+    stable_fallback = [
         1 if is_boilerplate(item) else 0,
-        int(file_ev.get("best_rank") or 999),
-        int(original_rank or 9999),
         int(item.get("start_line") or 0),
         item.get("name") or "",
     ]
     if diagnostic_symbol and not (title_symbol or exact_symbol or narrative_symbol or source_only_signal):
-        key[10] += 1
+        stable_fallback[0] += 1
+    # G4 and G5 are signal families rather than contiguous slices: the
+    # released key places boilerplate demotion before the final source-rank
+    # tie-breaks. Keep that 15-component order unchanged for Full.
+    key_parts = [
+        ("G1", [-len(title_symbol), -len(title_source)]),
+        ("G2", [-len(exact_symbol), -len(exact_source)]),
+        ("G3", [-len(narrative_symbol), -len(source_only_signal), -len(narrative_source)]),
+        (
+            "G4",
+            [
+                -int(file_ev.get("support") or 0),
+                int(file_ev.get("distance") or 999),
+                0 if file_ev.get("anchor_match") else 1,
+            ],
+        ),
+        ("G5", stable_fallback[:1]),
+        (
+            "G4",
+            [
+                int(file_ev.get("best_rank") or 999),
+                int(original_rank or 9999),
+            ],
+        ),
+        ("G5", stable_fallback[1:]),
+    ]
+    key = [
+        value
+        for group_name, group_values in key_parts
+        if group_name != SELECTOR_ABLATION
+        for value in group_values
+    ]
+    evidence["path_mining"]["selector_ablation"] = SELECTOR_ABLATION or "FULL"
     item["ranking_key"] = key
     return item
 
@@ -529,6 +563,17 @@ def merge_item(existing: dict | None, new_item: dict) -> dict:
 
 def rerank_instance(data: dict, dataset_item: dict) -> dict:
     root_meta = (data.get("run_meta") or {}).get("active_root") or {}
+    if not root_meta:
+        problem_statement = str(dataset_item.get("problem_statement") or "")
+        title = next(
+            (line.strip() for line in problem_statement.splitlines() if line.strip()),
+            str(dataset_item.get("instance_id") or "root"),
+        )
+        root_meta = {
+            "title": title,
+            "content": problem_statement,
+            "name": "root",
+        }
     sections = issue_sections(root_meta)
     file_map = file_evidence_from_export(data)
     original_methods = (data.get("related_entities") or {}).get("methods", [])
@@ -588,6 +633,7 @@ def rerank_instance(data: dict, dataset_item: dict) -> dict:
     kg_params["uses_edge_weights"] = False
     kg_params["uses_discussion_comments"] = False
     kg_params["tunable_retrieval_parameters"] = []
+    kg_params["selector_ablation"] = SELECTOR_ABLATION or "FULL"
     out.setdefault("artifact_stats", {})["path_mined_files"] = len(file_map)
     return out
 
@@ -614,6 +660,7 @@ def main() -> None:
         out["related_entities"]["classes"] = out["related_entities"]["classes"][: args.limit]
         out.setdefault("run_meta", {})["path_mining_source_dir"] = str(args.input_dir)
         out.setdefault("run_meta", {})["tag"] = args.output_dir.name
+        out.setdefault("run_meta", {})["selector_ablation"] = SELECTOR_ABLATION or "FULL"
         (args.output_dir / f"{iid}.json").write_text(json.dumps(out, separators=(",", ":")))
         done += 1
         if done % 50 == 0 or done == len(ids):

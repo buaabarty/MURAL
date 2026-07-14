@@ -36,6 +36,8 @@ EXPECTED_RESULT_FILES = {
     "retrieve_then_localize_disagreements_20260711.tsv",
     "retrieve_then_localize_paired_20260711.tsv",
     "retrieve_then_localize_top20_20260711.tsv",
+    "selector_ablation_paired_20260714.tsv",
+    "selector_ablation_summary_20260714.tsv",
     "time_boundary_external_artifact_sensitivity_20260531.tsv",
     "tse_gt_mapping_v6.tsv",
 }
@@ -156,6 +158,45 @@ def verify_rq1() -> None:
         expect_metric_row(source, row_by(rows, "name", name), values, f"RQ1 {name}")
 
     verify_retrieve_then_localize_controls()
+    verify_selector_ablation()
+
+
+def verify_selector_ablation() -> None:
+    source = "selector_ablation_summary_20260714.tsv"
+    rows = read_tsv(source)
+    expected = {
+        "Full": (73.6, 50.1, 28.6, 57.0),
+        "minus_G1": (73.0, 48.4, 27.9, 55.2),
+        "minus_G2": (73.2, 49.7, 28.5, 56.6),
+        "minus_G3": (73.6, 50.1, 28.7, 57.0),
+        "minus_G4": (73.6, 50.1, 28.5, 57.0),
+        "minus_G5": (73.6, 50.1, 28.6, 57.0),
+    }
+    expect_row_set("Selector ablation row set", rows, "name", list(expected), source)
+    for name, values in expected.items():
+        expect_metric_row(source, row_by(rows, "name", name), values, f"Selector ablation {name}")
+
+    paired_source = "selector_ablation_paired_20260714.tsv"
+    paired = read_tsv(paired_source)
+    hit_rows = {
+        row["treatment"]: row
+        for row in paired
+        if row["baseline"] == "Full" and row["metric"] == "hit"
+    }
+    expect_equal("Selector ablation paired treatments", list(hit_rows), list(expected)[1:], paired_source)
+    g1 = hit_rows["minus_G1"]
+    expect_close("Selector minus G1 Hit delta", pct(g1["delta"]), -1.8, paired_source)
+    expect_close("Selector minus G1 Hit CI low", pct(g1["ci95_low"]), -5.4, paired_source)
+    expect_close("Selector minus G1 Hit CI high", pct(g1["ci95_high"]), 1.8, paired_source)
+    expect_equal("Selector minus G1 Hit wins", int(g1["wins"]), 36, paired_source)
+    expect_equal("Selector minus G1 Hit losses", int(g1["losses"]), 45, paired_source)
+    expect_close(
+        "Selector minus G1 exact p",
+        float(g1["exact_mcnemar_p"]),
+        0.3741744176047079,
+        paired_source,
+        tol=1e-15,
+    )
 
 
 def verify_retrieve_then_localize_controls() -> None:

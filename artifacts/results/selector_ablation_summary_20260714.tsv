@@ -1,0 +1,7 @@
+name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
+Full	500	20	0.736	0.5007613275613275	0.2864737545478257	0.57	temp_run/mural_experiment_additions/selector_ablation_v4/full
+minus_G1	500	20	0.73	0.48358581696081687	0.2790361754602466	0.552	temp_run/mural_experiment_additions/selector_ablation_v4/minus_g1
+minus_G2	500	20	0.732	0.49680299422799423	0.2850734312986634	0.566	temp_run/mural_experiment_additions/selector_ablation_v4/minus_g2
+minus_G3	500	20	0.736	0.5009279942279942	0.2871296632589975	0.57	temp_run/mural_experiment_additions/selector_ablation_v4/minus_g3
+minus_G4	500	20	0.736	0.5007613275613275	0.28540708788115904	0.57	temp_run/mural_experiment_additions/selector_ablation_v4/minus_g4
+minus_G5	500	20	0.736	0.5007613275613275	0.2864737545478257	0.57	temp_run/mural_experiment_additions/selector_ablation_v4/minus_g5

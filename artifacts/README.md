@@ -22,6 +22,8 @@ unchanged so archived commands and checksums stay stable.
 - `scripts/verify_paper_results.py`: strict result-inventory and value checker.
 - `scripts/export_ranked_file_seeds.py`: converts BM25 code-method output to
   ranked file records for the shared file-local selector.
+- `scripts/export_selector_ablation.py`: exports the Full selector and all five
+  leave-one-signal-family-out variants while caching parsed source files.
 - `scripts/export_fixed_prefix_fusion.py`: builds prefix-preserving context
   windows under a fixed output budget.
 - `scripts/export_equal_rrf_fusion.py`: combines BM25-local and KG-local
@@ -64,6 +66,10 @@ unchanged so archived commands and checksums stay stable.
 - `retrieve_then_localize_budget_curve_20260711.tsv` and
   `retrieve_then_localize_budget_paired_20260711.tsv`: budgets 5, 10, 20, and
   40 for KG-local, BM25-local, and MURAL tails.
+- `selector_ablation_summary_20260714.tsv` and
+  `selector_ablation_paired_20260714.tsv`: BM25-local Full and five
+  leave-one-signal-family-out selector variants, including paired uncertainty
+  and exact Hit@20 tests.
 
 ## Verifier
 

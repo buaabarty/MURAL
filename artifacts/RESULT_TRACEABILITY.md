@@ -43,7 +43,7 @@ The verifier checks:
 - RQ-1 controlled source, selector, fusion, and paired statistics;
 - RQ-2 fixed-prefix controls and paired statistics;
 - RQ-3 mapped edit-target coverage and paired uncertainty;
-- supplementary budget-sensitivity values; and
+- supplementary budget-sensitivity and selector-ablation values; and
 - leakage and external-artifact sensitivity statements.
 
 ## Main-Manuscript Mapping
@@ -102,6 +102,13 @@ The verifier checks:
   `artifacts/results/retrieve_then_localize_budget_curve_20260711.tsv`.
 - Four-budget paired statistics:
   `artifacts/results/retrieve_then_localize_budget_paired_20260711.tsv`.
+
+### Selector Signal-Family Ablation
+
+- Full and leave-one-family-out aggregate rows:
+  `artifacts/results/selector_ablation_summary_20260714.tsv`.
+- Paired bootstrap intervals, win/loss counts, and exact binary tests:
+  `artifacts/results/selector_ablation_paired_20260714.tsv`.
 
 ### Reproduction Settings
 
@@ -208,6 +215,41 @@ python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
   --output-summary logs/comparison_current/retrieve_then_localize_top20_20260711.tsv \
   --output-paired logs/comparison_current/retrieve_then_localize_paired_20260711.tsv \
   --output-disagreements logs/comparison_current/retrieve_then_localize_disagreements_20260711.tsv
+```
+
+### Selector Signal-Family Ablation
+
+The archived BM25 ranked-file records used for the reported selector run are
+the count-support seeds below. The cached exporter processes Full and all five
+leave-one-family-out variants in one pass; `artifacts/selector_ablation_plan.md`
+also documents an eight-shard invocation.
+
+```bash
+BM25_FILE_SEEDS=temp_run/private_bm25_filelocal_20260704/seeds_top20_files_count
+SELECTOR_ROOT=temp_run/mural_experiment_additions/selector_ablation_v4
+
+python3 artifacts/scripts/export_selector_ablation.py \
+  --input-dir "$BM25_FILE_SEEDS" \
+  --output-root "$SELECTOR_ROOT" \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --limit 50
+
+python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
+  --group Full="$SELECTOR_ROOT/full" \
+  --group minus_G1="$SELECTOR_ROOT/minus_g1" \
+  --group minus_G2="$SELECTOR_ROOT/minus_g2" \
+  --group minus_G3="$SELECTOR_ROOT/minus_g3" \
+  --group minus_G4="$SELECTOR_ROOT/minus_g4" \
+  --group minus_G5="$SELECTOR_ROOT/minus_g5" \
+  --compare Full=minus_G1 --compare Full=minus_G2 \
+  --compare Full=minus_G3 --compare Full=minus_G4 \
+  --compare Full=minus_G5 \
+  --top-k 20 --bootstrap-iters 10000 --seed 7 \
+  --output-summary artifacts/results/selector_ablation_summary_20260714.tsv \
+  --output-paired artifacts/results/selector_ablation_paired_20260714.tsv \
+  --output-disagreements temp_run/selector_ablation_disagreements_20260714.tsv
 ```
 
 ### Patch-Derived Coverage
