@@ -688,8 +688,13 @@ def build_user_record(name):
                 break
         return selected
 
+    def _expanded_repair_profile(self):
+        return os.environ.get("MURAL_REPAIR_PROFILE", "compact").strip().lower() == "expanded"
+
     def _get_prompt_token_limit(self):
         base_limit = int(self.MAX_INPUT_LENGTH * 0.9)
+        if self._expanded_repair_profile() and self.api_type == "openai_compat":
+            return min(base_limit, 8000)
         model_name = (self.model or "").lower()
         if "qwen3-coder-480b-a35b-instruct" in model_name:
             return min(base_limit, 3200)
@@ -705,6 +710,8 @@ def build_user_record(name):
         model_name = (self.model or "").lower()
         if "qwen3-coder-30b" in model_name:
             return 1024
+        if self._expanded_repair_profile():
+            return 2048
         if "deepseek-coder-v2-lite" in model_name:
             return 1536
         if "qwen3-coder-480b-a35b-instruct" in model_name:
@@ -2205,7 +2212,9 @@ def build_user_record(name):
                     continue
                 seen_retry_contents.add(key)
                 deduped_retry_variants.append((retry_label, retry_content, no_op_failure))
-            if self._prefer_ultra_compact_first():
+            if self._expanded_repair_profile():
+                deduped_retry_variants = deduped_retry_variants[:2]
+            elif self._prefer_ultra_compact_first():
                 deduped_retry_variants = deduped_retry_variants[:1]
 
             for retry_label, retry_content, no_op_failure in deduped_retry_variants:

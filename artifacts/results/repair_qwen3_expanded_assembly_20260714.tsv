@@ -1,0 +1,1501 @@
+instance_id	variant	compact_nonempty	fallback_attempted	fallback_nonempty	selected_source	patch_sha256	patch_chars
+astropy__astropy-12907	issue	0	1	0	empty		0
+astropy__astropy-13033	issue	0	1	0	empty		0
+astropy__astropy-13236	issue	0	1	0	empty		0
+astropy__astropy-13398	issue	0	1	0	empty		0
+astropy__astropy-13453	issue	0	1	1	expanded_fallback	699987ddf3a78fd1de42d2a1dd4f864ac6de5989607834e01c52606b03129e57	549
+astropy__astropy-13579	issue	1	0	0	compact	dd40ccc0666c03348fa4d66db22b34712fbe76c07daa0f67b897ae01279b59f0	1041
+astropy__astropy-13977	issue	0	1	0	empty		0
+astropy__astropy-14096	issue	0	1	0	empty		0
+astropy__astropy-14182	issue	1	0	0	compact	f9bfd947827593829ebbf284af22c87f1b6fab3434511189ef1f0124dc6a14ab	456
+astropy__astropy-14309	issue	0	1	1	expanded_fallback	117b453439e8c6a299b0651438c6230e01212cba5ffc7c27c48d7b0e8aeeb9e1	310
+astropy__astropy-14365	issue	0	1	0	empty		0
+astropy__astropy-14369	issue	0	1	0	empty		0
+astropy__astropy-14508	issue	1	0	0	compact	4e72e88aa3a99e8615517990544988db3b43fddee4423c35a58ac56c915631a8	501
+astropy__astropy-14539	issue	0	1	0	empty		0
+astropy__astropy-14598	issue	1	0	0	compact	dd68e6909b78d04ced114bd275aa2c0cdbd15fd1f75b087020bf7a19fa9f655c	663
+astropy__astropy-14995	issue	1	0	0	compact	a9a1aedc0943cd942d2350fea9b99c7865656672463b9b4f3b3a4958382c4dfc	2381
+astropy__astropy-7166	issue	1	0	0	compact	94d2ea9bdb8f5d2980173099d4cbcc81c32d7f2adac7a2e3cbe446d376749cc9	625
+astropy__astropy-7336	issue	0	1	0	empty		0
+astropy__astropy-7606	issue	1	0	0	compact	dc1020b69929fe40102180674d5b06a679807548a8e906e2b41050b26d0b33d5	362
+astropy__astropy-7671	issue	0	1	0	empty		0
+astropy__astropy-8707	issue	0	1	0	empty		0
+astropy__astropy-8872	issue	0	1	0	empty		0
+django__django-10097	issue	0	1	0	empty		0
+django__django-10554	issue	0	1	0	empty		0
+django__django-10880	issue	0	1	1	expanded_fallback	02ee666ba67a728189831627fc770f4b6a82e75fb1ab0997ce53038e7dd5470c	639
+django__django-10914	issue	1	0	0	compact	1f194930c41ab9e597cff1094a5b908a48e4c0151de99ee711852587b99a2e39	461
+django__django-10973	issue	0	1	0	empty		0
+django__django-10999	issue	0	1	0	empty		0
+django__django-11066	issue	1	0	0	compact	b8902182cc96a81fde52c15a2c4c27235d937347bee1eec31dc4c975986950b3	567
+django__django-11087	issue	0	1	0	empty		0
+django__django-11095	issue	1	0	0	compact	bdb897fe4a8fb1f77d84b5b7343e0d49a4b093e1776b8e712c9d19251ea59944	361
+django__django-11099	issue	0	1	0	empty		0
+django__django-11119	issue	0	1	0	empty		0
+django__django-11133	issue	0	1	0	empty		0
+django__django-11138	issue	0	1	1	expanded_fallback	304fba17b26b3712aeb16f7da8bac3fbbeb6686b0e0761983405dc273226147a	480
+django__django-11141	issue	1	0	0	compact	d33f3a4047253257f09e79dc076dce6f50de1b83a44bbceb94078f6e03d83beb	1007
+django__django-11149	issue	0	1	0	empty		0
+django__django-11163	issue	1	0	0	compact	771f69a5d163b6815070df2bf389110317a5f38242d77537904fe8ecc93dc1a8	417
+django__django-11179	issue	1	0	0	compact	a0f460702fe5ccdef24f5e6b4fbb46e6a7eda639118a7bf2c55a33f6c174a680	342
+django__django-11206	issue	1	0	0	compact	e24d1635c29fb3ed096df4dabe7159e178454323cd8672f7c3f2af685b65aa0d	653
+django__django-11211	issue	0	1	0	empty		0
+django__django-11239	issue	1	0	0	compact	055e926d4231de60493bca24d2d9f159029e51e8ae54bf24c5c74cb9428d15cd	651
+django__django-11265	issue	0	1	0	empty		0
+django__django-11276	issue	0	1	0	empty		0
+django__django-11292	issue	0	1	0	empty		0
+django__django-11299	issue	0	1	0	empty		0
+django__django-11333	issue	0	1	0	empty		0
+django__django-11400	issue	0	1	0	empty		0
+django__django-11433	issue	0	1	0	empty		0
+django__django-11451	issue	1	0	0	compact	3ebe083854f1d457a23701e0f97fe8e885da04884043a77c152e6fe75fa072e5	324
+django__django-11477	issue	1	0	0	compact	d3ae5c8106bae95e8fc83652049b3906716c8c80779e24eb7b9a41a9da39fd03	792
+django__django-11490	issue	0	1	0	empty		0
+django__django-11532	issue	1	0	0	compact	b3f2f80b4c925546b5d145696d3c6aa2c0576f2658b3ef80e4f08d74c1b97059	807
+django__django-11551	issue	1	0	0	compact	8efeaaf282fb479b096fc15851a985dae0a6d22b68ec2da196b4e8a185ba047d	473
+django__django-11555	issue	0	1	0	empty		0
+django__django-11603	issue	0	1	0	empty		0
+django__django-11728	issue	0	1	0	empty		0
+django__django-11734	issue	0	1	0	empty		0
+django__django-11740	issue	0	1	0	empty		0
+django__django-11749	issue	1	0	0	compact	d8966a4b030c97c7b053b059d0cc62dc251e9d2a8958c38a7ad44579e4b4c372	369
+django__django-11790	issue	0	1	0	empty		0
+django__django-11815	issue	1	0	0	compact	80b969c497f5c9d832ab8fe8a0753ced92ebb6a251694a7a727cd96b406989ff	557
+django__django-11820	issue	0	1	0	empty		0
+django__django-11848	issue	1	0	0	compact	544433ec77d396f7ff7d77ab26a47f1dc462268f34b7341f32bdec748c1119dc	633
+django__django-11880	issue	0	1	0	empty		0
+django__django-11885	issue	0	1	0	empty		0
+django__django-11951	issue	0	1	0	empty		0
+django__django-11964	issue	0	1	0	empty		0
+django__django-11999	issue	0	1	0	empty		0
+django__django-12039	issue	0	1	0	empty		0
+django__django-12050	issue	0	1	0	empty		0
+django__django-12125	issue	0	1	1	expanded_fallback	505a2c4ab31dd25eaf32cb4690459911d317ff70490a29fd830ce57ef4d8f4ac	1616
+django__django-12143	issue	0	1	0	empty		0
+django__django-12155	issue	1	0	0	compact	076eac9a2ab083d33a4ade80755e81b12351c6d38a72b4294a5f330f52f7d2fc	514
+django__django-12193	issue	0	1	0	empty		0
+django__django-12209	issue	0	1	0	empty		0
+django__django-12262	issue	0	1	0	empty		0
+django__django-12273	issue	0	1	0	empty		0
+django__django-12276	issue	1	0	0	compact	c2d57b3397cdef507d74d256aa1aaee098c1c027ebb7bd43a832779a420e804a	262
+django__django-12304	issue	0	1	0	empty		0
+django__django-12308	issue	0	1	1	expanded_fallback	53e9f9a72998f59ff31a146c7b570a2d8dee7130309d3957646a44a3266464d9	500
+django__django-12325	issue	0	1	0	empty		0
+django__django-12406	issue	1	0	0	compact	bb0f9ada0feb667807d7013830d4cf9d46608ffa4b046eb7bbbb4fd7d4d7106e	403
+django__django-12419	issue	1	0	0	compact	e0fa77e176e54a3781e05223e7f5270927ae16d943b9b39cd55da8841f7484ad	518
+django__django-12663	issue	1	0	0	compact	352985b3a3131a4c9766c66909ba09a995f417e7871a919560863c26d8991c91	440
+django__django-12708	issue	0	1	0	empty		0
+django__django-12713	issue	0	1	0	empty		0
+django__django-12741	issue	1	0	0	compact	e5692c1981c0697e914583424d6d4b7f4b9a9e991cd5dc9599102cc6d326d696	747
+django__django-12754	issue	0	1	0	empty		0
+django__django-12774	issue	0	1	0	empty		0
+django__django-12858	issue	0	1	0	empty		0
+django__django-12965	issue	0	1	0	empty		0
+django__django-13012	issue	0	1	0	empty		0
+django__django-13023	issue	1	0	0	compact	4671508e0de0cbb086f707359a87a73011e2cff4680d274913b997ec87d187ff	695
+django__django-13028	issue	1	0	0	compact	eeb448dba7d2f507e1f54b84007d3819ea23a05b29f807a45825036fb7e58ebd	738
+django__django-13033	issue	0	1	0	empty		0
+django__django-13089	issue	0	1	0	empty		0
+django__django-13109	issue	1	0	0	compact	609754dd6c1d674f4dff115cc0759dbd2b1f81df43eaad0b04da31a48fa55b93	484
+django__django-13112	issue	0	1	0	empty		0
+django__django-13121	issue	1	0	0	compact	ebfe22dd763f2b24a88febd075ba5d4d5509f2ad6d853fa64dbd889815c43f77	485
+django__django-13128	issue	1	0	0	compact	98dfba58c8aca4f434475ceca079de49b3231d8cbe8cdb935bcce35e9f00352f	514
+django__django-13158	issue	0	1	0	empty		0
+django__django-13195	issue	0	1	0	empty		0
+django__django-13212	issue	0	1	0	empty		0
+django__django-13279	issue	0	1	1	expanded_fallback	28642f84d3ea182be64480e2f91cc02b8b0a5cbf1ec9a1bfbec38e6a062e7f38	909
+django__django-13297	issue	0	1	1	expanded_fallback	6847593b718eddcf8bfe51e4be0ef8a1a650cb57282dbf637985311db096ff86	604
+django__django-13315	issue	0	1	0	empty		0
+django__django-13343	issue	0	1	0	empty		0
+django__django-13344	issue	0	1	0	empty		0
+django__django-13346	issue	0	1	0	empty		0
+django__django-13363	issue	1	0	0	compact	ea98e70fb38d91daa7c789cacb878748446a8685a5d5e56bc15ae9f4bec112c2	619
+django__django-13401	issue	0	1	0	empty		0
+django__django-13406	issue	1	0	0	compact	dc139d34831b8f24bc8bc4fd4f12c4882b11cc0d835a9cce02e3b463fcf134c8	476
+django__django-13410	issue	0	1	0	empty		0
+django__django-13417	issue	0	1	1	expanded_fallback	549a3ff2b4c1dab218cd57b3c859af78301a782722d4c9a598520af5064115e6	575
+django__django-13449	issue	1	0	0	compact	76f5d1cd4602a79a9ad4bdce5cc9b52c2b5f5ae6757f5fb7ae9bf8e9dae19746	767
+django__django-13512	issue	1	0	0	compact	ecfc7d01a607883b10f1d429efca2d5a0cab8946abd44a50bd3111168dee166b	396
+django__django-13513	issue	0	1	0	empty		0
+django__django-13516	issue	0	1	0	empty		0
+django__django-13551	issue	1	0	0	compact	ff0229b9d0dfe88206ac6f6e48f72323cf40bdd9624d1f366f0ab57c96a09953	765
+django__django-13568	issue	0	1	0	empty		0
+django__django-13569	issue	0	1	0	empty		0
+django__django-13590	issue	0	1	0	empty		0
+django__django-13658	issue	1	0	0	compact	2229b7b651a76af031b138396ba0d75deff523836a4d816279320551d9e0c62f	739
+django__django-13670	issue	1	0	0	compact	0958ff98eac92feb94863ba9b74e7abde4bdae86344041748531c0091a0648bd	433
+django__django-13741	issue	1	0	0	compact	a465f103e5b893d06792f1a440421b9a7dfa83a36120e8bc6ad30f80cf08613b	310
+django__django-13786	issue	0	1	0	empty		0
+django__django-13794	issue	1	0	0	compact	b5a5c9810e34c6f6b774c7ea4d512534ec38283fe0b81f435906ef1e2d21f190	400
+django__django-13807	issue	1	0	0	compact	b18f9f30b2858de1a66d3f0cf85c8839a3c14d62ea677033a962703f2c0be5e8	1959
+django__django-13809	issue	1	0	0	compact	6d6cdf4885da69e51dc8e85c8d97980d161d2d6a10fb275029f41c20c8e48515	509
+django__django-13810	issue	1	0	0	compact	6647263e4a03157c93e3e88aa6056a93692daa071ab3bd5f1f3e5171dcb4f6f3	656
+django__django-13820	issue	1	0	0	compact	1eb260e25ecd132d336c4e2cac4130884082bd2114c3c4cc357feded59ec41de	814
+django__django-13821	issue	0	1	0	empty		0
+django__django-13837	issue	0	1	0	empty		0
+django__django-13925	issue	1	0	0	compact	5fac42490bc2ac0fa5234d29970477698a81c05a9816f85fecd8c3c998dcacb5	618
+django__django-13933	issue	0	1	0	empty		0
+django__django-13964	issue	0	1	0	empty		0
+django__django-14007	issue	0	1	0	empty		0
+django__django-14011	issue	0	1	0	empty		0
+django__django-14017	issue	0	1	1	expanded_fallback	2b069af2489a70d413de7c8d1b0d0a0cac919d0ac196593ff4930574a14d6170	778
+django__django-14034	issue	0	1	0	empty		0
+django__django-14053	issue	0	1	0	empty		0
+django__django-14089	issue	0	1	0	empty		0
+django__django-14122	issue	0	1	0	empty		0
+django__django-14140	issue	1	0	0	compact	9a1025b0032f5f4483db1039e7f585ad631041ce6ab66026fbe5d7e92d8b9f5e	496
+django__django-14155	issue	0	1	0	empty		0
+django__django-14170	issue	0	1	0	empty		0
+django__django-14238	issue	0	1	0	empty		0
+django__django-14311	issue	0	1	0	empty		0
+django__django-14315	issue	0	1	0	empty		0
+django__django-14349	issue	1	0	0	compact	9f8c42192e7308dce92ed25a80999bddd1854f0f495640ec1213181fd2a52c47	651
+django__django-14351	issue	0	1	0	empty		0
+django__django-14373	issue	1	0	0	compact	cb14488f8fc682f9b0cad486bbd7d2447c05374cffb9e98fbaada72e0ffa1266	283
+django__django-14376	issue	1	0	0	compact	7275537f77ccef3db96149c0f71724f335a4aab3d38a2ce821f4ac154eb38ac2	630
+django__django-14404	issue	0	1	0	empty		0
+django__django-14434	issue	0	1	0	empty		0
+django__django-14493	issue	0	1	0	empty		0
+django__django-14500	issue	0	1	0	empty		0
+django__django-14534	issue	0	1	0	empty		0
+django__django-14539	issue	0	1	0	empty		0
+django__django-14559	issue	0	1	0	empty		0
+django__django-14580	issue	0	1	0	empty		0
+django__django-14608	issue	0	1	0	empty		0
+django__django-14631	issue	0	1	0	empty		0
+django__django-14672	issue	0	1	0	empty		0
+django__django-14725	issue	1	0	0	compact	3089a82f69b13f5c170dbfd2c2b2742e995630ed1e497ef2f738d24ba8c4a244	509
+django__django-14752	issue	1	0	0	compact	b8acf83f6d9748a5201efef3d63b524858533671247e25b236eee3e0a45e40ed	487
+django__django-14765	issue	0	1	0	empty		0
+django__django-14771	issue	0	1	0	empty		0
+django__django-14787	issue	0	1	0	empty		0
+django__django-14792	issue	0	1	0	empty		0
+django__django-14855	issue	0	1	0	empty		0
+django__django-14915	issue	0	1	0	empty		0
+django__django-14999	issue	1	0	0	compact	28c36b0ec2bf61dae84e7222508a8eb7124003342cc3868f1ced0e13ed7a7728	606
+django__django-15022	issue	0	1	0	empty		0
+django__django-15037	issue	0	1	0	empty		0
+django__django-15098	issue	0	1	0	empty		0
+django__django-15103	issue	1	0	0	compact	9d10485c54b31c43eecb188257e00091885891100fac62f371c44a3594eb26cb	1317
+django__django-15104	issue	1	0	0	compact	16e0f0105edbb7c5772b48ed47332b156b1006f4528a418413180fdd5d866036	760
+django__django-15127	issue	1	0	0	compact	c755733351d0332954b1805255507a5ce7cf76c803ba8748eb448317a36c2f36	342
+django__django-15128	issue	1	0	0	compact	442b0259ef2a7145649c861b1ff190de4801196f3f3d1e22bee4de0552ad36d3	422
+django__django-15161	issue	0	1	0	empty		0
+django__django-15252	issue	0	1	0	empty		0
+django__django-15268	issue	0	1	0	empty		0
+django__django-15277	issue	0	1	1	expanded_fallback	baf6e3788a95375a6b1d44e68fe173ae66f1df37b92cfff801d8ab54aaf3426d	617
+django__django-15278	issue	0	1	0	empty		0
+django__django-15280	issue	1	0	0	compact	4072ce1c2328abe05f989412da1f22782f88027cd89fd606b8d524ac1dd5abab	630
+django__django-15315	issue	1	0	0	compact	9f9f1c4a73f1f61cf75a7afeac0ddee8340ce6b15794a39aab6040b26bdf6016	641
+django__django-15368	issue	0	1	0	empty		0
+django__django-15375	issue	0	1	0	empty		0
+django__django-15380	issue	0	1	0	empty		0
+django__django-15382	issue	1	0	0	compact	d012b696c3dae168558b9534c66a0e365919babf7cfe90e62e163a72ed932d20	467
+django__django-15467	issue	1	0	0	compact	4cafc029615afe5c859c4abea558276ddf769d5e34f5027440e3158cc3ab3c89	520
+django__django-15499	issue	0	1	0	empty		0
+django__django-15503	issue	0	1	0	empty		0
+django__django-15525	issue	0	1	0	empty		0
+django__django-15554	issue	0	1	1	expanded_fallback	38b8c94747ee5b67dece9b1df89b599da3c55f9b9d47e25aaef238deece231b6	924
+django__django-15561	issue	1	0	0	compact	ae92415763cd75389cf76235e8c961a4fce800bfe2a74e48091d871de538171b	990
+django__django-15563	issue	0	1	0	empty		0
+django__django-15569	issue	0	1	0	empty		0
+django__django-15572	issue	0	1	0	empty		0
+django__django-15629	issue	1	0	0	compact	92e93f9c211f657f8cf647bb989179e4f8b3abcbbaeabd93490b913045df2433	1714
+django__django-15695	issue	1	0	0	compact	a33b9cf71ee4e4f57f2cc1acdeffcf4202b9060237873d1f86fa3928bb609299	645
+django__django-15731	issue	0	1	0	empty		0
+django__django-15732	issue	1	0	0	compact	95403cb34b8d512bdfe06babd7d45432d9b92ae7f4959a048f7dc3769c8c5644	1349
+django__django-15741	issue	0	1	1	expanded_fallback	ca624c1935a444a6c887d0f6d4c612055d66d51b20802bd6c0594110cceb567a	439
+django__django-15814	issue	0	1	0	empty		0
+django__django-15851	issue	0	1	0	empty		0
+django__django-15863	issue	0	1	0	empty		0
+django__django-15916	issue	0	1	0	empty		0
+django__django-15930	issue	0	1	0	empty		0
+django__django-15957	issue	0	1	0	empty		0
+django__django-15973	issue	0	1	0	empty		0
+django__django-15987	issue	0	1	0	empty		0
+django__django-16032	issue	0	1	0	empty		0
+django__django-16082	issue	0	1	0	empty		0
+django__django-16100	issue	1	0	0	compact	a42f883273041d51566803b0f33c016ef6b561f7ed546f2583106a755daedebb	362
+django__django-16116	issue	0	1	0	empty		0
+django__django-16136	issue	0	1	0	empty		0
+django__django-16139	issue	1	0	0	compact	7463f25843567c0ad6bf46706e290dbedf10364b420245cc96b53d0a94a84589	434
+django__django-16145	issue	0	1	0	empty		0
+django__django-16255	issue	1	0	0	compact	3ab9df6fa24fca3c5353efe5558d48b23a408904e52e82b99c4f50ca1e6b0886	386
+django__django-16256	issue	0	1	0	empty		0
+django__django-16263	issue	0	1	1	expanded_fallback	bf20f803c1212dcbc76f11722191ea3de18b89098abb3731d2070e77d36d4cde	1764
+django__django-16315	issue	0	1	1	expanded_fallback	2766414c0f108fbf5864c4add52eca027869fb689afc51901f691d12474a82eb	1292
+django__django-16333	issue	1	0	0	compact	2f56e804ff9f8a27f456fdf5f8246ff26131852cd3a0acb9805e7cff21b66571	530
+django__django-16429	issue	0	1	0	empty		0
+django__django-16454	issue	0	1	0	empty		0
+django__django-16485	issue	0	1	0	empty		0
+django__django-16493	issue	1	0	0	compact	f15328a09d41bfbf9977af1163bdb136a4a2e4a07b3ccede0273d2aee0b51327	929
+django__django-16502	issue	0	1	0	empty		0
+django__django-16527	issue	1	0	0	compact	46a0687379ecbdb0d43221ae09a5e5e329e3f23a6f765a50fd350f0ac847a2dc	509
+django__django-16560	issue	1	0	0	compact	714b6949e6868f6ff8746146f7fd5ae7d1f82b7d77e0e14067eecf4c6e53c1a4	526
+django__django-16569	issue	0	1	0	empty		0
+django__django-16595	issue	1	0	0	compact	7a5a3eb8709d28a3449e7e18063b6ef49e0a205ea3b7c21074beeac3f295408d	470
+django__django-16612	issue	0	1	0	empty		0
+django__django-16631	issue	0	1	0	empty		0
+django__django-16642	issue	0	1	0	empty		0
+django__django-16661	issue	1	0	0	compact	ad23709a6843c19d6cc8fd413cc7a30f6bba8ed68b5d03ca2080768ed480b8bc	364
+django__django-16662	issue	0	1	0	empty		0
+django__django-16667	issue	1	0	0	compact	1b944150b8a162ce815f5d854edf941b63969e7a1a7f40a2c1705c90f6a2188e	555
+django__django-16801	issue	0	1	0	empty		0
+django__django-16819	issue	0	1	0	empty		0
+django__django-16877	issue	0	1	0	empty		0
+django__django-16899	issue	0	1	0	empty		0
+django__django-16901	issue	0	1	0	empty		0
+django__django-16938	issue	0	1	0	empty		0
+django__django-16950	issue	0	1	0	empty		0
+django__django-17029	issue	1	0	0	compact	62959fbea89ee40c8312881c59d23b712eebc3612ae6dbb1e92c093e745cd700	480
+django__django-17084	issue	1	0	0	compact	f3eac8526195a795ea9621e34251bb5bad743a760fa7a2ef381ab0bff36e9925	522
+django__django-17087	issue	0	1	0	empty		0
+django__django-7530	issue	0	1	1	expanded_fallback	50fea21a5836185356b5276602740724b15d5a164a70bded2c0c3b188b0307aa	503
+django__django-9296	issue	0	1	0	empty		0
+matplotlib__matplotlib-13989	issue	0	1	0	empty		0
+matplotlib__matplotlib-14623	issue	1	0	0	compact	8f67fddb87bbaca99595bf5b1f5fd1b2c45692ab3ea5eae3d6da856f5e6a7f1b	1039
+matplotlib__matplotlib-20488	issue	0	1	0	empty		0
+matplotlib__matplotlib-20676	issue	0	1	0	empty		0
+matplotlib__matplotlib-20826	issue	1	0	0	compact	8843a40e5764ddfbf5abccd42b83f147306ae957317274105f95003974e8df45	416
+matplotlib__matplotlib-20859	issue	0	1	0	empty		0
+matplotlib__matplotlib-21568	issue	1	0	0	compact	a570d5e5a6d387c0066858b88db7389c4b5a1b77bdf9cde4d570f48973f81902	470
+matplotlib__matplotlib-22719	issue	0	1	0	empty		0
+matplotlib__matplotlib-22865	issue	0	1	0	empty		0
+matplotlib__matplotlib-22871	issue	0	1	0	empty		0
+matplotlib__matplotlib-23299	issue	0	1	0	empty		0
+matplotlib__matplotlib-23314	issue	0	1	0	empty		0
+matplotlib__matplotlib-23412	issue	0	1	0	empty		0
+matplotlib__matplotlib-23476	issue	1	0	0	compact	22ab230b76b678a9df54155fa12933989e6ab54f31733b894c5db83e5eaa621c	1457
+matplotlib__matplotlib-24026	issue	0	1	1	expanded_fallback	2d7c81468910cd73f9a69c0e85f887d9d28939d71e16ccfed259fbed5ba17e85	784
+matplotlib__matplotlib-24149	issue	0	1	1	expanded_fallback	de1b2b9ba820b9b2e6b5199fe21dfe10046053f7df728d2d70b1672e922690b8	507
+matplotlib__matplotlib-24177	issue	0	1	0	empty		0
+matplotlib__matplotlib-24570	issue	0	1	0	empty		0
+matplotlib__matplotlib-24627	issue	1	0	0	compact	773b7473ab98e8146aed8474ae8b639a513ddd4d100770428b3aa3edc61cc16b	445
+matplotlib__matplotlib-24637	issue	0	1	0	empty		0
+matplotlib__matplotlib-24870	issue	0	1	1	expanded_fallback	7ec10b51b327f1e0541cd3a02c2e9a956feea980751066da4fa78be1e6d1f801	474
+matplotlib__matplotlib-24970	issue	0	1	0	empty		0
+matplotlib__matplotlib-25122	issue	1	0	0	compact	6869dca75aa0187ec7ca63874e8f4c19fae26050f3191f3b325668fc59ea2cdb	668
+matplotlib__matplotlib-25287	issue	0	1	0	empty		0
+matplotlib__matplotlib-25311	issue	0	1	0	empty		0
+matplotlib__matplotlib-25332	issue	1	0	0	compact	e00fbff1c1a2e448534a8b2a0008c7dc7ebc511c7542d2892c968c004ed4537d	559
+matplotlib__matplotlib-25479	issue	0	1	0	empty		0
+matplotlib__matplotlib-25775	issue	0	1	0	empty		0
+matplotlib__matplotlib-25960	issue	0	1	0	empty		0
+matplotlib__matplotlib-26113	issue	0	1	0	empty		0
+matplotlib__matplotlib-26208	issue	0	1	0	empty		0
+matplotlib__matplotlib-26291	issue	0	1	0	empty		0
+matplotlib__matplotlib-26342	issue	0	1	0	empty		0
+matplotlib__matplotlib-26466	issue	0	1	0	empty		0
+mwaskom__seaborn-3069	issue	0	1	0	empty		0
+mwaskom__seaborn-3187	issue	1	0	0	compact	6148f9c794eb9a2a41322c30fa87dfbe5e8d5142a18810071db57535d6b68a84	569
+pallets__flask-5014	issue	0	1	0	empty		0
+psf__requests-1142	issue	1	0	0	compact	203936e47ee56bf599272961688dbd9c5d773b802dc1ea27f9dece5aa37605c5	823
+psf__requests-1724	issue	1	0	0	compact	35d5bc08a81e8baa1c583a9984a23aa4385fa8a4e983316fa1cc158edd673c90	339
+psf__requests-1766	issue	1	0	0	compact	2a02974a784c675150167550ed6f8bb7d59ad8fb4e1edc2779a6cb100325fd2c	493
+psf__requests-1921	issue	0	1	0	empty		0
+psf__requests-2317	issue	0	1	1	expanded_fallback	1d3afac918d4014df279e5d254d4f489ad5d6e5b402c0055e3df26ac70c84ed6	307
+psf__requests-2931	issue	0	1	0	empty		0
+psf__requests-5414	issue	1	0	0	compact	911fceba09e0d374497c917a0c38674efd8c6b0c72e333981d7b3080f151c14a	587
+psf__requests-6028	issue	0	1	0	empty		0
+pydata__xarray-2905	issue	1	0	0	compact	c2220e3a1a0d3186b37a3d033e8568639ac47927edf68f6e46e26b45f9a79848	386
+pydata__xarray-3095	issue	0	1	0	empty		0
+pydata__xarray-3151	issue	0	1	0	empty		0
+pydata__xarray-3305	issue	0	1	0	empty		0
+pydata__xarray-3677	issue	0	1	1	expanded_fallback	da68371acae9fa52eb5f282b74e53f1d55e7a6d2908d27326dc0ffa4c4dbd8c6	1266
+pydata__xarray-3993	issue	1	0	0	compact	d21ddabfea1d525dbd2e2f02e649a128e5ae3bf5127e092e230cf74b097fbd53	418
+pydata__xarray-4075	issue	0	1	0	empty		0
+pydata__xarray-4094	issue	0	1	0	empty		0
+pydata__xarray-4356	issue	1	0	0	compact	3d70b9a8e696c2cecaa64d18637117492195c904075cd34780bf54c6c7fc7421	523
+pydata__xarray-4629	issue	0	1	0	empty		0
+pydata__xarray-4687	issue	0	1	0	empty		0
+pydata__xarray-4695	issue	0	1	0	empty		0
+pydata__xarray-4966	issue	0	1	0	empty		0
+pydata__xarray-6461	issue	1	0	0	compact	92313e973306533f3a9f0ec17f5001f34bdc533222c4c918a4c4f93d78f0f854	511
+pydata__xarray-6599	issue	0	1	1	expanded_fallback	829fcffb10813e3467d7df5a7c858922d491e35c40a5c66d1ecf9b2529034a8f	427
+pydata__xarray-6721	issue	0	1	0	empty		0
+pydata__xarray-6744	issue	0	1	0	empty		0
+pydata__xarray-6938	issue	0	1	0	empty		0
+pydata__xarray-6992	issue	0	1	0	empty		0
+pydata__xarray-7229	issue	0	1	0	empty		0
+pydata__xarray-7233	issue	0	1	0	empty		0
+pydata__xarray-7393	issue	0	1	0	empty		0
+pylint-dev__pylint-4551	issue	0	1	0	empty		0
+pylint-dev__pylint-4604	issue	1	0	0	compact	abd694126cd43f0c234f30b34209e2ad639ec3ec638645fe913a3447b445ff57	878
+pylint-dev__pylint-4661	issue	0	1	0	empty		0
+pylint-dev__pylint-4970	issue	1	0	0	compact	92d9a0518d883b6634729fd92efca041f94c0023ca8b135939a6885a2872def8	463
+pylint-dev__pylint-6386	issue	0	1	0	empty		0
+pylint-dev__pylint-6528	issue	0	1	0	empty		0
+pylint-dev__pylint-6903	issue	1	0	0	compact	dd3e67d35ebe95482959186366811cd5a7c5f6b1a6b693d05fb7db29c80e28d3	379
+pylint-dev__pylint-7080	issue	0	1	0	empty		0
+pylint-dev__pylint-7277	issue	0	1	0	empty		0
+pylint-dev__pylint-8898	issue	0	1	0	empty		0
+pytest-dev__pytest-10051	issue	1	0	0	compact	0864d24aaac0e498eabefcf098e62320f77e86ad1976dcb5d36027552934a9ac	393
+pytest-dev__pytest-10081	issue	0	1	0	empty		0
+pytest-dev__pytest-10356	issue	1	0	0	compact	9fc0c6457429af5b808dbaabb8c9294c81d479f29356644be6a9515963caf629	360
+pytest-dev__pytest-5262	issue	0	1	0	empty		0
+pytest-dev__pytest-5631	issue	0	1	0	empty		0
+pytest-dev__pytest-5787	issue	0	1	0	empty		0
+pytest-dev__pytest-5809	issue	1	0	0	compact	79bd30df08209807a932bedaad1d2db82b488e0adfbb4c1606cd4e7f9dafd433	287
+pytest-dev__pytest-5840	issue	0	1	0	empty		0
+pytest-dev__pytest-6197	issue	0	1	0	empty		0
+pytest-dev__pytest-6202	issue	1	0	0	compact	cc582843ed03adfdf866786c3cc284d72e9de2494c0d88c84e32b348e5d2a286	270
+pytest-dev__pytest-7205	issue	0	1	0	empty		0
+pytest-dev__pytest-7236	issue	0	1	0	empty		0
+pytest-dev__pytest-7324	issue	1	0	0	compact	a8073d1ecae63f622ed6111a965a99e9d9b2e89423e0cf161c670bbb056b9189	378
+pytest-dev__pytest-7432	issue	1	0	0	compact	9289289131693a025b58b587e6024417e3c874feef91fd96177ccdb7c124489b	574
+pytest-dev__pytest-7490	issue	0	1	0	empty		0
+pytest-dev__pytest-7521	issue	0	1	1	expanded_fallback	5525c4449cd3b2473025ce42e390f18e47257426fae382881cc8ca122d1ac8ab	366
+pytest-dev__pytest-7571	issue	0	1	0	empty		0
+pytest-dev__pytest-7982	issue	0	1	1	expanded_fallback	9b66451ac8f7de05c309a26a2d41d4cc9dabd6e082e6544af6ccc4c5d3bd1bfb	430
+pytest-dev__pytest-8399	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-10297	issue	1	0	0	compact	092bb0cab8bef42465e135725a162d7f1cd1241ed3fa0173dfec964408c7c12b	675
+scikit-learn__scikit-learn-10844	issue	1	0	0	compact	7489ff13ae0932d430151e5bb55d27f1e37a3d19391aa41e2203c9a8cd4d2e28	445
+scikit-learn__scikit-learn-10908	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-11310	issue	1	0	0	compact	d6489e93b7ee5596c85c6b2c3a0abacbcfa11709a86f31f8034cd076d191356d	500
+scikit-learn__scikit-learn-11578	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-12585	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-12682	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-12973	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-13124	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-13135	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-13142	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-13328	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-13439	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-13496	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-13779	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-14053	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-14087	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-14141	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-14496	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-14629	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-14710	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-14894	issue	1	0	0	compact	27248a30eb70bcac0861679b542fc550ec7e37d57371d07a062cb5cb2f03d857	645
+scikit-learn__scikit-learn-14983	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-15100	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-25102	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-25232	issue	1	0	0	compact	c69b2d922b341bea81ffdc2e30c0fabb3b296c2f3e8bef5cc5edd07c04903e75	347
+scikit-learn__scikit-learn-25747	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-25931	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-25973	issue	0	1	0	empty		0
+scikit-learn__scikit-learn-26194	issue	0	1	1	expanded_fallback	7d1b2fa829f08318c6861e5277ddf9a3691865e579935e149b8e714792e3254b	614
+scikit-learn__scikit-learn-26323	issue	1	0	0	compact	c677ceffb13e9c537ee20a395650276bc6bd3abd263482c93371e436c7ad636e	522
+scikit-learn__scikit-learn-9288	issue	0	1	0	empty		0
+sphinx-doc__sphinx-10323	issue	0	1	0	empty		0
+sphinx-doc__sphinx-10435	issue	0	1	0	empty		0
+sphinx-doc__sphinx-10449	issue	0	1	0	empty		0
+sphinx-doc__sphinx-10466	issue	0	1	0	empty		0
+sphinx-doc__sphinx-10614	issue	0	1	0	empty		0
+sphinx-doc__sphinx-10673	issue	0	1	0	empty		0
+sphinx-doc__sphinx-11445	issue	0	1	0	empty		0
+sphinx-doc__sphinx-11510	issue	0	1	0	empty		0
+sphinx-doc__sphinx-7440	issue	0	1	0	empty		0
+sphinx-doc__sphinx-7454	issue	0	1	1	expanded_fallback	fac5f49e031fd0e8973adb0a30600d95b3b9ae5fc0d3acd14e4a9ac43c1309a5	394
+sphinx-doc__sphinx-7462	issue	0	1	0	empty		0
+sphinx-doc__sphinx-7590	issue	0	1	0	empty		0
+sphinx-doc__sphinx-7748	issue	0	1	0	empty		0
+sphinx-doc__sphinx-7757	issue	1	0	0	compact	a6728e36ced329b847c28bbdb1ca90c6a1199a6c7e812e530c393ba9db7386eb	323
+sphinx-doc__sphinx-7889	issue	1	0	0	compact	2eba7949c103bc7df5c5774d7f45444a63bda31e77765f816ac9db842a5d66fb	796
+sphinx-doc__sphinx-7910	issue	0	1	0	empty		0
+sphinx-doc__sphinx-7985	issue	1	0	0	compact	13ac46736d0fbf8985f668d8b4895e727103b71fb51089a9a3aace07c7667ca0	355
+sphinx-doc__sphinx-8035	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8056	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8120	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8265	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8269	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8459	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8475	issue	1	0	0	compact	67288eb46d4e1749d242c604a5dfe8f08c591e636cc9b6cb18b9516c583ae96f	987
+sphinx-doc__sphinx-8548	issue	1	0	0	compact	bcfcbc8bab184e6a4888a8238f7586b9c9cdad330e91372b1a2c2fd4711c620b	662
+sphinx-doc__sphinx-8551	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8593	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8595	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8621	issue	0	1	0	empty		0
+sphinx-doc__sphinx-8638	issue	1	0	0	compact	1d1637c598ef16b496559606b072d9cb5a40f3cf1f3b6eb2ee759c90e3bba738	679
+sphinx-doc__sphinx-8721	issue	0	1	0	empty		0
+sphinx-doc__sphinx-9229	issue	0	1	0	empty		0
+sphinx-doc__sphinx-9230	issue	0	1	0	empty		0
+sphinx-doc__sphinx-9258	issue	0	1	1	expanded_fallback	8451f76a03c0f09bbd52d38cb455e4f0666710fd4ed26529f8a867bc5fe4ee3d	1137
+sphinx-doc__sphinx-9281	issue	0	1	0	empty		0
+sphinx-doc__sphinx-9320	issue	1	0	0	compact	38a1e287fbd98343a1e92ac25e5084f3515ff89f47e1e869717f86611cf9fbf6	500
+sphinx-doc__sphinx-9367	issue	0	1	1	expanded_fallback	7d2955600ac11269a2d773ce896b9a89575618aaa4093bf01b941d75e773fe93	532
+sphinx-doc__sphinx-9461	issue	0	1	0	empty		0
+sphinx-doc__sphinx-9591	issue	0	1	1	expanded_fallback	7e4723f5d81536908263a22e50eefdc2c49620a091a6de73a15f56e3d30c77d1	494
+sphinx-doc__sphinx-9602	issue	0	1	0	empty		0
+sphinx-doc__sphinx-9658	issue	0	1	0	empty		0
+sphinx-doc__sphinx-9673	issue	1	0	0	compact	5b3344353fca10f0c6d2a3846e3f6d60ded775ed0f3b5000113710dde2c9d474	464
+sphinx-doc__sphinx-9698	issue	1	0	0	compact	edc1e210ad0f7450a22a1bc1260f5f5feba29714575d5c97023daf830f5140f2	592
+sphinx-doc__sphinx-9711	issue	0	1	0	empty		0
+sympy__sympy-11618	issue	0	1	0	empty		0
+sympy__sympy-12096	issue	0	1	0	empty		0
+sympy__sympy-12419	issue	0	1	0	empty		0
+sympy__sympy-12481	issue	1	0	0	compact	c04554b8e8d663db9a419ba328e3a63f8ff7448198c8a3a14a4c4ad40a43898b	831
+sympy__sympy-12489	issue	0	1	0	empty		0
+sympy__sympy-13031	issue	0	1	1	expanded_fallback	366c71e55471ad7b3233b72984233cab8ba55e8cc608b9d69546d37e876fa7dd	432
+sympy__sympy-13091	issue	0	1	0	empty		0
+sympy__sympy-13372	issue	0	1	0	empty		0
+sympy__sympy-13480	issue	0	1	1	expanded_fallback	bf395ab6444ca507b0b5ad6074b56b6a7963078624b3e89776778b8793041fee	2963
+sympy__sympy-13551	issue	0	1	0	empty		0
+sympy__sympy-13615	issue	0	1	0	empty		0
+sympy__sympy-13647	issue	0	1	0	empty		0
+sympy__sympy-13757	issue	1	0	0	compact	9b15b22643662b6a2eab04673f0917771047d26863736af25c1e132c531144cd	334
+sympy__sympy-13798	issue	0	1	0	empty		0
+sympy__sympy-13852	issue	0	1	0	empty		0
+sympy__sympy-13877	issue	0	1	0	empty		0
+sympy__sympy-13878	issue	0	1	0	empty		0
+sympy__sympy-13974	issue	0	1	0	empty		0
+sympy__sympy-14248	issue	0	1	0	empty		0
+sympy__sympy-14531	issue	0	1	0	empty		0
+sympy__sympy-14711	issue	1	0	0	compact	ab37c63fd40ce68b27a0d75adeab4632099e32b0270593401637ac8a2fb1c272	304
+sympy__sympy-14976	issue	0	1	0	empty		0
+sympy__sympy-15017	issue	1	0	0	compact	93a73cd6f438e6676b59148031fbe55e786af4396fc240cd5ca4ac9b491732ee	277
+sympy__sympy-15345	issue	0	1	0	empty		0
+sympy__sympy-15349	issue	0	1	0	empty		0
+sympy__sympy-15599	issue	0	1	0	empty		0
+sympy__sympy-15809	issue	0	1	0	empty		0
+sympy__sympy-15875	issue	0	1	0	empty		0
+sympy__sympy-15976	issue	0	1	0	empty		0
+sympy__sympy-16450	issue	0	1	0	empty		0
+sympy__sympy-16597	issue	1	0	0	compact	cf5f5eb8358e763052fd73e7b828f170c546474e2710cceb4092ca651e997359	578
+sympy__sympy-16766	issue	0	1	0	empty		0
+sympy__sympy-16792	issue	0	1	0	empty		0
+sympy__sympy-16886	issue	0	1	0	empty		0
+sympy__sympy-17139	issue	0	1	0	empty		0
+sympy__sympy-17318	issue	1	0	0	compact	93c7b89eacae13455e8b7601351bc7d2bd9c62915a86109561c3728cbe056413	259
+sympy__sympy-17630	issue	0	1	0	empty		0
+sympy__sympy-17655	issue	0	1	0	empty		0
+sympy__sympy-18189	issue	0	1	0	empty		0
+sympy__sympy-18199	issue	1	0	0	compact	9a2f14ed8c79555b5a34734a971febcdce41a686d5a59fbfcdbe98eae89d8ac9	426
+sympy__sympy-18211	issue	0	1	0	empty		0
+sympy__sympy-18698	issue	0	1	0	empty		0
+sympy__sympy-18763	issue	0	1	0	empty		0
+sympy__sympy-19040	issue	0	1	0	empty		0
+sympy__sympy-19346	issue	0	1	0	empty		0
+sympy__sympy-19495	issue	0	1	0	empty		0
+sympy__sympy-19637	issue	0	1	0	empty		0
+sympy__sympy-19783	issue	0	1	0	empty		0
+sympy__sympy-19954	issue	1	0	0	compact	19ad6187a90f0fc0733142354d2c73ecfa5a5f343ff88cc79ddcf1d0ecc9ded3	1205
+sympy__sympy-20154	issue	1	0	0	compact	e3d8ace8fde329e9bda79d8fa0e671c7dcd9e0312ef5e46f8caf50b5c29bb6a1	514
+sympy__sympy-20428	issue	1	0	0	compact	65f7876967331be582db017e5b816c0ec5a48b47970cee037f8b32164dd9d0ec	411
+sympy__sympy-20438	issue	1	0	0	compact	ff12989f948787a83cd0d75f730e222c892a8824fcd7345c7b8858c576e45ad7	629
+sympy__sympy-20590	issue	0	1	0	empty		0
+sympy__sympy-20801	issue	0	1	0	empty		0
+sympy__sympy-20916	issue	0	1	0	empty		0
+sympy__sympy-21379	issue	0	1	0	empty		0
+sympy__sympy-21596	issue	0	1	0	empty		0
+sympy__sympy-21612	issue	0	1	0	empty		0
+sympy__sympy-21847	issue	0	1	0	empty		0
+sympy__sympy-21930	issue	0	1	0	empty		0
+sympy__sympy-22080	issue	0	1	0	empty		0
+sympy__sympy-22456	issue	0	1	0	empty		0
+sympy__sympy-22714	issue	0	1	0	empty		0
+sympy__sympy-22914	issue	0	1	0	empty		0
+sympy__sympy-23262	issue	0	1	0	empty		0
+sympy__sympy-23413	issue	0	1	0	empty		0
+sympy__sympy-23534	issue	0	1	0	empty		0
+sympy__sympy-23824	issue	1	0	0	compact	7bfc106128a96411ea34e590a2a6f742685e65b92bfae965beb3c10b6e5fc12f	817
+sympy__sympy-23950	issue	1	0	0	compact	afbf8bbdb8e45219999f8af1be31841cc878f8eb926a9d39b153e0dc95da674b	326
+sympy__sympy-24066	issue	1	0	0	compact	7e21a66d39bb35a3ed3b2cdc1e1174869458196d5e82479e0c4b26f896daa756	852
+sympy__sympy-24213	issue	0	1	0	empty		0
+sympy__sympy-24443	issue	0	1	0	empty		0
+sympy__sympy-24539	issue	1	0	0	compact	244fd60cf27eebf48b70fd49d52ac9fa1f9010cc46b44f68f29b4a9bf8f8e04c	408
+sympy__sympy-24562	issue	0	1	0	empty		0
+sympy__sympy-24661	issue	0	1	0	empty		0
+astropy__astropy-12907	bm25	0	1	0	empty		0
+astropy__astropy-13033	bm25	0	1	0	empty		0
+astropy__astropy-13236	bm25	0	1	0	empty		0
+astropy__astropy-13398	bm25	0	1	0	empty		0
+astropy__astropy-13453	bm25	0	1	0	empty		0
+astropy__astropy-13579	bm25	1	0	0	compact	7737f1c5eb147503898bd82e6b631cbd6c363ba5aef5064fbd3f88ca88d7447b	538
+astropy__astropy-13977	bm25	0	1	0	empty		0
+astropy__astropy-14096	bm25	0	1	0	empty		0
+astropy__astropy-14182	bm25	0	1	0	empty		0
+astropy__astropy-14309	bm25	0	1	0	empty		0
+astropy__astropy-14365	bm25	1	0	0	compact	6459f68cf2cf6cfc39a513a3b7684b45f7c2d2c1ae5f10ed5b2c8c9a0169bb17	338
+astropy__astropy-14369	bm25	0	1	0	empty		0
+astropy__astropy-14508	bm25	0	1	0	empty		0
+astropy__astropy-14539	bm25	1	0	0	compact	740041948d0e56a11f5049a885c789e010ad59706de7d61f35719c465af113a1	1025
+astropy__astropy-14598	bm25	0	1	0	empty		0
+astropy__astropy-14995	bm25	1	0	0	compact	90e01da2155a4f2a2d8e4c6b7f30bceb5aab6467ac545471f7a989224babb68c	1246
+astropy__astropy-7166	bm25	0	1	0	empty		0
+astropy__astropy-7336	bm25	0	1	1	expanded_fallback	77fc4106a73f8b83e263be83bd2b74e321c0d609365bc5a9f1a4978a45449362	567
+astropy__astropy-7606	bm25	1	0	0	compact	24861cf55f8ced087ba15aa8139f64c8ac320dedbb37637723bec34768511655	327
+astropy__astropy-7671	bm25	0	1	0	empty		0
+astropy__astropy-8707	bm25	0	1	0	empty		0
+astropy__astropy-8872	bm25	0	1	0	empty		0
+django__django-10097	bm25	0	1	0	empty		0
+django__django-10554	bm25	0	1	0	empty		0
+django__django-10880	bm25	1	0	0	compact	02ee666ba67a728189831627fc770f4b6a82e75fb1ab0997ce53038e7dd5470c	639
+django__django-10914	bm25	1	0	0	compact	1a5909f799ae5e91d851f432742aa24b3f95647e0c93bcdd09bf3782a4486843	443
+django__django-10973	bm25	0	1	1	expanded_fallback	2250a944c6334974e09fecd112821177a554bfb473eb9085c00522a7e4e9f737	1104
+django__django-10999	bm25	0	1	0	empty		0
+django__django-11066	bm25	0	1	0	empty		0
+django__django-11087	bm25	0	1	0	empty		0
+django__django-11095	bm25	1	0	0	compact	bdb897fe4a8fb1f77d84b5b7343e0d49a4b093e1776b8e712c9d19251ea59944	361
+django__django-11099	bm25	0	1	0	empty		0
+django__django-11119	bm25	0	1	0	empty		0
+django__django-11133	bm25	0	1	1	expanded_fallback	b139d327ff97277403cb380b716cbce853aaa5c699cb569bb66158562a2502e8	517
+django__django-11138	bm25	1	0	0	compact	8159c496ac09ad0b53b8d5ee6689a7e25692efa251711d78a9706abd72590db3	526
+django__django-11141	bm25	1	0	0	compact	d95ac65dfa48bec580ce883ff6c1a0bf0eb0bd0d53312fe5a6e7767713f8d162	478
+django__django-11149	bm25	0	1	0	empty		0
+django__django-11163	bm25	1	0	0	compact	771f69a5d163b6815070df2bf389110317a5f38242d77537904fe8ecc93dc1a8	417
+django__django-11179	bm25	1	0	0	compact	56af96dc60820cb964713525c1ca710926434bccf40497db98063ef6eeb64d6d	563
+django__django-11206	bm25	0	1	1	expanded_fallback	b7c03e3f43da16eb24905090425c440f331dd63e82be353cec09ddc107007f62	993
+django__django-11211	bm25	0	1	0	empty		0
+django__django-11239	bm25	1	0	0	compact	3ad16c1c9888eeec7c5c318155535611942edf717e954e70d4479d81a7f74774	664
+django__django-11265	bm25	0	1	0	empty		0
+django__django-11276	bm25	0	1	0	empty		0
+django__django-11292	bm25	0	1	0	empty		0
+django__django-11299	bm25	0	1	0	empty		0
+django__django-11333	bm25	0	1	0	empty		0
+django__django-11400	bm25	0	1	0	empty		0
+django__django-11433	bm25	0	1	0	empty		0
+django__django-11451	bm25	1	0	0	compact	aa858e6ea3f3d41cc81409e9eed9dadd94a8aba65fba3708d6b992339bb2147f	383
+django__django-11477	bm25	1	0	0	compact	d3ae5c8106bae95e8fc83652049b3906716c8c80779e24eb7b9a41a9da39fd03	792
+django__django-11490	bm25	0	1	0	empty		0
+django__django-11532	bm25	1	0	0	compact	705ee02e631c99dbf01f0add86a2756a662916adef42a7c4f61df1c3123d5652	873
+django__django-11551	bm25	0	1	0	empty		0
+django__django-11555	bm25	0	1	0	empty		0
+django__django-11603	bm25	0	1	1	expanded_fallback	02ee666ba67a728189831627fc770f4b6a82e75fb1ab0997ce53038e7dd5470c	639
+django__django-11728	bm25	0	1	0	empty		0
+django__django-11734	bm25	0	1	0	empty		0
+django__django-11740	bm25	0	1	0	empty		0
+django__django-11749	bm25	1	0	0	compact	633245718b9afbc9dac72daad158d3f9d4c701f1aa7f2c023d06691ddb956cf1	581
+django__django-11790	bm25	0	1	0	empty		0
+django__django-11815	bm25	1	0	0	compact	63699830fc9678969f250aa1eb65a3c6230658ec632c56bbef3f257d4763f255	554
+django__django-11820	bm25	0	1	1	expanded_fallback	0b44a2bc2cf3fc9143758bbc818535c0e6f93e29f920990cf2d8d30a59d32e08	1007
+django__django-11848	bm25	0	1	1	expanded_fallback	65d641c128b944fda12ca19ab722afc054dd3df7eea3352f369f271026ddbaf7	431
+django__django-11880	bm25	1	0	0	compact	5d933fad00bcbe539a7dd5c597e7690ab70aa7be7aa63063023f3d6c4bae218c	326
+django__django-11885	bm25	0	1	0	empty		0
+django__django-11951	bm25	0	1	0	empty		0
+django__django-11964	bm25	0	1	0	empty		0
+django__django-11999	bm25	0	1	0	empty		0
+django__django-12039	bm25	1	0	0	compact	acb66250f321c1aecc966225acdf3bcfa877dbe8559f5e175e1844b4ce72fca5	514
+django__django-12050	bm25	0	1	0	empty		0
+django__django-12125	bm25	0	1	0	empty		0
+django__django-12143	bm25	0	1	0	empty		0
+django__django-12155	bm25	1	0	0	compact	076eac9a2ab083d33a4ade80755e81b12351c6d38a72b4294a5f330f52f7d2fc	514
+django__django-12193	bm25	0	1	0	empty		0
+django__django-12209	bm25	1	0	0	compact	dc9da3bd8bf3130e44de568985f954d5adba98de1291627073d4b64288b14912	800
+django__django-12262	bm25	0	1	0	empty		0
+django__django-12273	bm25	0	1	0	empty		0
+django__django-12276	bm25	1	0	0	compact	c2d57b3397cdef507d74d256aa1aaee098c1c027ebb7bd43a832779a420e804a	262
+django__django-12304	bm25	0	1	0	empty		0
+django__django-12308	bm25	0	1	0	empty		0
+django__django-12325	bm25	0	1	0	empty		0
+django__django-12406	bm25	0	1	1	expanded_fallback	bb0f9ada0feb667807d7013830d4cf9d46608ffa4b046eb7bbbb4fd7d4d7106e	403
+django__django-12419	bm25	1	0	0	compact	c4bff2dfbe98ab8685bfa01ab5c7d4864d7825fdf78002a38091c1432f2741ac	518
+django__django-12663	bm25	0	1	1	expanded_fallback	f9cbb713a7d1052a911027cadd23f1fabdd0e611ad561594d32f47387ec839df	653
+django__django-12708	bm25	1	0	0	compact	40c8de2cf9b748bf7243f8064169d4e28e3a0b4aa6a685556bce64e17a942edd	1535
+django__django-12713	bm25	0	1	0	empty		0
+django__django-12741	bm25	1	0	0	compact	e5692c1981c0697e914583424d6d4b7f4b9a9e991cd5dc9599102cc6d326d696	747
+django__django-12754	bm25	1	0	0	compact	a8c2ba0375ffcae191415a698db006a7e3a5193c0fc7afd32e8a0ff7596db995	865
+django__django-12774	bm25	0	1	1	expanded_fallback	1168ad56eb0f5ffaf553007e6cead334704b3c7e848aae7e8496efd7c93e8e65	714
+django__django-12858	bm25	0	1	0	empty		0
+django__django-12965	bm25	0	1	0	empty		0
+django__django-13012	bm25	0	1	0	empty		0
+django__django-13023	bm25	1	0	0	compact	94f67dde8934836071564510c44e572b764dcba7b38b7dd4019be7cccb50b84b	286
+django__django-13028	bm25	0	1	0	empty		0
+django__django-13033	bm25	0	1	0	empty		0
+django__django-13089	bm25	0	1	0	empty		0
+django__django-13109	bm25	0	1	0	empty		0
+django__django-13112	bm25	0	1	0	empty		0
+django__django-13121	bm25	1	0	0	compact	ebfe22dd763f2b24a88febd075ba5d4d5509f2ad6d853fa64dbd889815c43f77	485
+django__django-13128	bm25	0	1	1	expanded_fallback	27f9f3a85c9729896535de1caee323e846096708186c3e321e2252299b7d8dd6	510
+django__django-13158	bm25	1	0	0	compact	4d19c678f12b48e2bfd997dbb5cfd3295deb0c5bb161ebb703bedd5f061b6337	443
+django__django-13195	bm25	0	1	0	empty		0
+django__django-13212	bm25	1	0	0	compact	48aa906c854d6ad320dd4eb570f2a45314b3f6bd1365afacc43fa234a848cec9	567
+django__django-13279	bm25	1	0	0	compact	28642f84d3ea182be64480e2f91cc02b8b0a5cbf1ec9a1bfbec38e6a062e7f38	909
+django__django-13297	bm25	1	0	0	compact	1feb90847b4b1beebc009770a8d6f10a1d2e7fe56bbea378fd60295309a1b6a7	458
+django__django-13315	bm25	0	1	0	empty		0
+django__django-13343	bm25	1	0	0	compact	1360450641de597653c2ad245ab42dd287c4decc0694e4d000bc0e2dcf1e5a56	4667
+django__django-13344	bm25	0	1	1	expanded_fallback	fd6b05a8c8f43bdee48dde34495c6d3080492da8430b92a77d3b59c044e004bc	604
+django__django-13346	bm25	0	1	0	empty		0
+django__django-13363	bm25	0	1	0	empty		0
+django__django-13401	bm25	1	0	0	compact	2926df13daed7d742d32203409081530e1771b4ded184f4029b5ee8ba363184d	1060
+django__django-13406	bm25	0	1	0	empty		0
+django__django-13410	bm25	0	1	0	empty		0
+django__django-13417	bm25	0	1	0	empty		0
+django__django-13449	bm25	0	1	0	empty		0
+django__django-13512	bm25	1	0	0	compact	ecfc7d01a607883b10f1d429efca2d5a0cab8946abd44a50bd3111168dee166b	396
+django__django-13513	bm25	0	1	0	empty		0
+django__django-13516	bm25	0	1	0	empty		0
+django__django-13551	bm25	1	0	0	compact	2ffce018548f4ae1c4af156bb0f10517c950c00635ff765b96df29b21dfe0401	780
+django__django-13568	bm25	0	1	0	empty		0
+django__django-13569	bm25	0	1	0	empty		0
+django__django-13590	bm25	0	1	0	empty		0
+django__django-13658	bm25	0	1	1	expanded_fallback	c6091ab908073d3f808ac44df80b22b523a8e8473d8c6db65400304cfc29c465	749
+django__django-13670	bm25	1	0	0	compact	233d6b2ff4e25015805d473de05a0bf9710fd6dfd5b344098cd3eded9c5ec18f	396
+django__django-13741	bm25	1	0	0	compact	a465f103e5b893d06792f1a440421b9a7dfa83a36120e8bc6ad30f80cf08613b	310
+django__django-13786	bm25	0	1	0	empty		0
+django__django-13794	bm25	1	0	0	compact	20c76f1a8625202c5d3eba189a62693e066550fee82e5810d0e3b0b5e4a7a0c9	457
+django__django-13807	bm25	0	1	0	empty		0
+django__django-13809	bm25	1	0	0	compact	6d6cdf4885da69e51dc8e85c8d97980d161d2d6a10fb275029f41c20c8e48515	509
+django__django-13810	bm25	0	1	1	expanded_fallback	6647263e4a03157c93e3e88aa6056a93692daa071ab3bd5f1f3e5171dcb4f6f3	656
+django__django-13820	bm25	0	1	0	empty		0
+django__django-13821	bm25	1	0	0	compact	d92c4be558af81ba0cfa2a9ec2084e9cb3cc30dd83542aa99cdbf05e79a1ab69	483
+django__django-13837	bm25	0	1	0	empty		0
+django__django-13925	bm25	0	1	0	empty		0
+django__django-13933	bm25	0	1	0	empty		0
+django__django-13964	bm25	0	1	0	empty		0
+django__django-14007	bm25	0	1	0	empty		0
+django__django-14011	bm25	0	1	1	expanded_fallback	02e7ca229a4627dd369bdeafbfaff0e6ebf6d2d13a7ed12a96f7c83f8e30c100	831
+django__django-14017	bm25	1	0	0	compact	c39e47880743dfd89654701ab39c178d0bb26d8c0cd6fc7d9a2c0ae54cbb8dca	881
+django__django-14034	bm25	0	1	0	empty		0
+django__django-14053	bm25	0	1	0	empty		0
+django__django-14089	bm25	0	1	1	expanded_fallback	b4323bc6d55231760d912402c2180bd730e70b9e7a870bc6613d08ccefef9678	545
+django__django-14122	bm25	0	1	0	empty		0
+django__django-14140	bm25	0	1	0	empty		0
+django__django-14155	bm25	0	1	1	expanded_fallback	59b14a094bf8f2c0262c409b04c8ff0878fb58eb2c6cbcb00b7e606c9bd4a7be	538
+django__django-14170	bm25	1	0	0	compact	cb01cdc9a8d8f908889fe1191f529aee6e233f6b7204bba3ef324296e31a2c0f	1513
+django__django-14238	bm25	0	1	1	expanded_fallback	ddc1a518f553f1d3cd424760f2b4dfb1ba390f1cfd71bcc53c143d4d2b960d6c	686
+django__django-14311	bm25	0	1	0	empty		0
+django__django-14315	bm25	1	0	0	compact	3ad9dfdc6ce04d5efde4a91b35c7bf73b5233b55dab0d19ad823ec1e7a24fedd	555
+django__django-14349	bm25	0	1	0	empty		0
+django__django-14351	bm25	0	1	0	empty		0
+django__django-14373	bm25	1	0	0	compact	7bec88b55f46b3c3afe2f46d9e1c975511895b9457ce54819d888603a18fbb02	304
+django__django-14376	bm25	1	0	0	compact	7275537f77ccef3db96149c0f71724f335a4aab3d38a2ce821f4ac154eb38ac2	630
+django__django-14404	bm25	1	0	0	compact	f3589a928c5f93231b70b523532438c34bf718a3f5ada88d153ee59edd577d4a	441
+django__django-14434	bm25	0	1	1	expanded_fallback	4ef816907b28507052fe72cf052295cbe1bba1b435e48d0fa109ea8adc2ca41a	328
+django__django-14493	bm25	0	1	1	expanded_fallback	a74144d26b48b51d6bd1ed6e86bbed39714c779dff02003e40745e5dc366ce9c	447
+django__django-14500	bm25	0	1	0	empty		0
+django__django-14534	bm25	0	1	0	empty		0
+django__django-14539	bm25	0	1	0	empty		0
+django__django-14559	bm25	0	1	0	empty		0
+django__django-14580	bm25	0	1	0	empty		0
+django__django-14608	bm25	0	1	0	empty		0
+django__django-14631	bm25	1	0	0	compact	d067c4d5aac9e2114a5895a09d01fd884065bbee0c4a9336437e3b89d57d4bec	998
+django__django-14672	bm25	0	1	0	empty		0
+django__django-14725	bm25	1	0	0	compact	3089a82f69b13f5c170dbfd2c2b2742e995630ed1e497ef2f738d24ba8c4a244	509
+django__django-14752	bm25	1	0	0	compact	b8acf83f6d9748a5201efef3d63b524858533671247e25b236eee3e0a45e40ed	487
+django__django-14765	bm25	0	1	1	expanded_fallback	e52ae5bca588e15c03cb6830cd9d320a0a4b1779a7f4fb07bf157160ce623489	489
+django__django-14771	bm25	0	1	0	empty		0
+django__django-14787	bm25	0	1	0	empty		0
+django__django-14792	bm25	0	1	0	empty		0
+django__django-14855	bm25	0	1	0	empty		0
+django__django-14915	bm25	0	1	0	empty		0
+django__django-14999	bm25	1	0	0	compact	33e192eec6b2678ae43db1c273a2996a933e9d8c39b93852480e8c7d7de8985a	582
+django__django-15022	bm25	0	1	0	empty		0
+django__django-15037	bm25	0	1	0	empty		0
+django__django-15098	bm25	0	1	0	empty		0
+django__django-15103	bm25	1	0	0	compact	9d10485c54b31c43eecb188257e00091885891100fac62f371c44a3594eb26cb	1317
+django__django-15104	bm25	1	0	0	compact	62be14af600a499e6117473f114db9db1e72113b4325d601e02f7c0e2566ccd6	555
+django__django-15127	bm25	1	0	0	compact	56c8028b97fbb9204e3d946ac6dfe6f12bf6da78c1980f82cd16398394fbe07b	299
+django__django-15128	bm25	0	1	0	empty		0
+django__django-15161	bm25	0	1	0	empty		0
+django__django-15252	bm25	0	1	0	empty		0
+django__django-15268	bm25	0	1	1	expanded_fallback	496774f87342953c1ad7c4f41b09f2b51313d93ef932dc3377b37f8500ce77e5	2804
+django__django-15277	bm25	1	0	0	compact	aabea30da99be7119ae63752de8bab22b3cfdb31453e8d9f95864f9da7644a3a	1209
+django__django-15278	bm25	0	1	0	empty		0
+django__django-15280	bm25	0	1	0	empty		0
+django__django-15315	bm25	1	0	0	compact	9f9f1c4a73f1f61cf75a7afeac0ddee8340ce6b15794a39aab6040b26bdf6016	641
+django__django-15368	bm25	0	1	0	empty		0
+django__django-15375	bm25	0	1	0	empty		0
+django__django-15380	bm25	0	1	0	empty		0
+django__django-15382	bm25	0	1	1	expanded_fallback	c8ac2a443caf98c1cedfc4761a678d2c563bd36a570b7fef10b39e4eb180e38e	438
+django__django-15467	bm25	1	0	0	compact	4cafc029615afe5c859c4abea558276ddf769d5e34f5027440e3158cc3ab3c89	520
+django__django-15499	bm25	0	1	1	expanded_fallback	967684cb9f4685e611059e9134645b7d1d5267653d9b933ae6cfe91058ccf2b8	320
+django__django-15503	bm25	1	0	0	compact	0042ba40014fe50721eb7fee577d4f89c7b09ed98befa1ff7265096829c6a0eb	712
+django__django-15525	bm25	0	1	0	empty		0
+django__django-15554	bm25	0	1	1	expanded_fallback	15e3be617240f519a14fbd02a535a616f309ddd26d4918b5befa354e47909d0d	887
+django__django-15561	bm25	1	0	0	compact	f6dbd5399995f32f8ddbacf6d9f82dde3d142b3853e324ec5a05050c67b11b9c	823
+django__django-15563	bm25	0	1	0	empty		0
+django__django-15569	bm25	1	0	0	compact	853454e35538a2d03336d1e62bcf777d054d963b8f93fbf08af04afe92d1d6b6	385
+django__django-15572	bm25	0	1	0	empty		0
+django__django-15629	bm25	1	0	0	compact	a50267620143119fcd78f27a65fae011baa183aa327d664179300482b991230a	566
+django__django-15695	bm25	1	0	0	compact	a33b9cf71ee4e4f57f2cc1acdeffcf4202b9060237873d1f86fa3928bb609299	645
+django__django-15731	bm25	1	0	0	compact	812d45ef17ffb017f7c8228b199dd7071348a514c038fa6c24d2381e2e732cdd	544
+django__django-15732	bm25	1	0	0	compact	dce6e91984939171b81074a6b27be80380df1f9e49863ecd3105689bc56bdc29	789
+django__django-15741	bm25	0	1	0	empty		0
+django__django-15814	bm25	0	1	0	empty		0
+django__django-15851	bm25	1	0	0	compact	213b4bc183409695fb31565b0fd3b62e44fbd4ea37691887beb8443bc9c86dcc	302
+django__django-15863	bm25	0	1	0	empty		0
+django__django-15916	bm25	0	1	0	empty		0
+django__django-15930	bm25	0	1	0	empty		0
+django__django-15957	bm25	0	1	0	empty		0
+django__django-15973	bm25	0	1	0	empty		0
+django__django-15987	bm25	0	1	1	expanded_fallback	791c7498d712ce041d495bb0437d06ae9e1a3482380967c0406320e14f126ad3	405
+django__django-16032	bm25	0	1	0	empty		0
+django__django-16082	bm25	1	0	0	compact	27726274d0c4da9143497f1dea2ccfbe97674b0f85939b2c4425744697589798	693
+django__django-16100	bm25	1	0	0	compact	df07ff429085648ccb3a7f697dd59e056af56c36289a562d9aa3169c8bb8bd04	914
+django__django-16116	bm25	0	1	0	empty		0
+django__django-16136	bm25	1	0	0	compact	67c5f7ec4f253fea4e47f4280abf30784ce3329e71c5b6c32bb6e680a04b00db	522
+django__django-16139	bm25	1	0	0	compact	9acefafb2486953cc9a8b783fa20b714fbc50a751491a9c462d8917bb853cd82	559
+django__django-16145	bm25	0	1	0	empty		0
+django__django-16255	bm25	0	1	0	empty		0
+django__django-16256	bm25	0	1	0	empty		0
+django__django-16263	bm25	1	0	0	compact	0c5ec2a2c63c0031da8951c52cc69bb9db289f8b7f1da5e7db90431a20017b4d	2082
+django__django-16315	bm25	0	1	0	empty		0
+django__django-16333	bm25	1	0	0	compact	2f56e804ff9f8a27f456fdf5f8246ff26131852cd3a0acb9805e7cff21b66571	530
+django__django-16429	bm25	0	1	0	empty		0
+django__django-16454	bm25	0	1	0	empty		0
+django__django-16485	bm25	0	1	0	empty		0
+django__django-16493	bm25	1	0	0	compact	1f6c9d143f9417a380a16271193246a2668f0255cdfae5caaee55e944d5c251b	546
+django__django-16502	bm25	0	1	0	empty		0
+django__django-16527	bm25	1	0	0	compact	46a0687379ecbdb0d43221ae09a5e5e329e3f23a6f765a50fd350f0ac847a2dc	509
+django__django-16560	bm25	0	1	0	empty		0
+django__django-16569	bm25	0	1	0	empty		0
+django__django-16595	bm25	1	0	0	compact	7a5a3eb8709d28a3449e7e18063b6ef49e0a205ea3b7c21074beeac3f295408d	470
+django__django-16612	bm25	0	1	0	empty		0
+django__django-16631	bm25	1	0	0	compact	8920aca6cd671236745aa457738ad801ec67a115204db26ed3cc3f16297d0262	1041
+django__django-16642	bm25	0	1	0	empty		0
+django__django-16661	bm25	1	0	0	compact	ad23709a6843c19d6cc8fd413cc7a30f6bba8ed68b5d03ca2080768ed480b8bc	364
+django__django-16662	bm25	0	1	0	empty		0
+django__django-16667	bm25	1	0	0	compact	1b944150b8a162ce815f5d854edf941b63969e7a1a7f40a2c1705c90f6a2188e	555
+django__django-16801	bm25	0	1	0	empty		0
+django__django-16819	bm25	0	1	0	empty		0
+django__django-16877	bm25	0	1	0	empty		0
+django__django-16899	bm25	0	1	0	empty		0
+django__django-16901	bm25	0	1	0	empty		0
+django__django-16938	bm25	0	1	0	empty		0
+django__django-16950	bm25	1	0	0	compact	a7a30cdef4c8bd9aaa969930c37a8c458531b26044e99376f2000df8c64e12e4	455
+django__django-17029	bm25	0	1	0	empty		0
+django__django-17084	bm25	1	0	0	compact	f3eac8526195a795ea9621e34251bb5bad743a760fa7a2ef381ab0bff36e9925	522
+django__django-17087	bm25	0	1	0	empty		0
+django__django-7530	bm25	0	1	0	empty		0
+django__django-9296	bm25	0	1	0	empty		0
+matplotlib__matplotlib-13989	bm25	0	1	0	empty		0
+matplotlib__matplotlib-14623	bm25	1	0	0	compact	61bfcb9887faa5d8778af96cd2c893dd6a3f57195938566514658a9642cbbe3d	626
+matplotlib__matplotlib-20488	bm25	0	1	0	empty		0
+matplotlib__matplotlib-20676	bm25	0	1	1	expanded_fallback	183cb81d44648f6cdfff3b0c261083744614d1b625b458e4f5a0cb043a6c422e	396
+matplotlib__matplotlib-20826	bm25	0	1	1	expanded_fallback	02678f7391e949fae4019ed441db90de754df65a2ec325056c473246b2fd67e3	278
+matplotlib__matplotlib-20859	bm25	1	0	0	compact	e74285a8b06a4630f2516957d8df24d3e333342997424d1bb97918339cb91838	401
+matplotlib__matplotlib-21568	bm25	1	0	0	compact	b37194d324c4951e7d3e380b0cd0c40ce344c26835f8caf2e972cc169b895233	401
+matplotlib__matplotlib-22719	bm25	0	1	0	empty		0
+matplotlib__matplotlib-22865	bm25	0	1	0	empty		0
+matplotlib__matplotlib-22871	bm25	0	1	0	empty		0
+matplotlib__matplotlib-23299	bm25	0	1	0	empty		0
+matplotlib__matplotlib-23314	bm25	1	0	0	compact	0fc94cb7e5c2dbe1c04cce26e90e81f3803d24afd220dc1b298ba11e1a6674b4	676
+matplotlib__matplotlib-23412	bm25	0	1	0	empty		0
+matplotlib__matplotlib-23476	bm25	0	1	0	empty		0
+matplotlib__matplotlib-24026	bm25	0	1	0	empty		0
+matplotlib__matplotlib-24149	bm25	1	0	0	compact	56d5a3076b36208fb77c79b487ce69dac5ed9259ff1c2090f0cb2b4c3ba17905	619
+matplotlib__matplotlib-24177	bm25	0	1	0	empty		0
+matplotlib__matplotlib-24570	bm25	0	1	0	empty		0
+matplotlib__matplotlib-24627	bm25	0	1	0	empty		0
+matplotlib__matplotlib-24637	bm25	0	1	0	empty		0
+matplotlib__matplotlib-24870	bm25	0	1	0	empty		0
+matplotlib__matplotlib-24970	bm25	0	1	1	expanded_fallback	c9b9d5c0df02d97de3b842537e7584e37697f6df04c2d72cd306c0a3d70e89ea	456
+matplotlib__matplotlib-25122	bm25	1	0	0	compact	007365600f0d4dd9a79883d762991f0d8f09fc26d554323a3deaa8055cc10904	323
+matplotlib__matplotlib-25287	bm25	0	1	0	empty		0
+matplotlib__matplotlib-25311	bm25	0	1	0	empty		0
+matplotlib__matplotlib-25332	bm25	0	1	0	empty		0
+matplotlib__matplotlib-25479	bm25	0	1	0	empty		0
+matplotlib__matplotlib-25775	bm25	0	1	0	empty		0
+matplotlib__matplotlib-25960	bm25	0	1	1	expanded_fallback	ddedbcbd9401f20659ddff7294c1f261e1d1c2fd34285337c6ade192a168fe71	503
+matplotlib__matplotlib-26113	bm25	0	1	0	empty		0
+matplotlib__matplotlib-26208	bm25	0	1	0	empty		0
+matplotlib__matplotlib-26291	bm25	0	1	0	empty		0
+matplotlib__matplotlib-26342	bm25	1	0	0	compact	20e877077aff9fb7912a25bde39ea19b35144d4d40fed18b897198495a74fdb3	291
+matplotlib__matplotlib-26466	bm25	0	1	0	empty		0
+mwaskom__seaborn-3069	bm25	1	0	0	compact	fdb79f407d3d87c9d261c85c18a80ca856579e6a5ca83d4f333a3b504e232554	495
+mwaskom__seaborn-3187	bm25	0	1	0	empty		0
+pallets__flask-5014	bm25	0	1	1	expanded_fallback	2f3c165177a32b86215be399a5e92ecab004273101bb7022317939efea2b30db	388
+psf__requests-1142	bm25	1	0	0	compact	203936e47ee56bf599272961688dbd9c5d773b802dc1ea27f9dece5aa37605c5	823
+psf__requests-1724	bm25	1	0	0	compact	f0e799d31ca3af3e8ea3a80113207454e9ee2e8186e5cd46efab63bfbaa725cf	356
+psf__requests-1766	bm25	0	1	0	empty		0
+psf__requests-1921	bm25	0	1	0	empty		0
+psf__requests-2317	bm25	0	1	1	expanded_fallback	adf5860081bcc62761e220f71857b3bfb046bbe059371f7a24afd9bd9955eb23	499
+psf__requests-2931	bm25	0	1	0	empty		0
+psf__requests-5414	bm25	1	0	0	compact	de091ccf90b7b10c127b8f581a32effd412e2a7c102f7fdd5ea343a61e0abb12	441
+psf__requests-6028	bm25	0	1	0	empty		0
+pydata__xarray-2905	bm25	0	1	0	empty		0
+pydata__xarray-3095	bm25	0	1	0	empty		0
+pydata__xarray-3151	bm25	0	1	0	empty		0
+pydata__xarray-3305	bm25	0	1	0	empty		0
+pydata__xarray-3677	bm25	0	1	0	empty		0
+pydata__xarray-3993	bm25	1	0	0	compact	d1b95b14fe177ec97206a7ad129bb660440c5ca6cba58775495232fba2a566ee	1284
+pydata__xarray-4075	bm25	0	1	0	empty		0
+pydata__xarray-4094	bm25	0	1	0	empty		0
+pydata__xarray-4356	bm25	0	1	0	empty		0
+pydata__xarray-4629	bm25	1	0	0	compact	211512a785b1cf21471c4168830b2dc5d72063f098a4f0512748983082458643	430
+pydata__xarray-4687	bm25	0	1	0	empty		0
+pydata__xarray-4695	bm25	0	1	1	expanded_fallback	24d554b2ab1af417a8661356bbdb3823a734cc15f7f88597b2959c8326dab286	463
+pydata__xarray-4966	bm25	0	1	0	empty		0
+pydata__xarray-6461	bm25	1	0	0	compact	1344a0958ec9705427e85d288fa7ffd39100642e9cca4243ef3e00e9ab9f4eb6	537
+pydata__xarray-6599	bm25	0	1	1	expanded_fallback	2192fd66d6631960669e707aa7f829b481cbc03abb6e3c0468864f673ff7a635	434
+pydata__xarray-6721	bm25	0	1	0	empty		0
+pydata__xarray-6744	bm25	0	1	0	empty		0
+pydata__xarray-6938	bm25	0	1	0	empty		0
+pydata__xarray-6992	bm25	0	1	1	expanded_fallback	fb67a3b625c1032f1728828538acb8e2abe74704936acb73a2d8a4d75119d026	492
+pydata__xarray-7229	bm25	0	1	0	empty		0
+pydata__xarray-7233	bm25	1	0	0	compact	61e42ac1c6f1669a6cc9c0b9a8a6b038043861582e5444104b86925259231060	571
+pydata__xarray-7393	bm25	0	1	0	empty		0
+pylint-dev__pylint-4551	bm25	0	1	0	empty		0
+pylint-dev__pylint-4604	bm25	1	0	0	compact	9126f640ac8638b70ca2cbce1869f3eb0f4369cd29864480702cb819f92c8fb6	866
+pylint-dev__pylint-4661	bm25	0	1	0	empty		0
+pylint-dev__pylint-4970	bm25	1	0	0	compact	e831b69ed81308e1e8f86a503ac268a20d02509c3aba3ceed8cc5b757321cba7	388
+pylint-dev__pylint-6386	bm25	0	1	0	empty		0
+pylint-dev__pylint-6528	bm25	0	1	0	empty		0
+pylint-dev__pylint-6903	bm25	0	1	0	empty		0
+pylint-dev__pylint-7080	bm25	0	1	0	empty		0
+pylint-dev__pylint-7277	bm25	1	0	0	compact	64362a5a33bd120297203631934eafbb6356027df73d15529401f81defff6b71	1165
+pylint-dev__pylint-8898	bm25	0	1	0	empty		0
+pytest-dev__pytest-10051	bm25	1	0	0	compact	c478ab26954f11541c78b08d74516adf05f4ca1e7a113cbb613a3775e58ec40f	425
+pytest-dev__pytest-10081	bm25	0	1	0	empty		0
+pytest-dev__pytest-10356	bm25	1	0	0	compact	498e5cfe2799daebd85365fb523b9ed4a0380c7e3f06cbf9dd95ff5f3f2f7128	337
+pytest-dev__pytest-5262	bm25	0	1	0	empty		0
+pytest-dev__pytest-5631	bm25	0	1	0	empty		0
+pytest-dev__pytest-5787	bm25	0	1	1	expanded_fallback	cd529a380932571b3173988cfc79bdda59d2fd813fb0ae8e8dd8694b383d6d69	1424
+pytest-dev__pytest-5809	bm25	1	0	0	compact	79bd30df08209807a932bedaad1d2db82b488e0adfbb4c1606cd4e7f9dafd433	287
+pytest-dev__pytest-5840	bm25	0	1	0	empty		0
+pytest-dev__pytest-6197	bm25	0	1	0	empty		0
+pytest-dev__pytest-6202	bm25	1	0	0	compact	cc582843ed03adfdf866786c3cc284d72e9de2494c0d88c84e32b348e5d2a286	270
+pytest-dev__pytest-7205	bm25	0	1	0	empty		0
+pytest-dev__pytest-7236	bm25	0	1	0	empty		0
+pytest-dev__pytest-7324	bm25	0	1	1	expanded_fallback	cf97cbb567e29d3adf4465faa16a33898d35fc4b7394f7bbbf97c70bfa884bc2	778
+pytest-dev__pytest-7432	bm25	1	0	0	compact	08608785d9c9952c9c4fa48f32fbb5aec2c09e416b882d8d931df56c95d44b67	374
+pytest-dev__pytest-7490	bm25	0	1	0	empty		0
+pytest-dev__pytest-7521	bm25	0	1	0	empty		0
+pytest-dev__pytest-7571	bm25	0	1	0	empty		0
+pytest-dev__pytest-7982	bm25	0	1	1	expanded_fallback	9fe9395f429e498fa850a9c7d5eba95b2ce9c0e0e040d2479551c1f7b0210d39	471
+pytest-dev__pytest-8399	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-10297	bm25	1	0	0	compact	092bb0cab8bef42465e135725a162d7f1cd1241ed3fa0173dfec964408c7c12b	675
+scikit-learn__scikit-learn-10844	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-10908	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-11310	bm25	1	0	0	compact	3b33cc315ceb4c7e59849347a0bb36c06ec9c27f0f46751cd0c2f246869a4128	461
+scikit-learn__scikit-learn-11578	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-12585	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-12682	bm25	1	0	0	compact	094d2457d83f0b555ddd379cf05d0750cf8ae940874d9b06ce7e1e02ac88f7b7	864
+scikit-learn__scikit-learn-12973	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-13124	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-13135	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-13142	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-13328	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-13439	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-13496	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-13779	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-14053	bm25	0	1	1	expanded_fallback	406ea2adde8b2959e3221616c8f5d3e87e88724eed9e00820b21140a8610c9d3	1354
+scikit-learn__scikit-learn-14087	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-14141	bm25	0	1	1	expanded_fallback	2d67efa1753e4702a1790d993fb9b33199d24dbc9b266c4bddb9fb70dc69937d	348
+scikit-learn__scikit-learn-14496	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-14629	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-14710	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-14894	bm25	1	0	0	compact	8259bf737a1dd7aad4115cc11dbde2e38d67763020c2c5578bf41f8e0b5d051f	506
+scikit-learn__scikit-learn-14983	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-15100	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-25102	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-25232	bm25	1	0	0	compact	4eafd36727cc5738064863c9cf6d2397633da0ab2c1d0a7ec91d63dc0f9b1be0	285
+scikit-learn__scikit-learn-25747	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-25931	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-25973	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-26194	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-26323	bm25	0	1	0	empty		0
+scikit-learn__scikit-learn-9288	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-10323	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-10435	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-10449	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-10466	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-10614	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-10673	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-11445	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-11510	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-7440	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-7454	bm25	0	1	1	expanded_fallback	fac5f49e031fd0e8973adb0a30600d95b3b9ae5fc0d3acd14e4a9ac43c1309a5	394
+sphinx-doc__sphinx-7462	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-7590	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-7748	bm25	0	1	1	expanded_fallback	ef4eb7528145e289ef6bf9e203cc669f52c7c900e1ba7041a0aa64a552f09389	871
+sphinx-doc__sphinx-7757	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-7889	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-7910	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-7985	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8035	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8056	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8120	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8265	bm25	0	1	1	expanded_fallback	0f6a0a63625f6fe8cbf6aedc4d16e6f4da37893348a153ffb90abdfe7e4674cb	301
+sphinx-doc__sphinx-8269	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8459	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8475	bm25	0	1	1	expanded_fallback	d46c9acc42e977e96f275f0ebb68d8597141afbbb20ed38e00c3ca8f5f9310d3	440
+sphinx-doc__sphinx-8548	bm25	1	0	0	compact	94933e37605bf33fbb4896eab09cac1b6a3aad79cb693dd5fa0fd811f8d6ab07	658
+sphinx-doc__sphinx-8551	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8593	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8595	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-8621	bm25	1	0	0	compact	a331b83986d64281e19923f5e9297ab6caabd667d0310b2fdc2f1be92f554768	367
+sphinx-doc__sphinx-8638	bm25	1	0	0	compact	fe93686a70157057ff596e97d54b97784208414602dedd3f56d4047ed0582371	554
+sphinx-doc__sphinx-8721	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9229	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9230	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9258	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9281	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9320	bm25	1	0	0	compact	38a1e287fbd98343a1e92ac25e5084f3515ff89f47e1e869717f86611cf9fbf6	500
+sphinx-doc__sphinx-9367	bm25	1	0	0	compact	6f33488a01adcdf25f68f97183b067a303e437e1bb99562ba4f3c0ba7035f1ff	490
+sphinx-doc__sphinx-9461	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9591	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9602	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9658	bm25	0	1	0	empty		0
+sphinx-doc__sphinx-9673	bm25	0	1	1	expanded_fallback	5b3344353fca10f0c6d2a3846e3f6d60ded775ed0f3b5000113710dde2c9d474	464
+sphinx-doc__sphinx-9698	bm25	1	0	0	compact	edc1e210ad0f7450a22a1bc1260f5f5feba29714575d5c97023daf830f5140f2	592
+sphinx-doc__sphinx-9711	bm25	0	1	0	empty		0
+sympy__sympy-11618	bm25	0	1	0	empty		0
+sympy__sympy-12096	bm25	0	1	0	empty		0
+sympy__sympy-12419	bm25	0	1	0	empty		0
+sympy__sympy-12481	bm25	0	1	0	empty		0
+sympy__sympy-12489	bm25	0	1	0	empty		0
+sympy__sympy-13031	bm25	1	0	0	compact	1df2f3176277bc74d3f756d3f492d33ed768e93707be3c8bf39399bd4931c4bf	387
+sympy__sympy-13091	bm25	0	1	0	empty		0
+sympy__sympy-13372	bm25	1	0	0	compact	0b9617146a5129a1d24e3730fae19dd38abcefca39c21fac2470d3a12c028c7e	430
+sympy__sympy-13480	bm25	1	0	0	compact	1af7eb388c361702ad11c883b4ba4130cb4a108ad94469ba44e849a5021e52fd	3544
+sympy__sympy-13551	bm25	0	1	0	empty		0
+sympy__sympy-13615	bm25	0	1	0	empty		0
+sympy__sympy-13647	bm25	0	1	0	empty		0
+sympy__sympy-13757	bm25	1	0	0	compact	9b15b22643662b6a2eab04673f0917771047d26863736af25c1e132c531144cd	334
+sympy__sympy-13798	bm25	0	1	1	expanded_fallback	028c49840d325c3aad0b1e7b186388ccecd578f889c20f1ac5c808c6b29c26c5	646
+sympy__sympy-13852	bm25	0	1	0	empty		0
+sympy__sympy-13877	bm25	0	1	0	empty		0
+sympy__sympy-13878	bm25	0	1	0	empty		0
+sympy__sympy-13974	bm25	0	1	0	empty		0
+sympy__sympy-14248	bm25	0	1	0	empty		0
+sympy__sympy-14531	bm25	0	1	0	empty		0
+sympy__sympy-14711	bm25	1	0	0	compact	ab37c63fd40ce68b27a0d75adeab4632099e32b0270593401637ac8a2fb1c272	304
+sympy__sympy-14976	bm25	0	1	0	empty		0
+sympy__sympy-15017	bm25	1	0	0	compact	93a73cd6f438e6676b59148031fbe55e786af4396fc240cd5ca4ac9b491732ee	277
+sympy__sympy-15345	bm25	0	1	0	empty		0
+sympy__sympy-15349	bm25	0	1	0	empty		0
+sympy__sympy-15599	bm25	0	1	0	empty		0
+sympy__sympy-15809	bm25	0	1	0	empty		0
+sympy__sympy-15875	bm25	0	1	0	empty		0
+sympy__sympy-15976	bm25	0	1	0	empty		0
+sympy__sympy-16450	bm25	0	1	0	empty		0
+sympy__sympy-16597	bm25	1	0	0	compact	5b27b0f2def23ea7ace3ac4a636e7ca54779a9f449d88552db593e5d48a3d807	1055
+sympy__sympy-16766	bm25	0	1	0	empty		0
+sympy__sympy-16792	bm25	0	1	0	empty		0
+sympy__sympy-16886	bm25	0	1	0	empty		0
+sympy__sympy-17139	bm25	0	1	0	empty		0
+sympy__sympy-17318	bm25	0	1	0	empty		0
+sympy__sympy-17630	bm25	1	0	0	compact	3bc4dceaa2c64d0b43117a0ac6a7d3f85bb7f06343125a26078e2e9a4d454479	455
+sympy__sympy-17655	bm25	0	1	0	empty		0
+sympy__sympy-18189	bm25	0	1	0	empty		0
+sympy__sympy-18199	bm25	0	1	0	empty		0
+sympy__sympy-18211	bm25	0	1	0	empty		0
+sympy__sympy-18698	bm25	0	1	0	empty		0
+sympy__sympy-18763	bm25	0	1	0	empty		0
+sympy__sympy-19040	bm25	0	1	0	empty		0
+sympy__sympy-19346	bm25	0	1	0	empty		0
+sympy__sympy-19495	bm25	0	1	0	empty		0
+sympy__sympy-19637	bm25	0	1	0	empty		0
+sympy__sympy-19783	bm25	0	1	0	empty		0
+sympy__sympy-19954	bm25	0	1	0	empty		0
+sympy__sympy-20154	bm25	0	1	0	empty		0
+sympy__sympy-20428	bm25	0	1	1	expanded_fallback	65f7876967331be582db017e5b816c0ec5a48b47970cee037f8b32164dd9d0ec	411
+sympy__sympy-20438	bm25	1	0	0	compact	b898949515ffff7c81b3e9543f8886f25eac5abd59002a4dbe56cdcf7941e87a	444
+sympy__sympy-20590	bm25	1	0	0	compact	c9b73c58f43fb9ce2da4430e1205a0d10ad6b71205bb42322b2ae22d336488b8	270
+sympy__sympy-20801	bm25	0	1	0	empty		0
+sympy__sympy-20916	bm25	0	1	0	empty		0
+sympy__sympy-21379	bm25	0	1	0	empty		0
+sympy__sympy-21596	bm25	0	1	0	empty		0
+sympy__sympy-21612	bm25	0	1	0	empty		0
+sympy__sympy-21847	bm25	0	1	0	empty		0
+sympy__sympy-21930	bm25	0	1	0	empty		0
+sympy__sympy-22080	bm25	0	1	0	empty		0
+sympy__sympy-22456	bm25	0	1	0	empty		0
+sympy__sympy-22714	bm25	0	1	0	empty		0
+sympy__sympy-22914	bm25	0	1	1	expanded_fallback	6336be24c670008228216dc14e959eed3516c0340a1e1b48638d40f78f11cd08	395
+sympy__sympy-23262	bm25	0	1	1	expanded_fallback	03644f2b25711a52e51d7c5e914bc28e35a1617c8ce70df5542920af6674520f	482
+sympy__sympy-23413	bm25	0	1	0	empty		0
+sympy__sympy-23534	bm25	1	0	0	compact	699b45bf8c53ce52eb2c92dd163eb47a2da6c4cd293c597c3ae835747ebf3079	357
+sympy__sympy-23824	bm25	0	1	0	empty		0
+sympy__sympy-23950	bm25	1	0	0	compact	09198c50855d46b52ebee71ad9175dcdb8e1f46aeddf7be0752f75432f286890	345
+sympy__sympy-24066	bm25	1	0	0	compact	7e21a66d39bb35a3ed3b2cdc1e1174869458196d5e82479e0c4b26f896daa756	852
+sympy__sympy-24213	bm25	0	1	0	empty		0
+sympy__sympy-24443	bm25	0	1	0	empty		0
+sympy__sympy-24539	bm25	1	0	0	compact	670431531e6e53f1a3d629cad8435db5323213c8626424f2806a1c28b2d1fe51	901
+sympy__sympy-24562	bm25	0	1	0	empty		0
+sympy__sympy-24661	bm25	0	1	1	expanded_fallback	420cadff05537eb76b6548af204da106a20577991ff009cb9eb20b9e331da18d	883
+astropy__astropy-12907	mural	0	1	1	expanded_fallback	2629aa386530c18106ad59f4296a5fe66528985f06ecee5ca59e8f54670dc588	1031
+astropy__astropy-13033	mural	1	0	0	compact	3861e19ed15da014e13056db632e53b95d08e976c64aa5addcc02ccadd1ca4d6	364
+astropy__astropy-13236	mural	0	1	0	empty		0
+astropy__astropy-13398	mural	0	1	0	empty		0
+astropy__astropy-13453	mural	0	1	0	empty		0
+astropy__astropy-13579	mural	0	1	0	empty		0
+astropy__astropy-13977	mural	0	1	0	empty		0
+astropy__astropy-14096	mural	0	1	0	empty		0
+astropy__astropy-14182	mural	1	0	0	compact	1da2057dcdd251f5202e890f63b8c5937093770d184e1724b0f51e12e52458df	350
+astropy__astropy-14309	mural	0	1	0	empty		0
+astropy__astropy-14365	mural	0	1	0	empty		0
+astropy__astropy-14369	mural	0	1	0	empty		0
+astropy__astropy-14508	mural	1	0	0	compact	8d8ec74af8fea44e6316417f5cdb512828d50939ab2215dd54b47141c52906f3	353
+astropy__astropy-14539	mural	1	0	0	compact	e39d8bef3f014786e4a5b4779c6e6fa787136d8fa7bd6acbf97ae06c328425cf	727
+astropy__astropy-14598	mural	1	0	0	compact	dd68e6909b78d04ced114bd275aa2c0cdbd15fd1f75b087020bf7a19fa9f655c	663
+astropy__astropy-14995	mural	1	0	0	compact	90e01da2155a4f2a2d8e4c6b7f30bceb5aab6467ac545471f7a989224babb68c	1246
+astropy__astropy-7166	mural	0	1	0	empty		0
+astropy__astropy-7336	mural	1	0	0	compact	77fc4106a73f8b83e263be83bd2b74e321c0d609365bc5a9f1a4978a45449362	567
+astropy__astropy-7606	mural	1	0	0	compact	dc1020b69929fe40102180674d5b06a679807548a8e906e2b41050b26d0b33d5	362
+astropy__astropy-7671	mural	0	1	0	empty		0
+astropy__astropy-8707	mural	0	1	0	empty		0
+astropy__astropy-8872	mural	0	1	1	expanded_fallback	a16168c0fa0d463c5b94545270174764747b7c2ee157b648398f16bc0c799150	1148
+django__django-10097	mural	0	1	0	empty		0
+django__django-10554	mural	0	1	0	empty		0
+django__django-10880	mural	1	0	0	compact	02ee666ba67a728189831627fc770f4b6a82e75fb1ab0997ce53038e7dd5470c	639
+django__django-10914	mural	1	0	0	compact	1a5909f799ae5e91d851f432742aa24b3f95647e0c93bcdd09bf3782a4486843	443
+django__django-10973	mural	0	1	0	empty		0
+django__django-10999	mural	0	1	0	empty		0
+django__django-11066	mural	0	1	0	empty		0
+django__django-11087	mural	0	1	0	empty		0
+django__django-11095	mural	1	0	0	compact	bdb897fe4a8fb1f77d84b5b7343e0d49a4b093e1776b8e712c9d19251ea59944	361
+django__django-11099	mural	0	1	0	empty		0
+django__django-11119	mural	0	1	0	empty		0
+django__django-11133	mural	0	1	0	empty		0
+django__django-11138	mural	0	1	1	expanded_fallback	304fba17b26b3712aeb16f7da8bac3fbbeb6686b0e0761983405dc273226147a	480
+django__django-11141	mural	1	0	0	compact	81371ae3a5336db073513a617a5a6f9219614a6070f9e3539e2a1cad3c5c1fb9	1208
+django__django-11149	mural	0	1	0	empty		0
+django__django-11163	mural	1	0	0	compact	771f69a5d163b6815070df2bf389110317a5f38242d77537904fe8ecc93dc1a8	417
+django__django-11179	mural	1	0	0	compact	3bc26c81fb352f0ad7feeb81bdc7aba04ebc2da2603aa7347205abe7b676aa31	664
+django__django-11206	mural	1	0	0	compact	aa7390f386403e5df8ecbb646cba82b51c4e7780bd102ac30bc4835c3ddf09c8	532
+django__django-11211	mural	0	1	0	empty		0
+django__django-11239	mural	1	0	0	compact	b8899e2cf98199c331df894ddf74fa71ba650560eaa255c6c3a9719121d60f11	634
+django__django-11265	mural	0	1	0	empty		0
+django__django-11276	mural	0	1	0	empty		0
+django__django-11292	mural	0	1	0	empty		0
+django__django-11299	mural	0	1	0	empty		0
+django__django-11333	mural	0	1	0	empty		0
+django__django-11400	mural	0	1	0	empty		0
+django__django-11433	mural	0	1	0	empty		0
+django__django-11451	mural	1	0	0	compact	aa858e6ea3f3d41cc81409e9eed9dadd94a8aba65fba3708d6b992339bb2147f	383
+django__django-11477	mural	0	1	1	expanded_fallback	818944221b933906ac12e3fe5f8d9b2aca32103e7aaf2db391982d7b2db03375	935
+django__django-11490	mural	0	1	0	empty		0
+django__django-11532	mural	1	0	0	compact	644105a1778905f88511ed33000ef76cc91361caf4b30ebc911b02a22ff4ea7d	959
+django__django-11551	mural	0	1	0	empty		0
+django__django-11555	mural	0	1	0	empty		0
+django__django-11603	mural	1	0	0	compact	02ee666ba67a728189831627fc770f4b6a82e75fb1ab0997ce53038e7dd5470c	639
+django__django-11728	mural	0	1	0	empty		0
+django__django-11734	mural	0	1	0	empty		0
+django__django-11740	mural	0	1	0	empty		0
+django__django-11749	mural	1	0	0	compact	b4c64586aeee1181b1f6108c1a3808bbbff0342aaae2f0192201311253ad3d4c	691
+django__django-11790	mural	0	1	0	empty		0
+django__django-11815	mural	1	0	0	compact	e7f05b78f7033d75eb0ca47173a4a0aad5e71ab7779a2bcb54af821a6dc47483	1302
+django__django-11820	mural	0	1	0	empty		0
+django__django-11848	mural	1	0	0	compact	85d4abd7a62365d275b679232f346cb9d5ba0cdbf59ba4753bb7665f4ac93902	241
+django__django-11880	mural	1	0	0	compact	5d933fad00bcbe539a7dd5c597e7690ab70aa7be7aa63063023f3d6c4bae218c	326
+django__django-11885	mural	0	1	0	empty		0
+django__django-11951	mural	0	1	1	expanded_fallback	8b0df2c136bed41fe7a8c4a9adc11f929e5f55717ee9163d374b3d9036f76ad5	711
+django__django-11964	mural	0	1	0	empty		0
+django__django-11999	mural	0	1	0	empty		0
+django__django-12039	mural	0	1	1	expanded_fallback	3e1511c2f19564c2f52bb69682965eef355ecc4f31adcb9ec1ff0b4cc83f9067	482
+django__django-12050	mural	0	1	0	empty		0
+django__django-12125	mural	1	0	0	compact	d50456acd1481f01e37741f8bbc0b138e95e042b0737f5dcfcb1ae7c0bada505	340
+django__django-12143	mural	0	1	0	empty		0
+django__django-12155	mural	1	0	0	compact	076eac9a2ab083d33a4ade80755e81b12351c6d38a72b4294a5f330f52f7d2fc	514
+django__django-12193	mural	0	1	0	empty		0
+django__django-12209	mural	1	0	0	compact	2a82b009d53e061c90d44a89465248de5d3b1e6a03fd0dbc121c6fd2f294d7e0	704
+django__django-12262	mural	0	1	0	empty		0
+django__django-12273	mural	0	1	0	empty		0
+django__django-12276	mural	1	0	0	compact	c2d57b3397cdef507d74d256aa1aaee098c1c027ebb7bd43a832779a420e804a	262
+django__django-12304	mural	0	1	0	empty		0
+django__django-12308	mural	0	1	1	expanded_fallback	02b4d08035b4071eef3e63d9a13b8beb65a11d78f89f4cda6b1896dec202e067	671
+django__django-12325	mural	0	1	1	expanded_fallback	0d84a29253056ef95690b1f8e45f660cadc05d9e3023e12bcf89e4367e4ab98f	733
+django__django-12406	mural	0	1	1	expanded_fallback	839852a37d157934a188109f82640ccf21eafa4e47c2bc5b8f38c76e852804fb	447
+django__django-12419	mural	1	0	0	compact	c4bff2dfbe98ab8685bfa01ab5c7d4864d7825fdf78002a38091c1432f2741ac	518
+django__django-12663	mural	1	0	0	compact	7bedae77c0b6c14de582894bbbdd031936aa5e7ad6459998d0f9b7022f097ae0	439
+django__django-12708	mural	1	0	0	compact	6c722b522d7c3580367b5dd863e51c604cfc57ace3b17ea19a6c58b7131913e9	1115
+django__django-12713	mural	0	1	0	empty		0
+django__django-12741	mural	1	0	0	compact	e5692c1981c0697e914583424d6d4b7f4b9a9e991cd5dc9599102cc6d326d696	747
+django__django-12754	mural	1	0	0	compact	44a64d45e8d588b7993bf527e898dcc1488f753eee44f574beac0af43eee2971	805
+django__django-12774	mural	1	0	0	compact	a1669142b383beabd9820f5f5f1600080051e9f4bef9ecfc2e1b23c778a89e6a	693
+django__django-12858	mural	0	1	0	empty		0
+django__django-12965	mural	0	1	0	empty		0
+django__django-13012	mural	0	1	0	empty		0
+django__django-13023	mural	1	0	0	compact	94f67dde8934836071564510c44e572b764dcba7b38b7dd4019be7cccb50b84b	286
+django__django-13028	mural	0	1	1	expanded_fallback	cb5b6ed876e8fb10e5fbf852f9b315d021f8175204ce45b0a2054f644ca75bc9	677
+django__django-13033	mural	0	1	0	empty		0
+django__django-13089	mural	0	1	0	empty		0
+django__django-13109	mural	0	1	1	expanded_fallback	609754dd6c1d674f4dff115cc0759dbd2b1f81df43eaad0b04da31a48fa55b93	484
+django__django-13112	mural	0	1	0	empty		0
+django__django-13121	mural	1	0	0	compact	accb54009c286b98ede35ee83dc34221cea4162fca7baa81d96eb3ebbc19551f	504
+django__django-13128	mural	1	0	0	compact	2ee36427ecd51451d432065aaa1be6bc118fdbf7859d7805a8d69d8b1bf1a1a7	507
+django__django-13158	mural	0	1	1	expanded_fallback	3925a8b70dc165806887d1ac278f2d26c4e1f1477c78c82e939b073ef8703202	447
+django__django-13195	mural	0	1	0	empty		0
+django__django-13212	mural	0	1	0	empty		0
+django__django-13279	mural	1	0	0	compact	28642f84d3ea182be64480e2f91cc02b8b0a5cbf1ec9a1bfbec38e6a062e7f38	909
+django__django-13297	mural	0	1	1	expanded_fallback	94ae063ca3e0870bb71f2c73d97921020b25512201123845ac2047a0405e33fe	606
+django__django-13315	mural	0	1	0	empty		0
+django__django-13343	mural	1	0	0	compact	1360450641de597653c2ad245ab42dd287c4decc0694e4d000bc0e2dcf1e5a56	4667
+django__django-13344	mural	1	0	0	compact	c423ab8054e6d93d3e7538c1b66a6a17f09bbb2575571ae2e645b02033c3ac7a	778
+django__django-13346	mural	1	0	0	compact	6382e46037d7dac4b06c5462ffea438cd2c26ed503bb681ee2c0670a37b9dfec	675
+django__django-13363	mural	0	1	0	empty		0
+django__django-13401	mural	0	1	0	empty		0
+django__django-13406	mural	0	1	0	empty		0
+django__django-13410	mural	0	1	0	empty		0
+django__django-13417	mural	0	1	0	empty		0
+django__django-13449	mural	0	1	0	empty		0
+django__django-13512	mural	1	0	0	compact	ecfc7d01a607883b10f1d429efca2d5a0cab8946abd44a50bd3111168dee166b	396
+django__django-13513	mural	0	1	0	empty		0
+django__django-13516	mural	0	1	1	expanded_fallback	2b1b2b28f9873ef151715d148d6068e02ee74c2a53e4c0a84d4b096a73d40ac7	616
+django__django-13551	mural	1	0	0	compact	2fb8c4ec896a7327c5da17cecff1907224d5f211660014a42f5e13d53571d490	764
+django__django-13568	mural	0	1	0	empty		0
+django__django-13569	mural	0	1	0	empty		0
+django__django-13590	mural	0	1	0	empty		0
+django__django-13658	mural	1	0	0	compact	23f2b4b72389ecba810c4a067b8b5b1dc96faff3316d78dcc13cc3ec02131e17	502
+django__django-13670	mural	0	1	1	expanded_fallback	0958ff98eac92feb94863ba9b74e7abde4bdae86344041748531c0091a0648bd	433
+django__django-13741	mural	1	0	0	compact	a465f103e5b893d06792f1a440421b9a7dfa83a36120e8bc6ad30f80cf08613b	310
+django__django-13786	mural	0	1	0	empty		0
+django__django-13794	mural	1	0	0	compact	b5a5c9810e34c6f6b774c7ea4d512534ec38283fe0b81f435906ef1e2d21f190	400
+django__django-13807	mural	0	1	0	empty		0
+django__django-13809	mural	1	0	0	compact	6d6cdf4885da69e51dc8e85c8d97980d161d2d6a10fb275029f41c20c8e48515	509
+django__django-13810	mural	1	0	0	compact	00c2b8619c24df1c9651bca8ad2b829580e7413fb4f6e6e63ba0d6e5aca64368	500
+django__django-13820	mural	0	1	0	empty		0
+django__django-13821	mural	1	0	0	compact	d92c4be558af81ba0cfa2a9ec2084e9cb3cc30dd83542aa99cdbf05e79a1ab69	483
+django__django-13837	mural	0	1	0	empty		0
+django__django-13925	mural	0	1	0	empty		0
+django__django-13933	mural	0	1	0	empty		0
+django__django-13964	mural	0	1	0	empty		0
+django__django-14007	mural	0	1	0	empty		0
+django__django-14011	mural	1	0	0	compact	1921dc61c705ce9e7d22004e4cac24c65b645490d89989cfe204f800103d18ac	1126
+django__django-14017	mural	0	1	1	expanded_fallback	112ca15ab680612e03e92c97ecff050566dfcb62fc0852d1d83215ea349aa16f	610
+django__django-14034	mural	0	1	0	empty		0
+django__django-14053	mural	0	1	0	empty		0
+django__django-14089	mural	1	0	0	compact	73b6894fed6568142421199a6d56da0c455409876f45285b0f8ee01916f46e20	696
+django__django-14122	mural	0	1	0	empty		0
+django__django-14140	mural	0	1	0	empty		0
+django__django-14155	mural	0	1	1	expanded_fallback	214a84c6cb903fb20674000c7e8600f53bfbad6a64cf5ec844a0a0c5d8447b42	577
+django__django-14170	mural	0	1	0	empty		0
+django__django-14238	mural	0	1	0	empty		0
+django__django-14311	mural	0	1	0	empty		0
+django__django-14315	mural	0	1	0	empty		0
+django__django-14349	mural	0	1	0	empty		0
+django__django-14351	mural	0	1	0	empty		0
+django__django-14373	mural	1	0	0	compact	7bec88b55f46b3c3afe2f46d9e1c975511895b9457ce54819d888603a18fbb02	304
+django__django-14376	mural	1	0	0	compact	7275537f77ccef3db96149c0f71724f335a4aab3d38a2ce821f4ac154eb38ac2	630
+django__django-14404	mural	1	0	0	compact	f3589a928c5f93231b70b523532438c34bf718a3f5ada88d153ee59edd577d4a	441
+django__django-14434	mural	0	1	1	expanded_fallback	4ef816907b28507052fe72cf052295cbe1bba1b435e48d0fa109ea8adc2ca41a	328
+django__django-14493	mural	0	1	0	empty		0
+django__django-14500	mural	0	1	0	empty		0
+django__django-14534	mural	0	1	0	empty		0
+django__django-14539	mural	0	1	0	empty		0
+django__django-14559	mural	0	1	0	empty		0
+django__django-14580	mural	0	1	0	empty		0
+django__django-14608	mural	0	1	0	empty		0
+django__django-14631	mural	1	0	0	compact	a334773e45c93f3c4db340c3fb1ad41fd92731925725c16cb73054bb1b90b1a5	1288
+django__django-14672	mural	0	1	1	expanded_fallback	c04668ca74d34541e84adcf773dc5a77fb1eb221ed65d774691af528a08cdb96	3401
+django__django-14725	mural	1	0	0	compact	3089a82f69b13f5c170dbfd2c2b2742e995630ed1e497ef2f738d24ba8c4a244	509
+django__django-14752	mural	1	0	0	compact	5f0e8b25b1fe0a8160d5456be6da978c6a9d9a5f22643df5eba1d2b44a3e784e	533
+django__django-14765	mural	0	1	1	expanded_fallback	e52ae5bca588e15c03cb6830cd9d320a0a4b1779a7f4fb07bf157160ce623489	489
+django__django-14771	mural	1	0	0	compact	5ea7568f0a5619c9517a5ea9afc6701252548526aea3a5c3db33e41ac7c6a818	347
+django__django-14787	mural	0	1	1	expanded_fallback	4abc763bcc1a0c035faa6ac0c2915903ef3a4dd4de87b4d1efaa9857ffabe89c	663
+django__django-14792	mural	0	1	0	empty		0
+django__django-14855	mural	1	0	0	compact	242808dbed892cfc59e386e9cb08d3417d41b797e5acf51c87a0c813150747b1	556
+django__django-14915	mural	0	1	0	empty		0
+django__django-14999	mural	1	0	0	compact	33e192eec6b2678ae43db1c273a2996a933e9d8c39b93852480e8c7d7de8985a	582
+django__django-15022	mural	0	1	0	empty		0
+django__django-15037	mural	0	1	0	empty		0
+django__django-15098	mural	0	1	0	empty		0
+django__django-15103	mural	1	0	0	compact	9d10485c54b31c43eecb188257e00091885891100fac62f371c44a3594eb26cb	1317
+django__django-15104	mural	1	0	0	compact	16e0f0105edbb7c5772b48ed47332b156b1006f4528a418413180fdd5d866036	760
+django__django-15127	mural	1	0	0	compact	56c8028b97fbb9204e3d946ac6dfe6f12bf6da78c1980f82cd16398394fbe07b	299
+django__django-15128	mural	0	1	1	expanded_fallback	442b0259ef2a7145649c861b1ff190de4801196f3f3d1e22bee4de0552ad36d3	422
+django__django-15161	mural	0	1	0	empty		0
+django__django-15252	mural	0	1	0	empty		0
+django__django-15268	mural	0	1	0	empty		0
+django__django-15277	mural	0	1	1	expanded_fallback	7b4b544aec4657d66d554b2560c7d95a1def99ccbcfdb48120736111a830a0a8	634
+django__django-15278	mural	1	0	0	compact	86d4baf3ae1f0507ab71d4a6cd50b1040d4f428e5fe832c17b86d89771a47f6f	471
+django__django-15280	mural	0	1	0	empty		0
+django__django-15315	mural	1	0	0	compact	9f9f1c4a73f1f61cf75a7afeac0ddee8340ce6b15794a39aab6040b26bdf6016	641
+django__django-15368	mural	0	1	0	empty		0
+django__django-15375	mural	0	1	0	empty		0
+django__django-15380	mural	0	1	0	empty		0
+django__django-15382	mural	0	1	1	expanded_fallback	330196427ad2fc0bd736bc9cd99e7c1db9b57d20d34113527e0e19e6752b85a2	1397
+django__django-15467	mural	1	0	0	compact	4cafc029615afe5c859c4abea558276ddf769d5e34f5027440e3158cc3ab3c89	520
+django__django-15499	mural	0	1	0	empty		0
+django__django-15503	mural	1	0	0	compact	0042ba40014fe50721eb7fee577d4f89c7b09ed98befa1ff7265096829c6a0eb	712
+django__django-15525	mural	0	1	0	empty		0
+django__django-15554	mural	0	1	0	empty		0
+django__django-15561	mural	0	1	1	expanded_fallback	a0e51bdc1a729b0a0a6145e9106f9a72f54cc556dbab9680b5f3ae498b798808	644
+django__django-15563	mural	0	1	0	empty		0
+django__django-15569	mural	1	0	0	compact	853454e35538a2d03336d1e62bcf777d054d963b8f93fbf08af04afe92d1d6b6	385
+django__django-15572	mural	0	1	0	empty		0
+django__django-15629	mural	1	0	0	compact	b6db5209f5ba790b975446a5feef7297878a1b1a84314304b396846a61d77859	508
+django__django-15695	mural	0	1	1	expanded_fallback	3a78edf930acd91e6c17f2a3a171165995332b77de13f3eef053d6784c3bfe80	920
+django__django-15731	mural	0	1	1	expanded_fallback	812d45ef17ffb017f7c8228b199dd7071348a514c038fa6c24d2381e2e732cdd	544
+django__django-15732	mural	0	1	0	empty		0
+django__django-15741	mural	0	1	1	expanded_fallback	ca624c1935a444a6c887d0f6d4c612055d66d51b20802bd6c0594110cceb567a	439
+django__django-15814	mural	0	1	0	empty		0
+django__django-15851	mural	1	0	0	compact	07866293c2067fdd9a1cbce5aa1ef1f2d44388f1ba1aba743a84341b00dc7dc7	682
+django__django-15863	mural	0	1	0	empty		0
+django__django-15916	mural	0	1	0	empty		0
+django__django-15930	mural	0	1	0	empty		0
+django__django-15957	mural	0	1	0	empty		0
+django__django-15973	mural	0	1	0	empty		0
+django__django-15987	mural	0	1	0	empty		0
+django__django-16032	mural	0	1	0	empty		0
+django__django-16082	mural	1	0	0	compact	f81e53cf097e0b71e61cedc3a9e5e20996bfb0e32da400ae5fc0cfd8f72a9dd7	707
+django__django-16100	mural	1	0	0	compact	e78e5f5599cc770750c4905f3b986a4ae2504beff96f5a4f02a19ac5161b56b3	1862
+django__django-16116	mural	0	1	0	empty		0
+django__django-16136	mural	0	1	0	empty		0
+django__django-16139	mural	1	0	0	compact	9acefafb2486953cc9a8b783fa20b714fbc50a751491a9c462d8917bb853cd82	559
+django__django-16145	mural	0	1	0	empty		0
+django__django-16255	mural	1	0	0	compact	3ab9df6fa24fca3c5353efe5558d48b23a408904e52e82b99c4f50ca1e6b0886	386
+django__django-16256	mural	0	1	0	empty		0
+django__django-16263	mural	1	0	0	compact	1b7f6f2244515828f32f864f880edb617afab3161ab1d7ff39c7d5f1d02fafab	699
+django__django-16315	mural	0	1	1	expanded_fallback	6f4ef9ea9a828babcd30a3dd8c471f4ef7e8613abeafb6d4928d34e17acdc246	6516
+django__django-16333	mural	1	0	0	compact	2f56e804ff9f8a27f456fdf5f8246ff26131852cd3a0acb9805e7cff21b66571	530
+django__django-16429	mural	0	1	0	empty		0
+django__django-16454	mural	0	1	0	empty		0
+django__django-16485	mural	0	1	0	empty		0
+django__django-16493	mural	1	0	0	compact	10b97499b786160fcabb8b92f9d988e8f9b8c97c040a3cfa79d0c3d43e7e7b34	507
+django__django-16502	mural	0	1	0	empty		0
+django__django-16527	mural	1	0	0	compact	46a0687379ecbdb0d43221ae09a5e5e329e3f23a6f765a50fd350f0ac847a2dc	509
+django__django-16560	mural	1	0	0	compact	714b6949e6868f6ff8746146f7fd5ae7d1f82b7d77e0e14067eecf4c6e53c1a4	526
+django__django-16569	mural	0	1	0	empty		0
+django__django-16595	mural	1	0	0	compact	7a5a3eb8709d28a3449e7e18063b6ef49e0a205ea3b7c21074beeac3f295408d	470
+django__django-16612	mural	0	1	0	empty		0
+django__django-16631	mural	0	1	0	empty		0
+django__django-16642	mural	0	1	0	empty		0
+django__django-16661	mural	0	1	0	empty		0
+django__django-16662	mural	0	1	0	empty		0
+django__django-16667	mural	1	0	0	compact	1b944150b8a162ce815f5d854edf941b63969e7a1a7f40a2c1705c90f6a2188e	555
+django__django-16801	mural	0	1	1	expanded_fallback	b763b3000f9c63d15a9a9da4294e30e3bf5d5d432186d6c36984c06b3a24ddbd	760
+django__django-16819	mural	0	1	0	empty		0
+django__django-16877	mural	0	1	0	empty		0
+django__django-16899	mural	0	1	0	empty		0
+django__django-16901	mural	0	1	0	empty		0
+django__django-16938	mural	0	1	0	empty		0
+django__django-16950	mural	0	1	0	empty		0
+django__django-17029	mural	0	1	0	empty		0
+django__django-17084	mural	1	0	0	compact	97e977f8d1f4f1c42799aadb22aec76078ab320a86c7236a9e7a26bc8383513c	853
+django__django-17087	mural	0	1	0	empty		0
+django__django-7530	mural	0	1	0	empty		0
+django__django-9296	mural	1	0	0	compact	d5937f82b12529cb5043b07f782c9a247013a8ba8f5c6c1074d0019e3880209f	424
+matplotlib__matplotlib-13989	mural	0	1	0	empty		0
+matplotlib__matplotlib-14623	mural	0	1	0	empty		0
+matplotlib__matplotlib-20488	mural	0	1	0	empty		0
+matplotlib__matplotlib-20676	mural	0	1	0	empty		0
+matplotlib__matplotlib-20826	mural	1	0	0	compact	67033b05c92174afa637663e8318b73a2f09a5d45512cc03e32b3312fe39a7e6	348
+matplotlib__matplotlib-20859	mural	0	1	0	empty		0
+matplotlib__matplotlib-21568	mural	1	0	0	compact	9bcad1f761c9427164968f7e81ef09632a7b28952f21fc2bc90fa30e9133cc45	530
+matplotlib__matplotlib-22719	mural	1	0	0	compact	f48817ce9889902901b91d579b0e5841b693342143795bcd290fbb33ef852b5a	253
+matplotlib__matplotlib-22865	mural	0	1	0	empty		0
+matplotlib__matplotlib-22871	mural	0	1	0	empty		0
+matplotlib__matplotlib-23299	mural	0	1	0	empty		0
+matplotlib__matplotlib-23314	mural	0	1	0	empty		0
+matplotlib__matplotlib-23412	mural	0	1	0	empty		0
+matplotlib__matplotlib-23476	mural	0	1	0	empty		0
+matplotlib__matplotlib-24026	mural	0	1	0	empty		0
+matplotlib__matplotlib-24149	mural	0	1	0	empty		0
+matplotlib__matplotlib-24177	mural	0	1	0	empty		0
+matplotlib__matplotlib-24570	mural	0	1	0	empty		0
+matplotlib__matplotlib-24627	mural	0	1	1	expanded_fallback	773b7473ab98e8146aed8474ae8b639a513ddd4d100770428b3aa3edc61cc16b	445
+matplotlib__matplotlib-24637	mural	0	1	0	empty		0
+matplotlib__matplotlib-24870	mural	1	0	0	compact	89aa0ca06cf844fdf207599146aaeaf1ed6986bcc4cd6693e1f20489a2b8b70a	619
+matplotlib__matplotlib-24970	mural	0	1	0	empty		0
+matplotlib__matplotlib-25122	mural	1	0	0	compact	6869dca75aa0187ec7ca63874e8f4c19fae26050f3191f3b325668fc59ea2cdb	668
+matplotlib__matplotlib-25287	mural	0	1	0	empty		0
+matplotlib__matplotlib-25311	mural	1	0	0	compact	65aceed68b745c42d978fd6cbe5b8f29922494f0b9e9cf0ba32fbfef76cdc6c0	618
+matplotlib__matplotlib-25332	mural	1	0	0	compact	d8fe321ebca67fb3c8441501c5d9eb1ec98f01c44d508fe137ed2e9d04316891	473
+matplotlib__matplotlib-25479	mural	0	1	1	expanded_fallback	e15d20009866fa9a44df7df9e90134e68b0ac0606400493d2a6f15b5523cea6c	754
+matplotlib__matplotlib-25775	mural	0	1	0	empty		0
+matplotlib__matplotlib-25960	mural	1	0	0	compact	ddedbcbd9401f20659ddff7294c1f261e1d1c2fd34285337c6ade192a168fe71	503
+matplotlib__matplotlib-26113	mural	0	1	0	empty		0
+matplotlib__matplotlib-26208	mural	0	1	0	empty		0
+matplotlib__matplotlib-26291	mural	0	1	0	empty		0
+matplotlib__matplotlib-26342	mural	1	0	0	compact	20e877077aff9fb7912a25bde39ea19b35144d4d40fed18b897198495a74fdb3	291
+matplotlib__matplotlib-26466	mural	0	1	0	empty		0
+mwaskom__seaborn-3069	mural	0	1	1	expanded_fallback	9f7446765ee2622bec637b179ab564a151798f096fb99a72002d9746e5c92f41	739
+mwaskom__seaborn-3187	mural	0	1	0	empty		0
+pallets__flask-5014	mural	0	1	1	expanded_fallback	7f976ba3f1cdebb8d6693913e7fdd58c4ec9f69f75b2149c6d37f544477c0346	536
+psf__requests-1142	mural	1	0	0	compact	203936e47ee56bf599272961688dbd9c5d773b802dc1ea27f9dece5aa37605c5	823
+psf__requests-1724	mural	0	1	0	empty		0
+psf__requests-1766	mural	0	1	1	expanded_fallback	538307a07be51b0ce4ebab092e00d3245f75921c3d803a6ac773ed6666913bd5	377
+psf__requests-1921	mural	0	1	0	empty		0
+psf__requests-2317	mural	0	1	1	expanded_fallback	34b62ff89968e50bf8a9c161f4c546d8559716f5a27be2dcc2c9a4c37d168647	329
+psf__requests-2931	mural	0	1	0	empty		0
+psf__requests-5414	mural	1	0	0	compact	e07b79cf60692ba4c9d7cfca1ffbd00f9d555c2329dc3d77084d0f5aa743f4f0	619
+psf__requests-6028	mural	0	1	0	empty		0
+pydata__xarray-2905	mural	1	0	0	compact	c5ccea91c9438d83fcd36271b57a49b637a101b416d1d2b432f78521b2bde295	3352
+pydata__xarray-3095	mural	0	1	0	empty		0
+pydata__xarray-3151	mural	0	1	0	empty		0
+pydata__xarray-3305	mural	0	1	0	empty		0
+pydata__xarray-3677	mural	0	1	0	empty		0
+pydata__xarray-3993	mural	1	0	0	compact	4dd7c1c20e0a91c183cfd6d3bad561bd212e33bd9fdb91cf018d38f187b09e56	741
+pydata__xarray-4075	mural	0	1	0	empty		0
+pydata__xarray-4094	mural	0	1	0	empty		0
+pydata__xarray-4356	mural	0	1	0	empty		0
+pydata__xarray-4629	mural	0	1	0	empty		0
+pydata__xarray-4687	mural	0	1	0	empty		0
+pydata__xarray-4695	mural	0	1	0	empty		0
+pydata__xarray-4966	mural	0	1	0	empty		0
+pydata__xarray-6461	mural	1	0	0	compact	92313e973306533f3a9f0ec17f5001f34bdc533222c4c918a4c4f93d78f0f854	511
+pydata__xarray-6599	mural	0	1	1	expanded_fallback	7758a4cffcb01d4a0736f2a10c8d7d14f4966e7e3c913a4d89309b3aaab1fb79	453
+pydata__xarray-6721	mural	0	1	0	empty		0
+pydata__xarray-6744	mural	0	1	0	empty		0
+pydata__xarray-6938	mural	0	1	0	empty		0
+pydata__xarray-6992	mural	0	1	0	empty		0
+pydata__xarray-7229	mural	0	1	0	empty		0
+pydata__xarray-7233	mural	0	1	0	empty		0
+pydata__xarray-7393	mural	0	1	0	empty		0
+pylint-dev__pylint-4551	mural	0	1	0	empty		0
+pylint-dev__pylint-4604	mural	0	1	1	expanded_fallback	a048e1f5f44e0e3c0d639d433598741f3d5999239da58e8ea4b21ec8dce37390	878
+pylint-dev__pylint-4661	mural	0	1	0	empty		0
+pylint-dev__pylint-4970	mural	1	0	0	compact	e831b69ed81308e1e8f86a503ac268a20d02509c3aba3ceed8cc5b757321cba7	388
+pylint-dev__pylint-6386	mural	0	1	0	empty		0
+pylint-dev__pylint-6528	mural	0	1	0	empty		0
+pylint-dev__pylint-6903	mural	0	1	0	empty		0
+pylint-dev__pylint-7080	mural	0	1	0	empty		0
+pylint-dev__pylint-7277	mural	1	0	0	compact	7add2f54b5fdf49db49a1215b4c7444fe33b83a16f8fe5ea9cdf74b7f74e293d	1111
+pylint-dev__pylint-8898	mural	0	1	0	empty		0
+pytest-dev__pytest-10051	mural	1	0	0	compact	d4a5d9be3827ea04d988ecb0814fe661bc14e06cd7229fe243582d67170e881d	434
+pytest-dev__pytest-10081	mural	0	1	0	empty		0
+pytest-dev__pytest-10356	mural	0	1	1	expanded_fallback	71c908879c5daa4373ac0f55d32de5cd637cc0ad747dd054d6099fb31caea21b	409
+pytest-dev__pytest-5262	mural	0	1	0	empty		0
+pytest-dev__pytest-5631	mural	0	1	0	empty		0
+pytest-dev__pytest-5787	mural	0	1	1	expanded_fallback	a7294543ce2b50527bfc533ed6b5ff9332a66068f836479f5e23ba2a1860b78e	916
+pytest-dev__pytest-5809	mural	1	0	0	compact	79bd30df08209807a932bedaad1d2db82b488e0adfbb4c1606cd4e7f9dafd433	287
+pytest-dev__pytest-5840	mural	0	1	0	empty		0
+pytest-dev__pytest-6197	mural	0	1	0	empty		0
+pytest-dev__pytest-6202	mural	1	0	0	compact	cc582843ed03adfdf866786c3cc284d72e9de2494c0d88c84e32b348e5d2a286	270
+pytest-dev__pytest-7205	mural	0	1	0	empty		0
+pytest-dev__pytest-7236	mural	0	1	1	expanded_fallback	11e2a4e4dba7ab7a125c648afbf8f091fcd639f01430f7dcd7b39d7213d815c4	410
+pytest-dev__pytest-7324	mural	0	1	1	expanded_fallback	cf97cbb567e29d3adf4465faa16a33898d35fc4b7394f7bbbf97c70bfa884bc2	778
+pytest-dev__pytest-7432	mural	1	0	0	compact	2d8dee787b918bddec03550721863f3eab2e98794dfde0c1df8e4265e78db871	569
+pytest-dev__pytest-7490	mural	0	1	0	empty		0
+pytest-dev__pytest-7521	mural	1	0	0	compact	820f68afb6169b09b59f612c5f2c33ac78bcff872caf77ed567bd92068d70e1a	361
+pytest-dev__pytest-7571	mural	0	1	0	empty		0
+pytest-dev__pytest-7982	mural	0	1	1	expanded_fallback	2cff2064aec3afe7334af19b1183b72e0f844350c77e4645b57fe9ffdd7543a4	395
+pytest-dev__pytest-8399	mural	0	1	1	expanded_fallback	77335524ccc4baf79502222003a922e6f597e0a4731614e7b90dcebf47e57e7e	506
+scikit-learn__scikit-learn-10297	mural	1	0	0	compact	092bb0cab8bef42465e135725a162d7f1cd1241ed3fa0173dfec964408c7c12b	675
+scikit-learn__scikit-learn-10844	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-10908	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-11310	mural	1	0	0	compact	d6489e93b7ee5596c85c6b2c3a0abacbcfa11709a86f31f8034cd076d191356d	500
+scikit-learn__scikit-learn-11578	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-12585	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-12682	mural	1	0	0	compact	094d2457d83f0b555ddd379cf05d0750cf8ae940874d9b06ce7e1e02ac88f7b7	864
+scikit-learn__scikit-learn-12973	mural	0	1	1	expanded_fallback	3ff29bfcb7e391de846bb79edeffad282eb36edbce43dd0fecea610a3a2fc93b	317
+scikit-learn__scikit-learn-13124	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-13135	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-13142	mural	1	0	0	compact	3e8d1c3fe5ad6a794b131bb80b121ab1917ca99a00205464f9e46d8ed5bf16f8	552
+scikit-learn__scikit-learn-13328	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-13439	mural	1	0	0	compact	ee712d574a9da4d787d98db73af09d4d6c2ff0e65f93a4fc8dd115da685b1a6d	469
+scikit-learn__scikit-learn-13496	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-13779	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-14053	mural	1	0	0	compact	1a17d19b2930c04086632ebfe71ad26450a607fddec714ab0de5099f0ac1c8b2	1196
+scikit-learn__scikit-learn-14087	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-14141	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-14496	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-14629	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-14710	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-14894	mural	1	0	0	compact	6bac12342ed7ffb48e9fc45f446c74f81e635bc171c523f4dc891ca7a568ca57	512
+scikit-learn__scikit-learn-14983	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-15100	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-25102	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-25232	mural	1	0	0	compact	81aa4412fcc70eef75d8df4226bcdf37254725dcf5b11297c14d8b5477610272	386
+scikit-learn__scikit-learn-25747	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-25931	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-25973	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-26194	mural	0	1	0	empty		0
+scikit-learn__scikit-learn-26323	mural	1	0	0	compact	87d2013fdde918a893fd30df8f9f56f8f4798c0ad59618b8ee40ea5291a28e40	552
+scikit-learn__scikit-learn-9288	mural	1	0	0	compact	46ea4620df019cb5afca5e0358dcfac2e698005d66003b6aa626cd797148472d	536
+sphinx-doc__sphinx-10323	mural	0	1	0	empty		0
+sphinx-doc__sphinx-10435	mural	0	1	0	empty		0
+sphinx-doc__sphinx-10449	mural	0	1	0	empty		0
+sphinx-doc__sphinx-10466	mural	0	1	0	empty		0
+sphinx-doc__sphinx-10614	mural	0	1	0	empty		0
+sphinx-doc__sphinx-10673	mural	0	1	0	empty		0
+sphinx-doc__sphinx-11445	mural	0	1	0	empty		0
+sphinx-doc__sphinx-11510	mural	0	1	0	empty		0
+sphinx-doc__sphinx-7440	mural	0	1	0	empty		0
+sphinx-doc__sphinx-7454	mural	0	1	1	expanded_fallback	fac5f49e031fd0e8973adb0a30600d95b3b9ae5fc0d3acd14e4a9ac43c1309a5	394
+sphinx-doc__sphinx-7462	mural	1	0	0	compact	018d42251bdbdf0f9de0960b852150f5851d791316560f5123358c14cac3efcc	957
+sphinx-doc__sphinx-7590	mural	0	1	0	empty		0
+sphinx-doc__sphinx-7748	mural	0	1	0	empty		0
+sphinx-doc__sphinx-7757	mural	0	1	0	empty		0
+sphinx-doc__sphinx-7889	mural	0	1	0	empty		0
+sphinx-doc__sphinx-7910	mural	0	1	0	empty		0
+sphinx-doc__sphinx-7985	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8035	mural	0	1	1	expanded_fallback	c8849bc97d450333b5b6a4cb27c1ef1d771be4c8667698d70441aa39c9aa2c02	543
+sphinx-doc__sphinx-8056	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8120	mural	0	1	1	expanded_fallback	482e8209c515fabc3a5ef9f4b7ebef33d7213c4e925c6d838a8f2d3294d3eb5e	406
+sphinx-doc__sphinx-8265	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8269	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8459	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8475	mural	0	1	1	expanded_fallback	8af20f5394402fc49546f40d6d0416b470ef4a43d61ab71620d89960587f9bde	1109
+sphinx-doc__sphinx-8548	mural	1	0	0	compact	83658e62e13ec95661eb4d6cd6738eb2ea46cc6aa087351fbdb6ef811407fb15	755
+sphinx-doc__sphinx-8551	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8593	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8595	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8621	mural	1	0	0	compact	8aa5f9dda8708b75db0da623c05ce569b760ebe862690cfc9be52211dc6de041	450
+sphinx-doc__sphinx-8638	mural	0	1	0	empty		0
+sphinx-doc__sphinx-8721	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9229	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9230	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9258	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9281	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9320	mural	1	0	0	compact	9ab8fd1453c6a2c3f200045f520623a6199dde38e80a5593fd2eaf957e931d0a	334
+sphinx-doc__sphinx-9367	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9461	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9591	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9602	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9658	mural	0	1	0	empty		0
+sphinx-doc__sphinx-9673	mural	1	0	0	compact	5b3344353fca10f0c6d2a3846e3f6d60ded775ed0f3b5000113710dde2c9d474	464
+sphinx-doc__sphinx-9698	mural	1	0	0	compact	79c4535eb04abb9ae55c5a92846aac9995a923f1d313b960cccfc77f9ea5666f	605
+sphinx-doc__sphinx-9711	mural	0	1	0	empty		0
+sympy__sympy-11618	mural	0	1	0	empty		0
+sympy__sympy-12096	mural	0	1	0	empty		0
+sympy__sympy-12419	mural	0	1	0	empty		0
+sympy__sympy-12481	mural	0	1	0	empty		0
+sympy__sympy-12489	mural	0	1	0	empty		0
+sympy__sympy-13031	mural	1	0	0	compact	1df2f3176277bc74d3f756d3f492d33ed768e93707be3c8bf39399bd4931c4bf	387
+sympy__sympy-13091	mural	0	1	0	empty		0
+sympy__sympy-13372	mural	0	1	0	empty		0
+sympy__sympy-13480	mural	0	1	0	empty		0
+sympy__sympy-13551	mural	0	1	0	empty		0
+sympy__sympy-13615	mural	0	1	0	empty		0
+sympy__sympy-13647	mural	0	1	0	empty		0
+sympy__sympy-13757	mural	1	0	0	compact	9b15b22643662b6a2eab04673f0917771047d26863736af25c1e132c531144cd	334
+sympy__sympy-13798	mural	1	0	0	compact	f49adb473e29b2f07a4270b65601f1aca4cdce670023709a4e07875e07efbc7c	422
+sympy__sympy-13852	mural	0	1	0	empty		0
+sympy__sympy-13877	mural	0	1	0	empty		0
+sympy__sympy-13878	mural	0	1	0	empty		0
+sympy__sympy-13974	mural	0	1	0	empty		0
+sympy__sympy-14248	mural	0	1	0	empty		0
+sympy__sympy-14531	mural	0	1	0	empty		0
+sympy__sympy-14711	mural	1	0	0	compact	ab37c63fd40ce68b27a0d75adeab4632099e32b0270593401637ac8a2fb1c272	304
+sympy__sympy-14976	mural	0	1	1	expanded_fallback	e59bbfa6c1e56c1518a590ab3787113baf3cf6c03e34b96948f5a09eea0f67f4	503
+sympy__sympy-15017	mural	1	0	0	compact	a9debb0cb6785a86145488d0f117979b176207df8ca66958dcb3e1a25662be63	281
+sympy__sympy-15345	mural	0	1	0	empty		0
+sympy__sympy-15349	mural	0	1	0	empty		0
+sympy__sympy-15599	mural	0	1	0	empty		0
+sympy__sympy-15809	mural	0	1	0	empty		0
+sympy__sympy-15875	mural	0	1	0	empty		0
+sympy__sympy-15976	mural	1	0	0	compact	105470af08ac3ab8ccba092323dc8e5baf1346022d769cf768e9a93380687ef4	920
+sympy__sympy-16450	mural	0	1	0	empty		0
+sympy__sympy-16597	mural	1	0	0	compact	63ed32a65f4654c311571859429ff58206f3c8199053b8e0987e33230928054f	579
+sympy__sympy-16766	mural	0	1	0	empty		0
+sympy__sympy-16792	mural	0	1	0	empty		0
+sympy__sympy-16886	mural	0	1	0	empty		0
+sympy__sympy-17139	mural	0	1	0	empty		0
+sympy__sympy-17318	mural	0	1	0	empty		0
+sympy__sympy-17630	mural	0	1	0	empty		0
+sympy__sympy-17655	mural	0	1	0	empty		0
+sympy__sympy-18189	mural	0	1	0	empty		0
+sympy__sympy-18199	mural	0	1	0	empty		0
+sympy__sympy-18211	mural	1	0	0	compact	cdb6954acd70be9310d057d77683e2d46be45e7b1641a50022ecd8649f56726c	383
+sympy__sympy-18698	mural	0	1	0	empty		0
+sympy__sympy-18763	mural	0	1	0	empty		0
+sympy__sympy-19040	mural	0	1	0	empty		0
+sympy__sympy-19346	mural	0	1	0	empty		0
+sympy__sympy-19495	mural	0	1	0	empty		0
+sympy__sympy-19637	mural	0	1	0	empty		0
+sympy__sympy-19783	mural	0	1	0	empty		0
+sympy__sympy-19954	mural	0	1	0	empty		0
+sympy__sympy-20154	mural	0	1	0	empty		0
+sympy__sympy-20428	mural	1	0	0	compact	bbaad7e08b30fece49ab24c1a0258f78acdec91ea533b91b05eadd97d4785b87	610
+sympy__sympy-20438	mural	1	0	0	compact	60f4583c9bda2c62e9282cda5eeb828e2ded53aeed963153270639a646267da2	536
+sympy__sympy-20590	mural	1	0	0	compact	c9b73c58f43fb9ce2da4430e1205a0d10ad6b71205bb42322b2ae22d336488b8	270
+sympy__sympy-20801	mural	1	0	0	compact	92bf18c787a5e52cac85f8e84ff29fffef8711a7fdd7da6f1ed452bb508edad4	525
+sympy__sympy-20916	mural	0	1	0	empty		0
+sympy__sympy-21379	mural	0	1	0	empty		0
+sympy__sympy-21596	mural	0	1	0	empty		0
+sympy__sympy-21612	mural	0	1	0	empty		0
+sympy__sympy-21847	mural	0	1	0	empty		0
+sympy__sympy-21930	mural	0	1	0	empty		0
+sympy__sympy-22080	mural	0	1	0	empty		0
+sympy__sympy-22456	mural	0	1	0	empty		0
+sympy__sympy-22714	mural	0	1	0	empty		0
+sympy__sympy-22914	mural	0	1	0	empty		0
+sympy__sympy-23262	mural	0	1	0	empty		0
+sympy__sympy-23413	mural	0	1	0	empty		0
+sympy__sympy-23534	mural	0	1	0	empty		0
+sympy__sympy-23824	mural	0	1	0	empty		0
+sympy__sympy-23950	mural	1	0	0	compact	afbf8bbdb8e45219999f8af1be31841cc878f8eb926a9d39b153e0dc95da674b	326
+sympy__sympy-24066	mural	1	0	0	compact	7e21a66d39bb35a3ed3b2cdc1e1174869458196d5e82479e0c4b26f896daa756	852
+sympy__sympy-24213	mural	0	1	1	expanded_fallback	0c59955df03e5512e916577aed26827305b63771739f933379cc5d2ee0956505	756
+sympy__sympy-24443	mural	0	1	0	empty		0
+sympy__sympy-24539	mural	1	0	0	compact	244fd60cf27eebf48b70fd49d52ac9fa1f9010cc46b44f68f29b4a9bf8f8e04c	408
+sympy__sympy-24562	mural	0	1	0	empty		0
+sympy__sympy-24661	mural	0	1	0	empty		0

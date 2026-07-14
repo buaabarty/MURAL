@@ -18,7 +18,7 @@ authors:
 title: "MURAL"
 version: "0.1.0"
 license: "MIT"
-repository-code: "https://github.com/GLEAM-Lab/MURAL"
+repository-code: "https://github.com/buaabarty/MURAL"
 preferred-citation:
   type: article
   authors:
@@ -36,5 +36,5 @@ preferred-citation:
       given-names: Bach
     - family-names: Tian
       given-names: Haoye
-  title: "MURAL: Unifying Multi-Source Retrieval and Function Localization for Repository Repair"
+  title: "MURAL: Decoupling File Retrieval from Within-File Entity Selection for Bounded Repository-Repair Context"
   year: "2026"

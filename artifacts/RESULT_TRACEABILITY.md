@@ -43,6 +43,7 @@ The verifier checks:
 - RQ-1 controlled source, selector, fusion, and paired statistics;
 - RQ-2 fixed-prefix controls and paired statistics;
 - RQ-3 mapped edit-target coverage and paired uncertainty;
+- RQ-4 complete repair outcomes and paired uncertainty;
 - supplementary budget, selector, RRF, and third-source values; and
 - leakage and external-artifact sensitivity statements.
 
@@ -54,6 +55,8 @@ The verifier checks:
   `artifacts/results/tse_gt_mapping_v6.tsv`.
 - Input-boundary record:
   `artifacts/issue_comment_boundary.json`.
+- Repair checkpoint and workflow record:
+  `artifacts/repair_protocol_qwen3_20260714.json`.
 
 ### RQ-1: Controlled Context Windows
 
@@ -87,6 +90,14 @@ The verifier checks:
 - Paired bootstrap intervals and exact complete-coverage tests:
   `artifacts/results/edit_target_paired_stats_20260713.tsv`.
 
+### RQ-4: Official Repair Outcomes
+
+- Complete 500-by-3 compact-workflow outcome ledger:
+  `artifacts/results/repair_qwen3_compact_outcomes_20260714.tsv`.
+- Nonempty/applicable/Resolved totals, paired bootstrap intervals, win/loss
+  counts, and exact McNemar tests:
+  `artifacts/results/repair_qwen3_compact_summary_20260714.tsv`.
+
 ### Threats to Validity
 
 - Leakage-sentinel audit:
@@ -102,6 +113,18 @@ The verifier checks:
   `artifacts/results/retrieve_then_localize_budget_curve_20260711.tsv`.
 - Four-budget paired statistics:
   `artifacts/results/retrieve_then_localize_budget_paired_20260711.tsv`.
+
+### Expanded Repair Fallback
+
+- Compact-reuse and fallback-activation ledger, including patch hashes but no
+  patch text:
+  `artifacts/results/repair_qwen3_expanded_assembly_20260714.tsv`.
+- Complete 500-by-3 outcome ledger and paired summary:
+  `artifacts/results/repair_qwen3_expanded_outcomes_20260714.tsv` and
+  `artifacts/results/repair_qwen3_expanded_summary_20260714.tsv`.
+- Explicit timeout disposition for the one applied patch whose official test
+  reached the 1,800-second cutoff:
+  `artifacts/results/repair_qwen3_expanded_timeouts_20260714.tsv`.
 
 ### Selector Signal-Family Ablation
 
@@ -130,6 +153,8 @@ The verifier checks:
 
 - Exact localization prompt:
   `artifacts/prompts/llm_fault_location_prompt.md`.
+- Exact Qwen3-Coder repair prompts:
+  `artifacts/prompts/qwen3_repair_prompt.md`.
 
 ## Reproduction Commands
 
@@ -433,6 +458,59 @@ python3 artifacts/scripts/evaluate_java_retrieve_localize.py \
 The evaluator clones missing repositories and caches parsed base-commit
 entities. BM25-local raises Hit@20 from 34.1% to 47.3%; MURAL reaches 48.4%,
 but its 1.1-point difference from BM25-local is not statistically clear.
+
+### Official Repair Outcomes
+
+The frozen prediction files retain all 500 instances per context condition,
+including empty patches. Official reports exist exactly for the nonempty
+predictions; the analyzer restores zero outcomes for empty predictions before
+computing paired statistics.
+
+```bash
+python3 artifacts/scripts/analyze_repair_outcomes.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --predictions-root temp_run/mural_experiment_additions/repair_qwen3_30b_full_20260713 \
+  --official-root temp_run/mural_experiment_additions/repair_qwen3_30b_official \
+  --output-outcomes artifacts/results/repair_qwen3_compact_outcomes_20260714.tsv \
+  --output-summary artifacts/results/repair_qwen3_compact_summary_20260714.tsv
+```
+
+For the expanded sensitivity, every applicable compact patch is reused. Only
+compact-empty instances activate a fresh temperature-zero first attempt and at
+most two failure-conditioned retries. Official test oracles are applied only
+after the selected predictions are frozen.
+
+```bash
+EXPANDED_PRED=temp_run/mural_experiment_additions/repair_qwen3_30b_iterative_predictions
+EXPANDED_REPORTS=temp_run/mural_experiment_additions/repair_qwen3_30b_iterative_official_combined
+
+python3 artifacts/scripts/assemble_iterative_repair_predictions.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --compact-root temp_run/mural_experiment_additions/repair_qwen3_30b_full_20260713 \
+  --fallback-root temp_run/mural_experiment_additions/repair_qwen3_30b_expanded_fallback_20260714 \
+  --output-root "$EXPANDED_PRED" \
+  --require-complete-fallback
+
+python3 artifacts/scripts/merge_iterative_repair_reports.py \
+  --predictions-root "$EXPANDED_PRED" \
+  --compact-official-root temp_run/mural_experiment_additions/repair_qwen3_30b_official \
+  --fallback-official-root temp_run/mural_experiment_additions/repair_qwen3_30b_iterative_fallback_official \
+  --output-root "$EXPANDED_REPORTS"
+
+python3 artifacts/scripts/analyze_repair_outcomes.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --predictions-root "$EXPANDED_PRED" \
+  --official-root "$EXPANDED_REPORTS" \
+  --timeout-outcomes artifacts/results/repair_qwen3_expanded_timeouts_20260714.tsv \
+  --output-outcomes artifacts/results/repair_qwen3_expanded_outcomes_20260714.tsv \
+  --output-summary artifacts/results/repair_qwen3_expanded_summary_20260714.tsv
+```
+
+The expanded profile yields 164, 178, and 185 applicable patches and resolves
+29 (5.8%), 25 (5.0%), and 32 (6.4%) instances for issue-only, BM25-local, and
+MURAL, respectively. MURAL exceeds BM25-local by 1.4 points (95% CI 0.0 to
+2.8; 10/3 wins/losses; exact McNemar p=0.0923), which is not treated as a
+statistically clear gain.
 
 ### Patch-Derived Coverage
 
