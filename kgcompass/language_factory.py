@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import copy
 import os
 import re
+from functools import lru_cache
 from config import STRONG_CONNECTION
 
 # === 新增：扩展名 → 语言 的映射 ==============
@@ -107,10 +108,14 @@ class MethodCallVisitor(ast.NodeVisitor):
 
                     # Ensure caller is created as an entity (if not already)
                     if self.caller.get('name') and self.caller.get('file_path'):
+                        caller_file_path = (
+                            self.caller.get('graph_file_path')
+                            or self.caller['file_path']
+                        )
                         self.kg.create_method_entity(
                             self.caller['name'],
                             self.caller.get('signature', self.caller['name']),
-                            self.caller['file_path'],
+                            caller_file_path,
                             self.caller.get('start_line', 0),
                             self.caller.get('end_line', self.caller.get('start_line', 0)),
                             self.caller.get('source_code', ''),
@@ -124,6 +129,8 @@ class MethodCallVisitor(ast.NodeVisitor):
                         self.caller.get('signature', self.caller['name']),
                         callee_name,
                         call_signature,
+                        self.caller.get('graph_file_path') or self.caller.get('file_path'),
+                        callee.get('file_path'),
                     )
                     break 
         except Exception as e:
@@ -230,13 +237,83 @@ class JavaLanguageConfig(LanguageConfig):
             'annotation': rf'@{escaped_name}',
         }
 
+    @staticmethod
+    @lru_cache(maxsize=16)
+    def _source_roots(base_path: str) -> tuple[str, ...]:
+        base_path = os.path.abspath(base_path)
+        roots = []
+        for root, dirs, _ in os.walk(base_path):
+            dirs[:] = [
+                directory
+                for directory in dirs
+                if directory not in {
+                    '.git', '.gradle', '.idea', 'build', 'dist', 'node_modules',
+                    'out', 'target', 'test', 'tests',
+                }
+            ]
+            normalized = root.replace('\\', '/')
+            if normalized.endswith('/src/main/java'):
+                roots.append(root)
+                dirs[:] = []
+        return tuple(sorted(set(roots))) or (base_path,)
+
+    @classmethod
+    @lru_cache(maxsize=16)
+    def _files_by_stem(cls, base_path: str) -> dict[str, tuple[str, ...]]:
+        files_by_stem = {}
+        for source_root in cls._source_roots(base_path):
+            for root, dirs, files in os.walk(source_root):
+                dirs[:] = [
+                    directory
+                    for directory in dirs
+                    if directory not in {'.git', 'build', 'out', 'target', 'test', 'tests'}
+                ]
+                for file_name in files:
+                    if not file_name.endswith('.java'):
+                        continue
+                    stem = file_name[:-5]
+                    files_by_stem.setdefault(stem, []).append(os.path.join(root, file_name))
+        return {
+            stem: tuple(sorted(paths))
+            for stem, paths in files_by_stem.items()
+        }
+
     def resolve_qualified_name_to_file_paths(self, base_path: str, qualified_name_parts: list[str]) -> list[tuple[str, str]]:
+        parts = [part for part in qualified_name_parts if part]
+        if not parts:
+            return []
+
         paths = []
-        # Class: com.example.MyClass -> com/example/MyClass.java
-        if qualified_name_parts:
-            paths.append(('file', os.path.join(base_path, *qualified_name_parts) + '.java'))
-        # Package: com.example -> com/example/ (as a directory)
-        paths.append(('package', os.path.join(base_path, *qualified_name_parts)))
+        seen = set()
+        resolved_type_file = False
+        source_roots = self._source_roots(base_path)
+        class_parts = [part for part in reversed(parts) if re.match(r'^[A-Z_$]', part)]
+        # Java packages are rooted below src/main/java, often inside one of many
+        # Maven/Gradle modules. A symbol may also end in a member name, so try
+        # progressively shorter type paths.
+        for source_root in source_roots:
+            for end in range(len(parts), 0, -1):
+                candidate = os.path.join(source_root, *parts[:end]) + '.java'
+                if os.path.isfile(candidate) and candidate not in seen:
+                    paths.append(('file', candidate))
+                    seen.add(candidate)
+                    resolved_type_file = True
+                    break
+            if not class_parts:
+                candidate = os.path.join(source_root, *parts)
+                if os.path.isdir(candidate) and candidate not in seen:
+                    paths.append(('package', candidate))
+                    seen.add(candidate)
+
+        # Simple and partially qualified type names cannot identify a source
+        # root directly. Exact Java filenames are a bounded fallback and avoid
+        # the previous repository-wide method-name expansion.
+        if class_parts and not resolved_type_file:
+            type_name = class_parts[0].split('$', 1)[0]
+            for candidate in self._files_by_stem(base_path).get(type_name, ()):
+                if candidate not in seen:
+                    paths.append(('file', candidate))
+                    seen.add(candidate)
         return paths
 
 class CppLanguageConfig(LanguageConfig):
@@ -1303,7 +1380,9 @@ class JavaParser(BaseParser):
                                 local_method_info['name'],
                                 local_method_info.get('signature', local_method_info['name']),
                                 m_info['name'],
-                                m_info.get('signature', m_info['name'])
+                                m_info.get('signature', m_info['name']),
+                                local_method_info.get('graph_file_path') or file_path,
+                                m_info.get('file_path'),
                             )
                             # Found a match, ideally break if we are sure, but multiple overloads might exist.
                             # For simplicity, link first match. More advanced would check signature.

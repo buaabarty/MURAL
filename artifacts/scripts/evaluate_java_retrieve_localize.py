@@ -590,8 +590,12 @@ def load_ranked_file_seeds(path: Path) -> dict[str, dict[str, dict[str, Any]]]:
                     "file_path": file_path,
                     "best_rank": int(record.get("rank") or position),
                     "support": int(record.get("support") or 1),
-                    "distance": int(record.get("first_entity_rank") or position),
-                    "anchor_match": False,
+                    "distance": int(
+                        record.get("graph_distance")
+                        or record.get("first_entity_rank")
+                        or position
+                    ),
+                    "anchor_match": bool(record.get("direct_anchor")),
                 }
             output[instance_id] = files
     return output

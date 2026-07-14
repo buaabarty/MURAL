@@ -1,7 +1,17 @@
-import traceback
+import hashlib
 import os
+import sqlite3
+import threading
+import traceback
 from transformers import AutoConfig, AutoModel
 import numpy as np
+
+MODEL_NAME = "jinaai/jina-embeddings-v2-base-code"
+DEFAULT_MODEL_REVISION = "516f4baf13dec4ddddda8631e019b5737c8bc250"
+MODEL_REVISION = os.getenv(
+    "KGCOMPASS_EMBEDDING_REVISION",
+    DEFAULT_MODEL_REVISION,
+)
 
 
 def _patch_transformers_pruning_helper():
@@ -65,6 +75,8 @@ def _patch_model_runtime_helpers(model):
 class Embedding:
     _instance = None
     _model = None
+    _cache = None
+    _cache_lock = threading.Lock()
     
     def __new__(cls):
         if cls._instance is None:
@@ -82,7 +94,8 @@ class Embedding:
                 # 严格从本地缓存加载，禁止联网探测
                 _patch_transformers_pruning_helper()
                 config = AutoConfig.from_pretrained(
-                    "jinaai/jina-embeddings-v2-base-code",
+                    MODEL_NAME,
+                    revision=MODEL_REVISION,
                     trust_remote_code=True,
                     local_files_only=True,
                 )
@@ -95,12 +108,32 @@ class Embedding:
                         setattr(config, name, value)
                 device = os.environ.get("KGCOMPASS_EMBEDDING_DEVICE", "cuda:0")
                 cls._model = _patch_model_runtime_helpers(AutoModel.from_pretrained(
-                    "jinaai/jina-embeddings-v2-base-code",
+                    MODEL_NAME,
+                    revision=MODEL_REVISION,
                     config=config,
                     trust_remote_code=True,
                     local_files_only=True,
                 )).to(device)
                 print(f"embedding model 初始化成功（仅本地缓存，device={device}）")
+
+                cache_path = os.getenv("KGCOMPASS_EMBEDDING_CACHE", "").strip()
+                if cache_path:
+                    cache_path = os.path.abspath(os.path.expanduser(cache_path))
+                    os.makedirs(os.path.dirname(cache_path) or ".", exist_ok=True)
+                    cls._cache = sqlite3.connect(
+                        cache_path,
+                        check_same_thread=False,
+                        isolation_level=None,
+                        timeout=60,
+                    )
+                    cls._cache.execute("PRAGMA journal_mode=WAL")
+                    cls._cache.execute("PRAGMA synchronous=NORMAL")
+                    cls._cache.execute("PRAGMA busy_timeout=60000")
+                    cls._cache.execute(
+                        "CREATE TABLE IF NOT EXISTS embeddings "
+                        "(cache_key TEXT PRIMARY KEY, vector BLOB NOT NULL)"
+                    )
+                    print(f"embedding cache 已启用: {cache_path}")
                         
             except Exception as e:
                 print(f"pipeline 初始化失败: {e}")
@@ -114,7 +147,7 @@ class Embedding:
     
     def __init__(self):
         pass
-    
+
     def get_embedding(self, text):
         """获取文本的 embedding"""
         try:
@@ -130,7 +163,50 @@ class Embedding:
                 print("警告: 输入文本为空")
                 return None
             
-            return self._model.encode([text])[0].tolist()
+            cache_key = hashlib.sha256(
+                (
+                    MODEL_NAME
+                    + "@"
+                    + MODEL_REVISION
+                    + "\0"
+                    + text
+                ).encode("utf-8")
+            ).hexdigest()
+            legacy_cache_key = hashlib.sha256(
+                (MODEL_NAME + "\0" + text).encode("utf-8")
+            ).hexdigest()
+            if self._cache is not None:
+                try:
+                    with self._cache_lock:
+                        if MODEL_REVISION == DEFAULT_MODEL_REVISION:
+                            row = self._cache.execute(
+                                "SELECT vector FROM embeddings WHERE cache_key IN (?, ?) "
+                                "ORDER BY cache_key = ? DESC LIMIT 1",
+                                (cache_key, legacy_cache_key, cache_key),
+                            ).fetchone()
+                        else:
+                            row = self._cache.execute(
+                                "SELECT vector FROM embeddings WHERE cache_key = ?",
+                                (cache_key,),
+                            ).fetchone()
+                except sqlite3.Error as error:
+                    print(f"embedding cache 读取失败，将重新计算: {error}")
+                    row = None
+                if row is not None:
+                    return np.frombuffer(row[0], dtype="<f4").tolist()
+
+            embedding = self._model.encode([text])[0].tolist()
+            if self._cache is not None:
+                vector = np.asarray(embedding, dtype="<f4").tobytes()
+                try:
+                    with self._cache_lock:
+                        self._cache.execute(
+                            "INSERT OR IGNORE INTO embeddings(cache_key, vector) VALUES (?, ?)",
+                            (cache_key, vector),
+                        )
+                except sqlite3.Error as error:
+                    print(f"embedding cache 写入失败，已保留当前结果: {error}")
+            return embedding
             
         except Exception as e:
             print(f"获取 embedding 时出错: {e}")

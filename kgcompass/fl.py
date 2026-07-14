@@ -95,8 +95,10 @@ LOCAL_OR_STDLIB_QUALIFIED_PREFIXES = {
     "sys", "tbl", "u",
 }
 GENERIC_QUALIFIED_TARGETS = {
-    "append", "count", "format", "lower", "open", "platform", "read", "version",
-    "transform", "write",
+    "add", "append", "clear", "close", "compareto", "contains", "count",
+    "equals", "format", "get", "hashcode", "lower", "now", "open", "platform",
+    "put", "read", "remove", "set", "size", "tostring", "transform", "version",
+    "write",
 }
 DOMAIN_OR_EMAIL_RE = re.compile(
     r"(^|[\s<])[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b|"
@@ -210,6 +212,7 @@ class CodeAnalyzer:
         )
         self.method_search_cache = {}
         self.method_search_cache_lock = threading.Lock()
+        self.lock = threading.Lock()
         self.method_search_locks = {}
         self.issue_cache = {}
         self.MAX_CANDIDATE_METHODS = MAX_CANDIDATE_METHODS
@@ -314,6 +317,8 @@ class CodeAnalyzer:
         if target == 'py' and '.' in full_path:
             target = full_path.split('.')[-2]
         target_lower = target.lower()
+        if target_lower.startswith(("assert", "assume")):
+            return False
         if target_lower in COMMON_WORD_REFERENCES:
             return False
         if target_lower in NOISY_DUNDER_REFERENCES:
@@ -324,7 +329,12 @@ class CodeAnalyzer:
                 return False
         has_qualifier = any(sep in full_path for sep in ('.', '/', '\\'))
         parts = [part for part in re.split(r"[./\\]+", full_path) if part]
-        if any(part.lower().startswith("test_") or part.lower() in {"test", "tests"} for part in parts):
+        if any(
+            part.lower().startswith("test_")
+            or part.lower() in {"test", "tests"}
+            or re.match(r"^test(?:_|[A-Z])", part)
+            for part in parts
+        ):
             return False
         if has_qualifier:
             if len(target) <= 1:
@@ -389,29 +399,24 @@ class CodeAnalyzer:
         return False
 
     def _clean_path(self, file_path: str) -> str:
-        """Return a normalized absolute path with forward slashes.
-        此函数曾经去掉 'playground/' 前缀，导致同一文件在 KG 中出现两种 path 表示
-        （绝对路径 vs. 相对路径），从而使 Issue-File 与 File-Method 无法连通。
+        """Return one repository-relative path for every graph node."""
+        path = os.path.normpath(str(file_path))
+        repo_root = os.path.abspath(os.path.normpath(self.config['repo_path']))
+        candidate = os.path.abspath(path)
+        try:
+            relative = os.path.relpath(candidate, repo_root)
+            if relative != os.pardir and not relative.startswith(os.pardir + os.sep):
+                return relative.replace('\\', '/')
+        except ValueError:
+            pass
 
-        为保持一致性，改为简单地规范化路径分隔符，并返回绝对路径。
-        """
-        # 统一为 Linux 风格分隔符
-        path = os.path.normpath(file_path).replace('\\', '/')
-
-        # 去掉 'playground/' 前缀
-        prefix = 'playground/'
-        if path.startswith(prefix):
-            path_after_playground = path[len(prefix):]
-        else:
-            path_after_playground = path
-
-        # 去掉仓库顶层目录（如 astropy__astropy）
-        repo_dir = os.path.basename(os.path.normpath(self.config['repo_path'].rstrip('/')))
-        parts = path_after_playground.split('/')
-        if parts and parts[0] == repo_dir:
-            path_after_playground = '/'.join(parts[1:]) if len(parts) > 1 else ''
-
-        return path_after_playground
+        normalized = path.replace('\\', '/').lstrip('./')
+        repo_normalized = os.path.normpath(self.config['repo_path']).replace('\\', '/').rstrip('/')
+        repo_dir = os.path.basename(repo_normalized)
+        for prefix in (repo_normalized + '/', f'playground/{repo_dir}/', f'{repo_dir}/'):
+            if normalized.startswith(prefix):
+                return normalized[len(prefix):]
+        return normalized
 
     def _check_and_count_artifact_time(self, artifact_timestamp, artifact_unique_id: str) -> bool:
         """
@@ -450,8 +455,19 @@ class CodeAnalyzer:
                 return
             self._process_repository(target_sample)
             
-            # Get related entities
-            related_entities = self.kg.get_all_similarities_to_root(limit=SEARCH_SPACE, max_hops=4, sort=True)
+            # Keep graph-construction breadth independent from the exported
+            # entity depth. File-level adapters often need more than 50
+            # entities to obtain 20 unique files.
+            result_limit = max(
+                1,
+                int(os.getenv("KGCOMPASS_RESULT_LIMIT", str(SEARCH_SPACE))),
+            )
+            related_entities = self.kg.get_all_similarities_to_root(
+                limit=result_limit,
+                max_hops=4,
+                sort=True,
+            )
+            related_entities['files'] = self.kg.get_evidence_files_to_root(max_hops=3)
 
             if 'methods' in related_entities:
                 related_entities['methods'].sort(key=lambda x: x.get('similarity', 0), reverse=True)
@@ -657,13 +673,27 @@ class CodeAnalyzer:
 
         if benchmark_name == 'multi-swe-bench':
             try:
-                # 首先尝试从本地 swe-bench_java 目录加载
+                # Prefer an explicitly frozen local split, then the legacy
+                # swe-bench_java directory, and only then the offline HF cache.
+                local_data_file = os.getenv("KGCOMPASS_MULTI_SWE_BENCH_FILE", "").strip()
                 local_data_dir = Path("swe-bench_java")
                 found_item = None
-                
-                if local_data_dir.exists():
+
+                if local_data_file:
+                    explicit_path = Path(local_data_file).expanduser().resolve()
+                    if not explicit_path.is_file():
+                        raise FileNotFoundError(
+                            f"KGCOMPASS_MULTI_SWE_BENCH_FILE does not exist: {explicit_path}"
+                        )
+                    print(f"Loading from frozen local split: {explicit_path}")
+                    jsonl_files = [explicit_path]
+                elif local_data_dir.exists():
                     print(f"Loading from local directory: {local_data_dir}")
                     jsonl_files = list(local_data_dir.glob("*_dataset.jsonl"))
+                else:
+                    jsonl_files = []
+
+                if jsonl_files:
                     
                     for jsonl_file in jsonl_files:
                         try:
@@ -693,7 +723,7 @@ class CodeAnalyzer:
                             continue
                 
                 # 如果本地没找到，回退到 Hugging Face
-                if not found_item:
+                if not found_item and not local_data_file:
                     print("Local data not found, falling back to Hugging Face...")
                     print("Loading Daoguang/Multi-SWE-bench (java_verified)...")
                     os.environ.setdefault("HF_DATASETS_OFFLINE", "1")
@@ -709,6 +739,11 @@ class CodeAnalyzer:
                             item.get('instance_id') == self.config['instance_id']):
                             found_item = item
                             break
+                elif not found_item:
+                    print(
+                        f"Instance {self.config['instance_id']} was not found in "
+                        f"{local_data_file}"
+                    )
                 
                 if found_item:
                     target_sample_from_dataset = _strip_unavailable_benchmark_fields(found_item)
@@ -923,12 +958,14 @@ class CodeAnalyzer:
             print(f"Skip processing test file: {file_path}")
             return
             
-        if file_path in self.processed_files:
-            print(f"File {file_path} already processed, skipping")
-            return
-            
+        processed_file_key = os.path.abspath(os.path.normpath(file_path))
+        with self.lock:
+            if processed_file_key in self.processed_files:
+                print(f"File {file_path} already processed, skipping")
+                return
+            self.processed_files.add(processed_file_key)
+
         print(f"Processing file: {file_path}")
-        self.processed_files.add(file_path)
         
         # 使用语言特定的解析器
         classes = parser.extract_classes(file_path)
@@ -1076,14 +1113,16 @@ class CodeAnalyzer:
                 belongs = get_pr_file_line_belongs(pull, self.config['repo_path'], file_path, start_line, end_line, parser)
                 for item in belongs['classes']:
                     print(f"Line {start_line}-{end_line} belongs to class: {item['name']}")
-                    self.kg.create_class_entity(item['name'], item['file_path'], item['start_line'], item['end_line'], item.get('source_code', ''), item.get('doc_string', ''), STRONG_CONNECTION)
-                    self.kg.link_class_to_issue(item['name'], item['file_path'], issue_id, STRONG_CONNECTION)
-                    self.kg.link_class_to_file(item['name'], item['file_path'], STRONG_CONNECTION)
+                    item_path = self._clean_path(item['file_path'])
+                    self.kg.create_class_entity(item['name'], item_path, item['start_line'], item['end_line'], item.get('source_code', ''), item.get('doc_string', ''), STRONG_CONNECTION)
+                    self.kg.link_class_to_issue(item['name'], item_path, issue_id, STRONG_CONNECTION)
+                    self.kg.link_class_to_file(item['name'], item_path, STRONG_CONNECTION)
                 for item in belongs['methods']:
                     print(f"Line {start_line}-{end_line} belongs to method: {item['name']}")
-                    self.kg.create_method_entity(item['name'], item['signature'], item['file_path'], item['start_line'], item['end_line'], item['source_code'], item.get('doc_string', ''), STRONG_CONNECTION)
-                    self.kg.link_method_to_issue(item['name'], item['signature'], item['file_path'], issue_id, STRONG_CONNECTION)
-                    self.kg.link_method_to_file(item['name'], item['signature'], item['file_path'], STRONG_CONNECTION)
+                    item_path = self._clean_path(item['file_path'])
+                    self.kg.create_method_entity(item['name'], item['signature'], item_path, item['start_line'], item['end_line'], item['source_code'], item.get('doc_string', ''), STRONG_CONNECTION)
+                    self.kg.link_method_to_issue(item['name'], item['signature'], item_path, issue_id, STRONG_CONNECTION)
+                    self.kg.link_method_to_file(item['name'], item['signature'], item_path, STRONG_CONNECTION)
                 # 如果未找到任何类或方法，则回退到整体文件级解析
                 if not belongs['classes'] and not belongs['methods']:
                     print(f"No class/method matched lines {start_line}-{end_line}, fallback to whole file")
@@ -1097,9 +1136,9 @@ class CodeAnalyzer:
                     all_methods = parser.get_global_methods(file_path, self.config['repo_root'])
                     all_methods.extend(parser.get_global_variables(file_path, self.config['repo_root']))
                     for cls in all_classes:
-                        self.kg.link_class_to_issue(cls['name'], cls['file_path'], issue_id, NORMAL_CONNECTION)
+                        self.kg.link_class_to_issue(cls['name'], clean_file_path, issue_id, NORMAL_CONNECTION)
                     for m in all_methods:
-                        self.kg.link_method_to_issue(m['name'], m['signature'], m['file_path'], issue_id, NORMAL_CONNECTION)
+                        self.kg.link_method_to_issue(m['name'], m['signature'], clean_file_path, issue_id, NORMAL_CONNECTION)
                     # 跳过后续按 belongs 处理的逻辑
                     continue
         print(f"Completed processing PR #{issue_id} modified methods")
@@ -1118,15 +1157,31 @@ class CodeAnalyzer:
         
         module_parts = full_path.split('.')
         target_name = module_parts[-1]
-        if target_name == 'py' and len(module_parts) > 1: # Python-specific heuristic
+        source_extensions = tuple(
+            extension.strip().lower()
+            for extension in os.getenv("KGCOMPASS_SOURCE_EXTENSIONS", "").split(',')
+            if extension.strip()
+        )
+        is_source_file_reference = bool(source_extensions) and full_path.lower().endswith(source_extensions)
+        if is_source_file_reference and len(module_parts) > 1:
+            target_name = module_parts[-2]
+        elif target_name == 'py' and len(module_parts) > 1: # Python-specific heuristic
             target_name = module_parts[-2]
         
         base_path = self.config['repo_path']
         initial_path_resolver_config = self.parser.language_config
 
-        possible_paths_generated = []
-        possible_paths_generated.extend(initial_path_resolver_config.resolve_qualified_name_to_file_paths(base_path, module_parts))
-        if len(module_parts) > 1:
+        possible_paths_generated = list(
+            initial_path_resolver_config.resolve_qualified_name_to_file_paths(
+                base_path,
+                module_parts,
+            )
+        )
+        # Once a qualified type resolves, its parent package is not another
+        # candidate. Expanding both linked every sibling file to the issue.
+        if len(module_parts) > 1 and not any(
+            os.path.exists(path) for _, path in possible_paths_generated
+        ):
             possible_paths_generated.extend(initial_path_resolver_config.resolve_qualified_name_to_file_paths(base_path, module_parts[:-1]))
 
         possible_paths = []
@@ -1136,7 +1191,12 @@ class CodeAnalyzer:
                 possible_paths.append((type_hint, path_str))
                 seen_paths.add(path_str)
 
-        find_by_kg = self.kg.search_file_by_path(target_name) 
+        has_path_separator = any(separator in full_path for separator in ('/', '\\'))
+        find_by_kg = (
+            self.kg.search_file_by_path(full_path)
+            if is_source_file_reference or has_path_separator
+            else None
+        )
         if find_by_kg:
             for file_node in find_by_kg:
                 kg_file_path = file_node['file']['path']
@@ -1155,16 +1215,12 @@ class CodeAnalyzer:
                 continue
             file_path_candidate = resolved_path
 
-            actual_parser = self._parser_for_file(file_path_candidate)
-            if not actual_parser:
-                continue
-
             if os.path.isdir(file_path_candidate):
                 if path_type_hint == 'package': 
                     print(f"Processing directory import/reference: {file_path_candidate}")
                     self.kg.create_directory_structure(file_path_candidate, self, True, multipler * STRONG_CONNECTION)
                     found_specific_entity = True 
-                    current_lang_extensions = actual_parser.language_config.config['file_extensions']
+                    current_lang_extensions = self.language_config.config['file_extensions']
                     for item_name in os.listdir(file_path_candidate):
                         if any(item_name.endswith(ext) for ext in current_lang_extensions):
                             dir_file_path = os.path.join(file_path_candidate, item_name)
@@ -1176,6 +1232,10 @@ class CodeAnalyzer:
                                 self._build_file_class_methods(dir_file_path)
                                 processed_files_for_this_ref.add(dir_file_path)
                 continue 
+
+            actual_parser = self._parser_for_file(file_path_candidate)
+            if not actual_parser:
+                continue
             
             if file_path_candidate in processed_files_for_this_ref:
                 continue
@@ -1275,10 +1335,12 @@ class CodeAnalyzer:
             print(f"[identifier-filter] kept {len(ref_list)}/{before} code-like references")
             if not ref_list:
                 return
-        if not hasattr(self, 'lock'):
-            self.lock = threading.Lock()
         # Use thread pool to process references in parallel
-        with ThreadPoolExecutor(max_workers=min(16, len(ref_list))) as executor:
+        reference_workers = max(
+            1,
+            int(os.getenv("KGCOMPASS_REFERENCE_WORKERS", "4")),
+        )
+        with ThreadPoolExecutor(max_workers=min(reference_workers, len(ref_list))) as executor:
             # Create task list
             future_to_ref = {
                 executor.submit(self._process_reference, issue_id, ref_data, multipler): (ref_data, issue_id)
@@ -1620,6 +1682,10 @@ class CodeAnalyzer:
         print(f"Searching methods or global variables {method_name} in repository {repo_root}")
         strict_name_search = os.getenv("KGCOMPASS_NAME_SEARCH_STRICT", "0") == "1"
         allowed_rule_types = {"method", "class", "global_var"}
+        max_matches = max(
+            1,
+            int(os.getenv("KGCOMPASS_NAME_SEARCH_MAX_MATCHES", "5")),
+        )
 
         # Get all supported extensions from the language factory
         all_supported_extensions = list(EXT_LANG_MAP.keys())
@@ -1644,6 +1710,8 @@ class CodeAnalyzer:
                     continue
 
                 file_path = os.path.join(root, file_name)
+                if self._should_skip_source_extension(file_path):
+                    continue
                 if self._should_skip_nonprod_context_path(file_path):
                     continue
                 
@@ -1689,10 +1757,19 @@ class CodeAnalyzer:
                     print(f"Error reading or searching file {file_path}: {e}")
                     continue
                 
-                if cnt > 20: # Increased limit slightly, can be configured
+                if strict_name_search and cnt > max_matches:
+                    print(
+                        f"Discarding ambiguous name search for {method_name}: "
+                        f"more than {max_matches} matching source files."
+                    )
+                    matching_files = []
+                    break
+                if not strict_name_search and cnt > 20: # Preserve legacy behavior outside strict runs.
                     print(f"Search limit of {cnt} reached, stopping search.")
                     break  # Break from inner loop (files in current directory)
-            if cnt > 20:
+            if (strict_name_search and cnt > max_matches) or (
+                not strict_name_search and cnt > 20
+            ):
                 break # Break from outer loop (os.walk)
 
         print(f"Completed searching methods or global variables {method_name} in repository {repo_root}, found {len(matching_files)} files after processing {cnt} matches.")
@@ -1999,7 +2076,6 @@ class CodeAnalyzer:
 
             for local_method_info in local_methods:
                 local_method_name = local_method_info.get('name', '')
-                local_method_info['file_path'] = clean_file_path
                 self.kg.create_method_entity(
                     local_method_name,
                     local_method_info.get('signature', local_method_name),
@@ -2011,8 +2087,10 @@ class CodeAnalyzer:
                     STRONG_CONNECTION
                 )
                 if analyze_calls:
+                    analysis_method_info = dict(local_method_info)
+                    analysis_method_info['graph_file_path'] = clean_file_path
                     parser.analyze_method_calls_in_method(
-                        local_method_info,
+                        analysis_method_info,
                         all_methods,
                         self.kg,
                         imports,

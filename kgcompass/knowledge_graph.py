@@ -1,7 +1,6 @@
 from neo4j import GraphDatabase
 import os
 from embedding import Embedding
-from utils import relative_path
 from config import (
     DECAY_FACTOR,
     VECTOR_SIMILARITY_WEIGHT,
@@ -326,7 +325,7 @@ class KnowledgeGraph:
             "MERGE (f:File {path: $file_path}) "
             "SET f.name = $name"
         )
-        tx.run(query, file_path=file_path, name=relative_path(file_path))
+        tx.run(query, file_path=file_path, name=file_path)
 
     def create_directory_structure(self, base_path, code_analyzer, process_detail=False, weight=1):
         """
@@ -336,20 +335,39 @@ class KnowledgeGraph:
             base_path (str): Base path
         """
         with self.driver.session() as session:
-            file_paths = session.execute_write(self._create_directory_structure, base_path)
+            repository_root = getattr(code_analyzer, "repo_path", base_path)
+            file_paths = session.execute_write(
+                self._create_directory_structure,
+                base_path,
+                repository_root,
+                weight,
+            )
             if process_detail and file_paths:
                 for file_path in file_paths:
                     code_analyzer._build_file_class_methods(file_path)
 
     @staticmethod
-    def _create_directory_structure(tx, base_path, weight=1):
+    def _create_directory_structure(tx, base_path, repository_root=None, weight=1):
         all_file_paths = []
         source_extensions = _source_extensions_for_directory_walk()
-        for root, dirs, files in os.walk(base_path):
+        walk_root = os.path.abspath(os.path.normpath(base_path))
+        base_abs_path = os.path.abspath(
+            os.path.normpath(repository_root or base_path)
+        )
+
+        def repository_relative(path):
+            relative = os.path.relpath(os.path.abspath(path), base_abs_path)
+            if relative == os.curdir:
+                return ""
+            if relative == os.pardir or relative.startswith(os.pardir + os.sep):
+                raise ValueError(f"Path escapes repository root: {path}")
+            return relative.replace('\\', '/')
+
+        for root, dirs, files in os.walk(walk_root):
             _filter_walk_dirs(dirs)
             # Create current directory
             abs_dir_path = root.replace('\\', '/')
-            rel_dir_path = relative_path(abs_dir_path)
+            rel_dir_path = repository_relative(abs_dir_path)
             if os.path.basename(root).startswith('.'):
                 continue
             # Create current directory node
@@ -364,7 +382,7 @@ class KnowledgeGraph:
             # If not root directory, create relationship with parent directory
             if rel_dir_path:
                 parent_dir_abs = os.path.dirname(abs_dir_path)
-                parent_dir_path = relative_path(parent_dir_abs)
+                parent_dir_path = repository_relative(parent_dir_abs)
                 query = (
                     "MATCH (parent:Directory {path: $parent_path}) "
                     "MATCH (child:Directory {path: $child_path}) "
@@ -382,7 +400,7 @@ class KnowledgeGraph:
             for idx, file in enumerate(py_files, 1):
                 print(f'\nProcessing file [{idx}/{total_files}] ({(idx/total_files*100):.1f}%): {file}')
                 file_abs_path = os.path.join(abs_dir_path, file)
-                rel_file_path = relative_path(file_abs_path)
+                rel_file_path = repository_relative(file_abs_path)
 
                 # Create file node
                 query = (
@@ -681,6 +699,31 @@ class KnowledgeGraph:
             print(f"Found {len(methods)} related methods")
             return methods
 
+    def get_evidence_files_to_root(self, max_hops=3):
+        """Return files connected to the root only through issue evidence."""
+        with self.driver.session() as session:
+            return session.execute_read(
+                self._get_evidence_files_to_root,
+                max_hops,
+            )
+
+    @staticmethod
+    def _get_evidence_files_to_root(tx, max_hops):
+        max_hops = max(1, int(max_hops))
+        query = f"""
+        MATCH p = (root:Issue {{id: 'root'}})-[:RELATED*1..{max_hops}]-(file:File)
+        WHERE all(node IN nodes(p)[1..-1] WHERE node:Issue)
+        WITH file,
+             min(length(p)) AS distance,
+             count(DISTINCT nodes(p)[size(nodes(p)) - 2].id) AS support
+        RETURN file.path AS file_path,
+               distance,
+               support,
+               distance = 1 AS direct_anchor
+        ORDER BY distance ASC, support DESC, file_path ASC
+        """
+        return [dict(record) for record in tx.run(query)]
+
     def link_issue_to_file(self, issue_id, file_path, weight=1):
         with self.driver.session() as session:
             session.execute_write(self._link_issue_to_file, issue_id, file_path, weight)
@@ -931,19 +974,30 @@ class KnowledgeGraph:
             weight=weight
         )
 
-    def link_method_calls(self, caller_name, caller_signature,
-                         callee_name, callee_signature):
+    def link_method_calls(
+        self,
+        caller_name,
+        caller_signature,
+        callee_name,
+        callee_signature,
+        caller_file_path=None,
+        callee_file_path=None,
+    ):
         with self.driver.session() as session:
             session.execute_write(self._link_method_calls,
                                 caller_name, caller_signature,
-                                callee_name, callee_signature)
+                                callee_name, callee_signature,
+                                caller_file_path, callee_file_path)
 
     @staticmethod
     def _link_method_calls(tx, caller_name, caller_signature,
-                          callee_name, callee_signature):
+                          callee_name, callee_signature,
+                          caller_file_path=None, callee_file_path=None):
         query = (
             "MATCH (caller:Method {name: $caller_name, signature: $caller_signature}) "
+            "WHERE $caller_file_path IS NULL OR caller.file_path = $caller_file_path "
             "MATCH (callee:Method {name: $callee_name, signature: $callee_signature}) "
+            "WHERE $callee_file_path IS NULL OR callee.file_path = $callee_file_path "
             "MERGE (caller)-[r:RELATED {description: 'calls method', weight: 1}]->(callee) "
             "MERGE (callee)-[r2:RELATED {description: 'called by method', weight: 1}]->(caller)"
             "RETURN caller.name as caller, callee.name as callee"
@@ -953,6 +1007,8 @@ class KnowledgeGraph:
             caller_signature=caller_signature,
             callee_name=callee_name,
             callee_signature=callee_signature,
+            caller_file_path=caller_file_path,
+            callee_file_path=callee_file_path,
         )
 
 
@@ -1066,7 +1122,7 @@ class KnowledgeGraph:
 
                 WITH nodeIds, totalCost, root_embedding, root_text,
                     gds.util.asNode(targetNode) as m
-                WHERE (m:Method OR m:Class AND NOT EXISTS((m)-[:RELATED]->(:Method)) OR m:Issue)
+                WHERE (m:Method OR m:Class OR m:Issue)
                   AND totalCost <= $max_hops
                   AND (m:Issue AND m.id <> 'root' OR NOT m:Issue)
                   AND m.embedding IS NOT NULL
@@ -1447,7 +1503,7 @@ class KnowledgeGraph:
 
                 WITH nodeIds, totalCost, root_embedding, root_text,
                     gds.util.asNode(nodeIds[-1]) as m
-                WHERE (m:Method OR m:Class AND NOT EXISTS((m)-[:RELATED]->(:Method)) OR m:Issue)
+                WHERE (m:Method OR m:Class OR m:Issue)
                   AND totalCost <= $max_hops
                   AND (m:Issue AND m.id <> 'root' OR NOT m:Issue)
 
