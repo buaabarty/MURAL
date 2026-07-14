@@ -43,7 +43,7 @@ The verifier checks:
 - RQ-1 controlled source, selector, fusion, and paired statistics;
 - RQ-2 fixed-prefix controls and paired statistics;
 - RQ-3 mapped edit-target coverage and paired uncertainty;
-- supplementary budget-sensitivity and selector-ablation values; and
+- supplementary budget, selector, RRF, and third-source values; and
 - leakage and external-artifact sensitivity statements.
 
 ## Main-Manuscript Mapping
@@ -117,6 +117,14 @@ The verifier checks:
 - Paired bootstrap intervals, win/loss counts, and exact binary tests against
   the predefined equal-weight (k=60) row:
   `artifacts/results/rrf_sensitivity_paired_20260714.tsv`.
+
+### Dense Third-Source Extension
+
+- Dense retrieval, shared-selector, two-/three-source, and GLM-5 fixed-prefix
+  aggregate rows:
+  `artifacts/results/dense_third_source_summary_20260714.tsv`.
+- Paired bootstrap intervals, win/loss counts, and exact binary tests:
+  `artifacts/results/dense_third_source_paired_20260714.tsv`.
 
 ### Reproduction Settings
 
@@ -311,6 +319,70 @@ python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
   --output-summary artifacts/results/rrf_sensitivity_summary_20260714.tsv \
   --output-paired artifacts/results/rrf_sensitivity_paired_20260714.tsv \
   --output-disagreements temp_run/rrf_sensitivity_disagreements_20260714.tsv
+```
+
+### Dense Third-Source Extension
+
+The dense entity source uses `jinaai/jina-embeddings-v2-base-code` revision
+`516f4baf13dec4ddddda8631e019b5737c8bc250` with cosine similarity over
+base-commit Python entities. Each encoded document concatenates
+the qualified signature, repository-relative path, docstring, and at most 3,000
+source characters; the query is the target issue title/body without benchmark
+hints. The adapter below collapses the entity ranking to the Top-20 unique files
+by best entity rank, records per-file candidate count as source support, and
+then invokes the unchanged selector. `MURAL_2SRC` is the predefined BM25/KG
+row; `MURAL_3SRC` adds the dense-local ranking without changing RRF settings.
+
+```bash
+DENSE_ENTITIES=runs/text_baselines_nohints/2001
+DENSE_FILES=temp_run/mural_experiment_additions/dense_top20_file_seeds_v2
+DENSE_LOCAL=temp_run/mural_experiment_additions/dense_top20_files_filelocal_v2
+MURAL_2SRC=temp_run/private_bm25_filelocal_20260704/hybrid_rrf/BM25_KG_deterministic_rrf
+MURAL_3SRC=temp_run/mural_experiment_additions/mural_3src_dense_v2
+
+python3 artifacts/scripts/export_ranked_file_seeds.py \
+  --input-dir "$DENSE_ENTITIES" --output-dir "$DENSE_FILES" \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --max-files 20 --support-mode count \
+  --source-name dense --uses-embeddings
+
+python3 artifacts/scripts/export_path_mined_filelocal.py \
+  --input-dir "$DENSE_FILES" --output-dir "$DENSE_LOCAL" \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl --limit 50
+
+python3 artifacts/scripts/export_multi_source_rrf_fusion.py \
+  --source BM25=temp_run/private_bm25_filelocal_20260704/bm25_top20_files_filelocal \
+  --source KG=runs/kg_verified_evidence_graph/tse_timesafe_main_20260531_pathunion_v1 \
+  --source Dense="$DENSE_LOCAL" --output-dir "$MURAL_3SRC" \
+  --top-k 50 --rrf-k 60 --force
+
+python3 artifacts/scripts/export_fixed_prefix_fusion.py \
+  --primary-dir temp_run/eval_aliyun_glm5_issueonly \
+  --secondary-dir "$MURAL_3SRC" \
+  --output-dir temp_run/mural_experiment_additions/glm5_mural_3src_b20_p10 \
+  --budget 20 --primary-prefix 10 --secondary-pool 20 --force
+
+python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
+  --group Dense_raw="$DENSE_ENTITIES" --group Dense_local="$DENSE_LOCAL" \
+  --group BM25_local=temp_run/private_bm25_filelocal_20260704/bm25_top20_files_filelocal \
+  --group KG_local=runs/kg_verified_evidence_graph/tse_timesafe_main_20260531_pathunion_v1 \
+  --group MURAL_2src="$MURAL_2SRC" --group MURAL_3src="$MURAL_3SRC" \
+  --group GLM5_issue=temp_run/eval_aliyun_glm5_issueonly \
+  --group GLM5_BM25_local=temp_run/private_bm25_filelocal_20260704/budget_fusions/GLM5_BM25FileLocal_b20_p10 \
+  --group GLM5_MURAL_2src=temp_run/private_bm25_filelocal_20260704/hybrid_rrf/deterministic_budget_fusions/GLM5_Hybrid_b20_p10 \
+  --group GLM5_MURAL_3src=temp_run/mural_experiment_additions/glm5_mural_3src_b20_p10 \
+  --compare Dense_raw=Dense_local --compare BM25_local=Dense_local \
+  --compare MURAL_2src=Dense_local --compare MURAL_2src=MURAL_3src \
+  --compare Dense_local=MURAL_3src \
+  --compare GLM5_issue=GLM5_MURAL_3src \
+  --compare GLM5_BM25_local=GLM5_MURAL_3src \
+  --compare GLM5_MURAL_2src=GLM5_MURAL_3src \
+  --top-k 20 --bootstrap-iters 10000 --seed 7 \
+  --output-summary artifacts/results/dense_third_source_summary_20260714.tsv \
+  --output-paired artifacts/results/dense_third_source_paired_20260714.tsv \
+  --output-disagreements temp_run/dense_third_source_disagreements_20260714.tsv
 ```
 
 ### Patch-Derived Coverage

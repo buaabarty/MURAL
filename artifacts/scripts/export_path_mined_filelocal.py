@@ -627,9 +627,11 @@ def rerank_instance(data: dict, dataset_item: dict) -> dict:
     out["related_entities"]["methods"] = methods
     out["related_entities"]["classes"] = classes
     kg_params = out.setdefault("kg_params", {})
+    source_uses_embeddings = bool(kg_params.get("uses_embeddings"))
     kg_params["retrieval_mode"] = "path_mined_file_local_expansion"
     kg_params["score"] = "lexicographic_issue_file_source_path_mining"
-    kg_params["uses_embeddings"] = False
+    kg_params["uses_embeddings"] = source_uses_embeddings
+    kg_params["selector_uses_embeddings"] = False
     kg_params["uses_edge_weights"] = False
     kg_params["uses_discussion_comments"] = False
     kg_params["tunable_retrieval_parameters"] = []

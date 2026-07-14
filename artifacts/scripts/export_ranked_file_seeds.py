@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Convert ranked method retrieval output into ranked file-only seeds."""
+"""Convert ranked entity retrieval output into source-labelled file seeds."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
@@ -51,7 +52,7 @@ def select_files(methods: Iterable[dict], max_files: int, scan_methods: int | No
                 "file_path": file_path,
                 "file_rank": len(selected) + 1,
                 "best_method_rank": method_rank,
-                "best_bm25_score": float(item.get("similarity") or 0.0),
+                "best_method_score": float(item.get("similarity") or 0.0),
                 "support": support[file_path],
             }
         )
@@ -60,20 +61,23 @@ def select_files(methods: Iterable[dict], max_files: int, scan_methods: int | No
     return selected
 
 
-def make_seed(instance_id: str, file_info: dict, support_mode: str) -> dict:
+def make_seed(instance_id: str, file_info: dict, support_mode: str, source_name: str) -> dict:
     file_path = file_info["file_path"]
     rank = int(file_info["file_rank"])
     support = int(file_info["support"]) if support_mode == "count" else 0
+    source_upper = source_name.upper()
+    source_display = "BM25" if source_name == "bm25" else source_name.capitalize()
+    score_field = "best_bm25_score" if source_name == "bm25" else "best_method_score"
     return {
         "type": "method",
         "entity_type": "file_seed",
-        "name": f"bm25_file_seed.{rank}",
-        "signature": f"bm25_file_seed.{rank}({file_path})",
+        "name": f"{source_name}_file_seed.{rank}",
+        "signature": f"{source_name}_file_seed.{rank}({file_path})",
         "file_path": file_path,
         "source_code": "",
         "start_line": 0,
         "end_line": 0,
-        "similarity": float(file_info["best_bm25_score"]),
+        "similarity": float(file_info["best_method_score"]),
         "evidence": {
             "support": support,
             "distance": int(file_info["best_method_rank"]),
@@ -90,11 +94,11 @@ def make_seed(instance_id: str, file_info: dict, support_mode: str) -> dict:
                 "end_labels": ["File"],
                 "start_type": "issue",
                 "end_type": "file",
-                "type": "BM25_FILE_SEED",
-                "description": "selected by BM25 file ranking",
+                "type": f"{source_upper}_FILE_SEED",
+                "description": f"selected by {source_display} file ranking",
                 "file_rank": rank,
                 "best_method_rank": int(file_info["best_method_rank"]),
-                "best_bm25_score": float(file_info["best_bm25_score"]),
+                score_field: float(file_info["best_method_score"]),
             }
         ],
     }
@@ -106,31 +110,33 @@ def convert_one(
     max_files: int,
     scan_methods: int | None,
     support_mode: str,
+    source_name: str = "bm25",
+    uses_embeddings: bool = False,
 ) -> dict:
     files = select_files(ranked_methods(payload), max_files, scan_methods)
     output = deepcopy(payload)
     entities = payload.get("related_entities") or {}
     output["related_entities"] = {
-        "methods": [make_seed(instance_id, file_info, support_mode) for file_info in files],
+        "methods": [make_seed(instance_id, file_info, support_mode, source_name) for file_info in files],
         "classes": [],
         "issues": entities.get("issues") or [],
     }
     output["kg_params"] = {
-        "baseline": "bm25_file_seed",
-        "retrieval_mode": "bm25_ranked_files_only",
+        "baseline": f"{source_name}_file_seed",
+        "retrieval_mode": f"{source_name}_ranked_files_only",
         "score": (
-            "bm25_best_method_file_rank_with_candidate_count_support"
+            f"{source_name}_best_method_file_rank_with_candidate_count_support"
             if support_mode == "count"
-            else "bm25_best_method_file_rank"
+            else f"{source_name}_best_method_file_rank"
         ),
-        "uses_embeddings": False,
+        "uses_embeddings": uses_embeddings,
         "uses_edge_weights": False,
         "uses_discussion_comments": False,
         "tunable_retrieval_parameters": [],
     }
-    output.setdefault("artifact_stats", {})["bm25_file_seed_count"] = len(files)
+    output.setdefault("artifact_stats", {})[f"{source_name}_file_seed_count"] = len(files)
     output.setdefault("run_meta", {})["instance_id"] = instance_id
-    output["run_meta"]["bm25_file_seed"] = {
+    output["run_meta"][f"{source_name}_file_seed"] = {
         "max_files": max_files,
         "scan_methods": scan_methods,
         "support_mode": support_mode,
@@ -146,6 +152,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-files", type=int, default=20)
     parser.add_argument("--scan-methods", type=int, default=0)
     parser.add_argument("--support-mode", choices=["count", "zero"], default="count")
+    parser.add_argument(
+        "--source-name",
+        default="bm25",
+        help="Stable lowercase source label used in evidence and metadata.",
+    )
+    parser.add_argument(
+        "--uses-embeddings",
+        action="store_true",
+        help="Record that the ranked input source uses embeddings.",
+    )
     return parser.parse_args()
 
 
@@ -153,6 +169,9 @@ def main() -> int:
     args = parse_args()
     if args.max_files <= 0:
         raise ValueError("--max-files must be positive")
+    source_name = args.source_name.strip().lower()
+    if not re.fullmatch(r"[a-z][a-z0-9_-]*", source_name):
+        raise ValueError("--source-name must match [a-z][a-z0-9_-]*")
     scan_methods = args.scan_methods if args.scan_methods > 0 else None
     args.output_dir.mkdir(parents=True, exist_ok=True)
     written = 0
@@ -161,7 +180,15 @@ def main() -> int:
         if not source.exists():
             continue
         payload = json.loads(source.read_text(encoding="utf-8"))
-        output = convert_one(payload, instance_id, args.max_files, scan_methods, args.support_mode)
+        output = convert_one(
+            payload,
+            instance_id,
+            args.max_files,
+            scan_methods,
+            args.support_mode,
+            source_name,
+            args.uses_embeddings,
+        )
         destination = args.output_dir / source.name
         destination.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
         written += 1

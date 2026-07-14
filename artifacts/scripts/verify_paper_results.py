@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "artifacts" / "results"
 
 EXPECTED_RESULT_FILES = {
+    "dense_third_source_paired_20260714.tsv",
+    "dense_third_source_summary_20260714.tsv",
     "edit_target_paired_stats_20260713.tsv",
     "glm5_baseline_fusion_controls_top10_20260614.tsv",
     "kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json",
@@ -162,6 +164,7 @@ def verify_rq1() -> None:
     verify_retrieve_then_localize_controls()
     verify_selector_ablation()
     verify_rrf_sensitivity()
+    verify_dense_third_source()
 
 
 def verify_selector_ablation() -> None:
@@ -252,6 +255,53 @@ def verify_rrf_sensitivity() -> None:
             paired_source,
             tol=1e-15,
         )
+
+
+def verify_dense_third_source() -> None:
+    source = "dense_third_source_summary_20260714.tsv"
+    rows = read_tsv(source)
+    expected = {
+        "Dense_raw": (89.4, 55.3, 36.4, 62.0),
+        "Dense_local": (83.0, 56.7, 32.0, 64.0),
+        "BM25_local": (73.6, 50.1, 28.6, 57.0),
+        "KG_local": (59.2, 45.4, 26.3, 50.8),
+        "MURAL_2src": (77.0, 55.3, 32.0, 62.8),
+        "MURAL_3src": (82.6, 59.7, 34.2, 67.4),
+        "GLM5_issue": (87.4, 53.0, 51.2, 62.4),
+        "GLM5_BM25_local": (94.2, 69.2, 54.4, 78.0),
+        "GLM5_MURAL_2src": (94.6, 70.9, 54.7, 79.0),
+        "GLM5_MURAL_3src": (95.2, 71.7, 54.9, 80.2),
+    }
+    expect_row_set("Dense third-source row set", rows, "name", list(expected), source)
+    for name, values in expected.items():
+        expect_metric_row(source, row_by(rows, "name", name), values, f"Dense third source {name}")
+
+    paired_source = "dense_third_source_paired_20260714.tsv"
+    paired = read_tsv(paired_source)
+    expected_hit = {
+        ("Dense_raw", "Dense_local"): (2.0, -3.0, 6.8, 80, 70, 0.4625495178668303),
+        ("BM25_local", "Dense_local"): (7.0, 3.8, 10.4, 54, 19, 5.0622659111780655e-05),
+        ("MURAL_2src", "Dense_local"): (1.2, -2.4, 4.8, 46, 40, 0.5900356111485574),
+        ("MURAL_2src", "MURAL_3src"): (4.6, 2.2, 7.2, 33, 10, 0.0006061066312668117),
+        ("Dense_local", "MURAL_3src"): (3.4, 0.6, 6.4, 35, 18, 0.027008317653722358),
+        ("GLM5_issue", "GLM5_MURAL_3src"): (17.8, 14.4, 21.2, 89, 0, 3.2311742677852644e-27),
+        ("GLM5_BM25_local", "GLM5_MURAL_3src"): (2.2, 0.0, 4.4, 21, 10, 0.07075554598122835),
+        ("GLM5_MURAL_2src", "GLM5_MURAL_3src"): (1.2, -0.2, 2.6, 9, 3, 0.14599609375),
+    }
+    observed_hit = {
+        (row["baseline"], row["treatment"]): row for row in paired if row["metric"] == "hit"
+    }
+    expect_equal("Dense third-source paired Hit set", list(observed_hit), list(expected_hit), paired_source)
+    for comparison, values in expected_hit.items():
+        delta, low, high, wins, losses, p_value = values
+        row = observed_hit[comparison]
+        prefix = f"Dense third source {comparison[0]}->{comparison[1]} Hit"
+        expect_close(f"{prefix} delta", pct(row["delta"]), delta, paired_source)
+        expect_close(f"{prefix} CI low", pct(row["ci95_low"]), low, paired_source)
+        expect_close(f"{prefix} CI high", pct(row["ci95_high"]), high, paired_source)
+        expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
+        expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
+        expect_close(f"{prefix} exact p", float(row["exact_mcnemar_p"]), p_value, paired_source, tol=1e-15)
 
 
 def verify_retrieve_then_localize_controls() -> None:

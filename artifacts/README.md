@@ -20,8 +20,9 @@ unchanged so archived commands and checksums stay stable.
   reproduced in the supplementary material.
 - `RESULT_TRACEABILITY.md`: file-to-claim mapping and reproduction commands.
 - `scripts/verify_paper_results.py`: strict result-inventory and value checker.
-- `scripts/export_ranked_file_seeds.py`: converts BM25 code-method output to
-  ranked file records for the shared file-local selector.
+- `scripts/export_ranked_file_seeds.py`: converts any ranked code-entity output
+  to source-labelled file records for the shared file-local selector; the
+  defaults preserve the original BM25 export.
 - `scripts/export_selector_ablation.py`: exports the Full selector and all five
   leave-one-signal-family-out variants while caching parsed source files.
 - `scripts/export_fixed_prefix_fusion.py`: builds prefix-preserving context
@@ -29,6 +30,8 @@ unchanged so archived commands and checksums stay stable.
 - `scripts/export_equal_rrf_fusion.py`: combines BM25-local and KG-local
   rankings with deterministic RRF; defaults reproduce equal weighting and
   optional source weights support the reported sensitivity sweep.
+- `scripts/export_multi_source_rrf_fusion.py`: applies the same deterministic
+  RRF contract to two or more named entity-ranking sources.
 - `scripts/analyze_retrieve_localize_controls.py`: computes aggregate metrics,
   paired bootstrap intervals, exact McNemar tests, and disagreement records.
 - `scripts/evaluate_patch_derived_context.py`: computes mapped edit-target
@@ -75,6 +78,10 @@ unchanged so archived commands and checksums stay stable.
   `rrf_sensitivity_paired_20260714.tsv`: four RRF constants and a symmetric
   five-setting BM25/KG weight sweep, with all variants paired against the
   predefined equal-weight (k=60) row.
+- `dense_third_source_summary_20260714.tsv` and
+  `dense_third_source_paired_20260714.tsv`: the Jina code-embedding source,
+  its shared-selector output, two- and three-source MURAL, and GLM-5
+  fixed-prefix controls with paired uncertainty and exact Hit@20 tests.
 
 ## Verifier
 
