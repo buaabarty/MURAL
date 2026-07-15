@@ -360,13 +360,24 @@ python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
 
 ### Java Cross-Language Diagnostic
 
-The supplementary Java check uses all 91 instances in the official
-`Daoguang/Multi-SWE-bench` `java_verified` split. The evaluator accepts the
-official `repo`, `base_commit`, `problem_statement`, and `patch` fields. It
-rebuilds entities from each base commit, freezes every ranking, and only then
-reads the patch to derive evaluation targets. The committed structural input
-contains ranked-file records only, including aggregate direct-anchor and graph
-distance fields; see
+The supplementary Java check uses the complete SWE-bench-Java Verified
+benchmark: all 91 instances across all six repositories, with no sampling,
+repository filtering, or instance exclusion. The release is hosted under the
+historical Hugging Face repository name `Daoguang/Multi-SWE-bench`, split
+`java_verified`; it is SWE-bench-Java (arXiv:2408.14354), not the later
+Multi-SWE-bench benchmark (arXiv:2504.02605). We pin revision
+`8bd202138a4ab9987daa77111c76a3e66af9f1c9`. The official JSON has SHA-256
+`4f5fd770eb1ff8bbd24540ccc367f38e466ba7426e2dc328867a901061e2ea07`,
+and the sorted 91-ID set has SHA-256
+`15cbf3065a33f11e328f792eff71761c1168b30425a8e81a15275afe5fc1f690`.
+The committed instance ledger and structural seed ledger reproduce that exact
+ID set: 91 unique evaluated IDs, zero missing, zero extra, and zero failed.
+
+The evaluator accepts the official `repo`, `base_commit`, `problem_statement`,
+and `patch` fields. It rebuilds entities from each base commit, freezes every
+ranking, and only then reads the patch to derive evaluation targets. The
+committed structural input contains ranked-file records only, including
+aggregate direct-anchor and graph-distance fields; see
 `artifacts/inputs/java_cross_language_manifest_20260714.json` for provenance.
 Files tied on anchor, graph distance, and support are ordered by their first
 structural entity rank rather than by path text. Target mapping follows the
@@ -383,7 +394,7 @@ import json
 from pathlib import Path
 from datasets import load_dataset
 
-out = Path("temp_run/multi_swe_bench_java_verified/java_verified_dataset.jsonl")
+out = Path("temp_run/swe_bench_java_verified/java_verified_dataset.jsonl")
 out.parent.mkdir(parents=True, exist_ok=True)
 rows = sorted(load_dataset("Daoguang/Multi-SWE-bench", split="java_verified"),
               key=lambda row: row["instance_id"])
@@ -401,7 +412,7 @@ deduplication; this does not broaden graph traversal.
 
 ```bash
 python3 artifacts/scripts/run_java_kg_batch.py \
-  --dataset temp_run/multi_swe_bench_java_verified/java_verified_dataset.jsonl \
+  --dataset temp_run/swe_bench_java_verified/java_verified_dataset.jsonl \
   --workdir temp_run/java_kg_work \
   --repos-dir temp_run/java_cross_language/repos \
   --output-dir temp_run/java_kg_raw \
@@ -424,7 +435,7 @@ equal-weight RRF:
 
 ```bash
 python3 artifacts/scripts/evaluate_java_retrieve_localize.py \
-  --dataset-dir temp_run/multi_swe_bench_java_verified \
+  --dataset-dir temp_run/swe_bench_java_verified \
   --kg-seeds artifacts/inputs/java_kg_ranked_file_seeds_20260714.jsonl \
   --repos-dir temp_run/java_cross_language/repos \
   --cache-dir temp_run/java_cross_language/entity_cache \

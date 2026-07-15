@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate retrieve-then-localize controls on Multi-SWE-bench Java.
+"""Evaluate retrieve-then-localize controls on SWE-bench-Java Verified.
 
 The script rebuilds base-commit Java entities, runs BM25 file retrieval, applies
 the same five-family lexicographic local selector used by MURAL, adapts archived
@@ -533,7 +533,7 @@ def rrf_fuse(*rankings: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def normalize_dataset_record(item: dict[str, Any], source: Path, line_number: int) -> dict[str, Any]:
-    """Map either official or repository-exported Multi-SWE-bench rows to one schema."""
+    """Map either official or repository-exported SWE-bench-Java rows to one schema."""
     if item.get("base_commit"):
         repo_full_name = str(item.get("repo") or "")
         if "/" not in repo_full_name:

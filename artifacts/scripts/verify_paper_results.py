@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import ast
 import csv
+import hashlib
 import json
 import math
 import sys
@@ -272,6 +273,35 @@ def verify_dense_third_source() -> None:
 
 
 def verify_java_cross_language() -> None:
+    manifest_source = "java_cross_language_manifest_20260714.json"
+    with (INPUTS / manifest_source).open(encoding="utf-8") as handle:
+        manifest = json.load(handle)
+    benchmark = manifest["benchmark"]
+    expect_equal("Java benchmark name", benchmark["name"], "SWE-bench-Java Verified", manifest_source)
+    expect_equal(
+        "Java benchmark source repository",
+        benchmark["dataset_repository"],
+        "Daoguang/Multi-SWE-bench",
+        manifest_source,
+    )
+    expect_equal(
+        "Java benchmark source revision",
+        benchmark["revision"],
+        "8bd202138a4ab9987daa77111c76a3e66af9f1c9",
+        manifest_source,
+    )
+    expect_equal("Java benchmark split", benchmark["split"], "java_verified", manifest_source)
+    expect_equal("Java official instance count", benchmark["official_instances"], 91, manifest_source)
+    expect_equal("Java evaluated instance count", benchmark["evaluated_instances"], 91, manifest_source)
+    expect_equal("Java excluded instance count", benchmark["excluded_instances"], 0, manifest_source)
+    expect_equal("Java official repository count", benchmark["repositories"], 6, manifest_source)
+    expect_equal(
+        "Java official ID-set hash",
+        benchmark["instance_id_set_sha256"],
+        "15cbf3065a33f11e328f792eff71761c1168b30425a8e81a15275afe5fc1f690",
+        manifest_source,
+    )
+
     source = "java_cross_language_summary_20260714.tsv"
     rows = read_tsv(source)
     expected = {
@@ -350,9 +380,30 @@ def verify_java_cross_language() -> None:
         instance_source,
     )
 
+    evaluated_ids = sorted(row["instance_id"] for row in instances)
+    evaluated_id_hash = hashlib.sha256("\n".join(evaluated_ids).encode("utf-8")).hexdigest()
+    expect_equal(
+        "Java evaluated ID set matches complete official split",
+        evaluated_id_hash,
+        benchmark["instance_id_set_sha256"],
+        instance_source,
+    )
+    expect_equal(
+        "Java target-cache official ID-set hash",
+        targets["meta"]["dataset_sha256"],
+        benchmark["instance_id_set_sha256"],
+        targets_source,
+    )
+
     seed_source = "java_kg_ranked_file_seeds_20260714.jsonl"
     seeds = read_jsonl(INPUTS / seed_source)
     expect_equal("Java structural seed rows", len(seeds), 91, seed_source)
+    expect_equal(
+        "Java structural seed IDs match evaluated IDs",
+        sorted(row["instance_id"] for row in seeds),
+        evaluated_ids,
+        seed_source,
+    )
     allowed = {
         "file_path",
         "rank",

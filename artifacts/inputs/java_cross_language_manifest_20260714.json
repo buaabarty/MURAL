@@ -1,9 +1,18 @@
 {
   "benchmark": {
-    "dataset": "Daoguang/Multi-SWE-bench",
-    "paper": "arXiv:2504.02605",
+    "name": "SWE-bench-Java Verified",
+    "dataset_repository": "Daoguang/Multi-SWE-bench",
+    "dataset_repository_note": "Historical Hugging Face repository name; this is SWE-bench-Java Verified (arXiv:2408.14354), not the later Multi-SWE-bench benchmark (arXiv:2504.02605).",
+    "paper": "arXiv:2408.14354",
+    "revision": "8bd202138a4ab9987daa77111c76a3e66af9f1c9",
     "split": "java_verified",
-    "instances": 91,
+    "dataset_file": "swe-bench-java-verified.json",
+    "dataset_file_sha256": "4f5fd770eb1ff8bbd24540ccc367f38e466ba7426e2dc328867a901061e2ea07",
+    "instance_id_set_sha256": "15cbf3065a33f11e328f792eff71761c1168b30425a8e81a15275afe5fc1f690",
+    "official_instances": 91,
+    "evaluated_instances": 91,
+    "excluded_instances": 0,
+    "selection": "Complete official split; no sampling, repository filtering, or instance exclusion.",
     "repositories": 6
   },
   "structural_ranked_file_source": {
@@ -39,7 +48,7 @@
   },
   "evaluation": {
     "script": "artifacts/scripts/evaluate_java_retrieve_localize.py",
-    "script_sha256": "70812aafbe82a20a04d76997f90a06ea59efdf4790e82b1675b3ef04e1671b2b",
+    "script_sha256": "266bd2aa180a218584b3a2b4b90455581158b7893ba94bc27c132d3ef636783e",
     "dataset_schema": "official repo/base_commit/problem_statement/patch",
     "target_source": "official patch, read after rankings are frozen",
     "target_mapping": "Map changed lines to base-commit Java entities. Auxiliary files and newly added entities do not enlarge an otherwise mapped target set; use one file-level fallback only if the entire patch has no mapped base-commit entity.",

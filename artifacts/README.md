@@ -118,9 +118,12 @@ unchanged so archived commands and checksums stay stable.
   its shared-selector output, two- and three-source MURAL, and GLM-5
   fixed-prefix controls with paired uncertainty and exact Hit@20 tests.
 - `java_cross_language_summary_20260714.tsv` and
-  `java_cross_language_paired_20260714.tsv`: the 91-instance
-  Multi-SWE-bench Java check, including the BM25-to-BM25-local selector
-  comparison and the corrected structural-source diagnostic.
+  `java_cross_language_paired_20260714.tsv`: the complete 91-instance
+  SWE-bench-Java Verified check (no sampling or exclusions), including the
+  BM25-to-BM25-local selector comparison and the corrected structural-source
+  diagnostic. The benchmark is hosted under the historical Hugging Face
+  repository name `Daoguang/Multi-SWE-bench`; it is not the later
+  Multi-SWE-bench benchmark.
 - `java_cross_language_instances_20260714.jsonl` and
   `java_cross_language_targets_20260714.json`: the per-instance ranking ledger
   and deterministic patch-to-base-commit-entity target cache for that Java
