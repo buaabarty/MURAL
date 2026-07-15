@@ -1,0 +1,7 @@
+name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
+Expanded	500	20	0.736	0.5007613275613275	0.2864737545478257	0.57	temp_run/mural_experiment_additions/selector_deterministic_20260715/expanded
+StableOnly	500	20	0.388	0.04143181818181818	0.01051961351342156	0.05	temp_run/mural_experiment_additions/selector_deterministic_20260715/stable_only
+FileRankAST	500	20	0.386	0.21362896825396827	0.06373092605708705	0.24	temp_run/mural_experiment_additions/selector_deterministic_20260715/file_rank_ast
+TitleFileRankAST	500	20	0.734	0.48911727994227994	0.27564540038564805	0.554	temp_run/mural_experiment_additions/selector_deterministic_20260715/title_file_rank_ast
+ExactFileRankAST	500	20	0.73	0.4815501026751026	0.27985792336318643	0.548	temp_run/mural_experiment_additions/selector_deterministic_20260715/exact_file_rank_ast
+Compact	500	20	0.736	0.5010113275613275	0.28811683707589275	0.57	temp_run/mural_experiment_additions/selector_deterministic_20260715/compact

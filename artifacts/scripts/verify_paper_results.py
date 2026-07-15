@@ -25,9 +25,13 @@ RESULTS = ROOT / "artifacts" / "results"
 INPUTS = ROOT / "artifacts" / "inputs"
 
 EXPECTED_RESULT_FILES = {
+    "context_construction_cost_20260715.tsv",
+    "dense_third_source_disagreements_20260714.tsv",
     "dense_third_source_paired_20260714.tsv",
     "dense_third_source_summary_20260714.tsv",
     "edit_target_paired_stats_20260713.tsv",
+    "external_localizer_fusion_paired_20260715.tsv",
+    "external_localizer_fusion_summary_20260715.tsv",
     "glm5_baseline_fusion_controls_top10_20260614.tsv",
     "java_cross_language_instances_20260714.jsonl",
     "java_cross_language_paired_20260714.tsv",
@@ -46,13 +50,20 @@ EXPECTED_RESULT_FILES = {
     "repair_glm5_outcomes_20260715.tsv",
     "repair_glm5_prediction_mapping_20260715.tsv",
     "repair_glm5_summary_20260715.tsv",
+    "repository_localization_breakdown_20260715.tsv",
+    "repository_repair_breakdown_20260715.tsv",
     "retrieve_then_localize_budget_curve_20260711.tsv",
+    "retrieve_then_localize_budget_disagreements_20260711.tsv",
     "retrieve_then_localize_budget_paired_20260711.tsv",
     "retrieve_then_localize_disagreements_20260711.tsv",
     "retrieve_then_localize_paired_20260711.tsv",
     "retrieve_then_localize_top20_20260711.tsv",
-    "selector_ablation_paired_20260714.tsv",
-    "selector_ablation_summary_20260714.tsv",
+    "rrf_sensitivity_disagreements_20260715.tsv",
+    "rrf_sensitivity_paired_20260715.tsv",
+    "rrf_sensitivity_summary_20260715.tsv",
+    "selector_simplification_disagreements_20260715.tsv",
+    "selector_simplification_paired_20260715.tsv",
+    "selector_simplification_summary_20260715.tsv",
     "time_boundary_external_artifact_sensitivity_20260531.tsv",
     "tse_gt_mapping_v6.tsv",
 }
@@ -176,69 +187,75 @@ def verify_rq1() -> None:
         "bluir": (55.6, 38.6, 28.9, 43.4),
         "no_history_codegraph": (63.6, 35.2, 22.9, 41.0),
         "strict_kg_ablation": (55.6, 33.8, 22.2, 37.8),
-        "full_pathmined": (59.2, 45.4, 26.3, 50.8),
+        "full_pathmined": (59.2, 45.3, 26.3, 50.6),
     }
     for name, values in expected.items():
         expect_metric_row(source, row_by(rows, "name", name), values, f"RQ1 {name}")
 
     verify_retrieve_then_localize_controls()
-    verify_selector_ablation()
+    verify_selector_simplification()
+    verify_rrf_sensitivity()
     verify_dense_third_source()
     verify_java_cross_language()
+    verify_repository_localization()
+    verify_context_construction_cost()
 
 
-def verify_selector_ablation() -> None:
-    source = "selector_ablation_summary_20260714.tsv"
+def verify_selector_simplification() -> None:
+    source = "selector_simplification_summary_20260715.tsv"
     rows = read_tsv(source)
     expected = {
-        "Full": (73.6, 50.1, 28.6, 57.0),
-        "minus_G1": (73.0, 48.4, 27.9, 55.2),
-        "minus_G2": (73.2, 49.7, 28.5, 56.6),
-        "minus_G3": (73.6, 50.1, 28.7, 57.0),
-        "minus_G4": (73.6, 50.1, 28.5, 57.0),
-        "minus_G5": (73.6, 50.1, 28.6, 57.0),
+        "Expanded": (73.6, 50.1, 28.6, 57.0),
+        "StableOnly": (38.8, 4.1, 1.1, 5.0),
+        "FileRankAST": (38.6, 21.4, 6.4, 24.0),
+        "TitleFileRankAST": (73.4, 48.9, 27.6, 55.4),
+        "ExactFileRankAST": (73.0, 48.2, 28.0, 54.8),
+        "Compact": (73.6, 50.1, 28.8, 57.0),
     }
-    expect_row_set("Selector ablation row set", rows, "name", list(expected), source)
+    expect_row_set("Selector simplification row set", rows, "name", list(expected), source)
     for name, values in expected.items():
-        expect_metric_row(source, row_by(rows, "name", name), values, f"Selector ablation {name}")
+        expect_metric_row(
+            source,
+            row_by(rows, "name", name),
+            values,
+            f"Selector simplification {name}",
+        )
 
-    paired_source = "selector_ablation_paired_20260714.tsv"
+    paired_source = "selector_simplification_paired_20260715.tsv"
     paired = read_tsv(paired_source)
-    hit_rows = {
-        row["treatment"]: row
+    compact = next(
+        row
         for row in paired
-        if row["baseline"] == "Full" and row["metric"] == "hit"
-    }
-    expect_equal("Selector ablation paired treatments", list(hit_rows), list(expected)[1:], paired_source)
-    g1 = hit_rows["minus_G1"]
-    expect_close("Selector minus G1 Hit delta", pct(g1["delta"]), -1.8, paired_source)
-    expect_close("Selector minus G1 Hit CI low", pct(g1["ci95_low"]), -5.4, paired_source)
-    expect_close("Selector minus G1 Hit CI high", pct(g1["ci95_high"]), 1.8, paired_source)
-    expect_equal("Selector minus G1 Hit wins", int(g1["wins"]), 36, paired_source)
-    expect_equal("Selector minus G1 Hit losses", int(g1["losses"]), 45, paired_source)
-    expect_close(
-        "Selector minus G1 exact p",
-        float(g1["exact_mcnemar_p"]),
-        0.3741744176047079,
-        paired_source,
-        tol=1e-15,
+        if row["baseline"] == "Expanded"
+        and row["treatment"] == "Compact"
+        and row["metric"] == "hit"
     )
-
+    expect_close("Compact selector Hit delta", pct(compact["delta"]), 0.0, paired_source)
+    expect_close("Compact selector Hit CI low", pct(compact["ci95_low"]), -0.6, paired_source)
+    expect_close("Compact selector Hit CI high", pct(compact["ci95_high"]), 0.6, paired_source)
+    expect_equal("Compact selector Hit wins", int(compact["wins"]), 1, paired_source)
+    expect_equal("Compact selector Hit losses", int(compact["losses"]), 1, paired_source)
+    expect_close(
+        "Compact selector exact p",
+        float(compact["exact_mcnemar_p"]),
+        1.0,
+        paired_source,
+    )
 
 def verify_dense_third_source() -> None:
     source = "dense_third_source_summary_20260714.tsv"
     rows = read_tsv(source)
     expected = {
         "Dense_raw": (89.4, 55.3, 36.4, 62.0),
-        "Dense_local": (83.0, 56.7, 32.0, 64.0),
-        "BM25_local": (73.6, 50.1, 28.6, 57.0),
-        "KG_local": (59.2, 45.4, 26.3, 50.8),
-        "MURAL_2src": (77.0, 55.3, 32.0, 62.8),
-        "MURAL_3src": (82.6, 59.7, 34.2, 67.4),
+        "Dense_local": (83.0, 56.5, 32.1, 63.6),
+        "BM25_local": (73.6, 50.1, 28.8, 57.0),
+        "KG_local": (59.2, 45.3, 26.3, 50.6),
+        "MURAL_2src": (77.0, 55.2, 32.0, 62.6),
+        "MURAL_3src": (83.0, 59.6, 34.5, 67.2),
         "GLM5_issue": (87.4, 53.0, 51.2, 62.4),
         "GLM5_BM25_local": (94.2, 69.2, 54.4, 78.0),
-        "GLM5_MURAL_2src": (94.6, 70.9, 54.7, 79.0),
-        "GLM5_MURAL_3src": (95.2, 71.7, 54.9, 80.2),
+        "GLM5_MURAL_2src": (94.6, 71.1, 54.8, 79.2),
+        "GLM5_MURAL_3src": (95.2, 71.6, 55.0, 80.2),
     }
     expect_row_set("Dense third-source row set", rows, "name", list(expected), source)
     for name, values in expected.items():
@@ -247,17 +264,19 @@ def verify_dense_third_source() -> None:
     paired_source = "dense_third_source_paired_20260714.tsv"
     paired = read_tsv(paired_source)
     expected_hit = {
-        ("Dense_raw", "Dense_local"): (2.0, -3.0, 6.8, 80, 70, 0.4625495178668303),
-        ("BM25_local", "Dense_local"): (7.0, 3.8, 10.4, 54, 19, 5.0622659111780655e-05),
-        ("MURAL_2src", "Dense_local"): (1.2, -2.4, 4.8, 46, 40, 0.5900356111485574),
-        ("MURAL_2src", "MURAL_3src"): (4.6, 2.2, 7.2, 33, 10, 0.0006061066312668117),
-        ("Dense_local", "MURAL_3src"): (3.4, 0.6, 6.4, 35, 18, 0.027008317653722358),
+        ("Dense_raw", "Dense_local"): (1.6, -3.4, 6.4, 78, 70, 0.5651719099883437),
+        ("BM25_local", "Dense_local"): (6.6, 3.2, 10.0, 54, 21, 0.00017630923003028782),
+        ("MURAL_2src", "Dense_local"): (1.0, -2.6, 4.6, 47, 42, 0.6718086491746106),
+        ("MURAL_2src", "MURAL_3src"): (4.6, 2.0, 7.2, 34, 11, 0.0008240823595997426),
+        ("Dense_local", "MURAL_3src"): (3.6, 0.8, 6.6, 37, 19, 0.022241389472860112),
         ("GLM5_issue", "GLM5_MURAL_3src"): (17.8, 14.4, 21.2, 89, 0, 3.2311742677852644e-27),
         ("GLM5_BM25_local", "GLM5_MURAL_3src"): (2.2, 0.0, 4.4, 21, 10, 0.07075554598122835),
-        ("GLM5_MURAL_2src", "GLM5_MURAL_3src"): (1.2, -0.2, 2.6, 9, 3, 0.14599609375),
+        ("GLM5_MURAL_2src", "GLM5_MURAL_3src"): (1.0, -0.4, 2.4, 9, 4, 0.266845703125),
     }
     observed_hit = {
-        (row["baseline"], row["treatment"]): row for row in paired if row["metric"] == "hit"
+        (row["baseline"], row["treatment"]): row
+        for row in paired
+        if row["metric"] == "hit"
     }
     expect_equal("Dense third-source paired Hit set", list(observed_hit), list(expected_hit), paired_source)
     for comparison, values in expected_hit.items():
@@ -270,7 +289,6 @@ def verify_dense_third_source() -> None:
         expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
         expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
         expect_close(f"{prefix} exact p", float(row["exact_mcnemar_p"]), p_value, paired_source, tol=1e-15)
-
 
 def verify_java_cross_language() -> None:
     manifest_source = "java_cross_language_manifest_20260714.json"
@@ -487,83 +505,69 @@ def verify_retrieve_then_localize_controls() -> None:
 
     source = "retrieve_then_localize_top20_20260711.tsv"
     rows = read_tsv(source)
-    expected_rows = [
-        "BM25",
-        "KG_grounded",
-        "BM25_filelocal",
-        "KG_filelocal",
-        "BM25_KG_RRF_filelocal",
-        "GLM5_issue",
-        "GLM5_KG_filelocal",
-        "GLM5_BM25_filelocal",
-        "GLM5_BM25_KG_RRF_filelocal",
-    ]
-    expect_row_set("Retrieve-then-localize Top-20 row set", rows, "name", expected_rows, source)
     expected = {
         "BM25": (77.0, 39.2, 25.3, 46.0),
         "KG_grounded": (55.6, 33.8, 22.2, 37.8),
-        "BM25_filelocal": (73.6, 50.1, 28.6, 57.0),
-        "KG_filelocal": (59.2, 45.4, 26.3, 50.8),
-        "BM25_KG_RRF_filelocal": (77.0, 55.3, 32.0, 62.8),
+        "BM25_filelocal": (73.6, 50.1, 28.8, 57.0),
+        "KG_filelocal": (59.2, 45.3, 26.3, 50.6),
+        "BM25_KG_RRF_filelocal": (77.0, 55.2, 32.0, 62.6),
         "GLM5_issue": (87.4, 53.0, 51.2, 62.4),
-        "GLM5_KG_filelocal": (93.2, 65.5, 53.7, 74.0),
+        "GLM5_KG_filelocal": (93.2, 65.9, 53.7, 74.2),
         "GLM5_BM25_filelocal": (94.2, 69.2, 54.4, 78.0),
-        "GLM5_BM25_KG_RRF_filelocal": (94.6, 70.9, 54.7, 79.0),
+        "GLM5_BM25_KG_RRF_filelocal": (94.6, 71.1, 54.8, 79.2),
     }
+    expect_row_set("Retrieve-then-localize Top-20 row set", rows, "name", list(expected), source)
     for name, values in expected.items():
         expect_metric_row(source, row_by(rows, "name", name), values, f"Retrieve/localize {name}")
 
     paired_source = "retrieve_then_localize_paired_20260711.tsv"
     paired = read_tsv(paired_source)
-    comparisons = {
-        ("BM25", "BM25_filelocal"): (11.0, 100, 45, 5.72317416461909e-06),
-        ("KG_grounded", "KG_filelocal"): (13.0, 67, 2, 8.185726402265558e-18),
-        ("KG_filelocal", "BM25_filelocal"): (6.2, 90, 59, 0.013712033079849216),
-        ("BM25_filelocal", "BM25_KG_RRF_filelocal"): (5.8, 43, 14, 0.00015388902244434233),
-        ("KG_filelocal", "BM25_KG_RRF_filelocal"): (12.0, 80, 20, 1.1159089057251951e-09),
-        ("GLM5_issue", "GLM5_KG_filelocal"): (11.6, 58, 0, 6.938893903907228e-18),
-        ("GLM5_issue", "GLM5_BM25_filelocal"): (15.6, 78, 0, 6.617444900424222e-24),
-        ("GLM5_issue", "GLM5_BM25_KG_RRF_filelocal"): (16.6, 83, 0, 2.0679515313825692e-25),
-        ("GLM5_KG_filelocal", "GLM5_BM25_filelocal"): (4.0, 39, 19, 0.011928139715763175),
-        ("GLM5_BM25_filelocal", "GLM5_BM25_KG_RRF_filelocal"): (1.0, 17, 12, 0.45825831964612007),
-        ("GLM5_KG_filelocal", "GLM5_BM25_KG_RRF_filelocal"): (5.0, 31, 6, 4.12575900554657e-05),
+    expected_hit = {
+        ("BM25", "BM25_filelocal"): (11.0, 6.4, 15.8, 101, 46, 6.6718656940094816e-06),
+        ("KG_grounded", "KG_filelocal"): (12.8, 9.8, 16.0, 66, 2, 1.5903890617646743e-17),
+        ("KG_filelocal", "BM25_filelocal"): (6.4, 1.6, 11.2, 91, 59, 0.011121593847224862),
+        ("KG_filelocal", "BM25_KG_RRF_filelocal"): (12.0, 8.2, 15.8, 80, 20, 1.1159089057251951e-09),
+        ("BM25_filelocal", "BM25_KG_RRF_filelocal"): (5.6, 2.8, 8.6, 43, 15, 0.0003069470155465659),
+        ("GLM5_issue", "GLM5_KG_filelocal"): (11.8, 9.0, 14.6, 59, 0, 3.469446951953614e-18),
+        ("GLM5_issue", "GLM5_BM25_filelocal"): (15.6, 12.4, 18.8, 78, 0, 6.617444900424222e-24),
+        ("GLM5_issue", "GLM5_BM25_KG_RRF_filelocal"): (16.8, 13.6, 20.2, 84, 0, 1.0339757656912846e-25),
+        ("GLM5_KG_filelocal", "GLM5_BM25_filelocal"): (3.8, 0.8, 6.8, 38, 19, 0.01634810389737615),
+        ("GLM5_KG_filelocal", "GLM5_BM25_KG_RRF_filelocal"): (5.0, 2.8, 7.4, 31, 6, 4.12575900554657e-05),
+        ("GLM5_BM25_filelocal", "GLM5_BM25_KG_RRF_filelocal"): (1.2, -0.8, 3.4, 18, 12, 0.361594608053565),
     }
-    for (baseline, treatment), (delta, wins, losses, p_value) in comparisons.items():
-        row = next(
-            item
-            for item in paired
-            if item["baseline"] == baseline and item["treatment"] == treatment and item["metric"] == "hit"
-        )
-        prefix = f"Retrieve/localize {baseline}->{treatment}"
-        expect_close(f"{prefix} Hit delta", pct(row["delta"]), delta, paired_source)
+    observed_hit = {
+        (row["baseline"], row["treatment"]): row
+        for row in paired
+        if row["metric"] == "hit"
+    }
+    expect_equal("Retrieve/localize paired Hit set", list(observed_hit), list(expected_hit), paired_source)
+    for comparison, values in expected_hit.items():
+        delta, low, high, wins, losses, p_value = values
+        row = observed_hit[comparison]
+        prefix = f"Retrieve/localize {comparison[0]}->{comparison[1]} Hit"
+        expect_close(f"{prefix} delta", pct(row["delta"]), delta, paired_source)
+        expect_close(f"{prefix} CI low", pct(row["ci95_low"]), low, paired_source)
+        expect_close(f"{prefix} CI high", pct(row["ci95_high"]), high, paired_source)
         expect_equal(f"{prefix} wins", int(row["wins"]), wins, paired_source)
         expect_equal(f"{prefix} losses", int(row["losses"]), losses, paired_source)
         expect_close(f"{prefix} exact p", float(row["exact_mcnemar_p"]), p_value, paired_source, tol=1e-15)
 
     budget_source = "retrieve_then_localize_budget_curve_20260711.tsv"
     budget_rows = read_tsv(budget_source)
-    expected_hits = {
-        "GLM5_issue_b5": 60.4,
-        "GLM5_KG_filelocal_b5": 65.0,
-        "GLM5_BM25_filelocal_b5": 66.2,
-        "GLM5_BM25_KG_RRF_b5": 66.6,
-        "GLM5_issue_b10": 62.4,
-        "GLM5_KG_filelocal_b10": 70.0,
-        "GLM5_BM25_filelocal_b10": 72.4,
-        "GLM5_BM25_KG_RRF_b10": 73.4,
-        "GLM5_issue_b20": 62.4,
-        "GLM5_KG_filelocal_b20": 74.0,
-        "GLM5_BM25_filelocal_b20": 78.0,
-        "GLM5_BM25_KG_RRF_b20": 79.0,
-        "GLM5_issue_b40": 62.4,
-        "GLM5_KG_filelocal_b40": 76.8,
-        "GLM5_BM25_filelocal_b40": 81.6,
-        "GLM5_BM25_KG_RRF_b40": 83.8,
+    expected_budget_hits = {
+        "BM25_B5": 66.4,
+        "MURAL_B5": 66.8,
+        "BM25_B10": 72.4,
+        "MURAL_B10": 73.2,
+        "BM25_B20": 78.0,
+        "MURAL_B20": 79.2,
+        "BM25_B40": 81.4,
+        "MURAL_B40": 84.0,
     }
-    expect_row_set("Retrieve/localize budget row set", budget_rows, "name", list(expected_hits), budget_source)
-    for name, expected_hit in expected_hits.items():
+    expect_row_set("Budget row set", budget_rows, "name", list(expected_budget_hits), budget_source)
+    for name, expected_hit in expected_budget_hits.items():
         expect_close(
-            f"Retrieve/localize budget {name} Hit",
+            f"Budget {name} Hit",
             pct(row_by(budget_rows, "name", name)["hit_rate"]),
             expected_hit,
             budget_source,
@@ -571,20 +575,22 @@ def verify_retrieve_then_localize_controls() -> None:
 
     budget_paired_source = "retrieve_then_localize_budget_paired_20260711.tsv"
     budget_paired = read_tsv(budget_paired_source)
-    b40_hybrid = next(
+    b40 = next(
         row
         for row in budget_paired
-        if row["baseline"] == "GLM5_BM25_filelocal_b40"
-        and row["treatment"] == "GLM5_BM25_KG_RRF_b40"
+        if row["baseline"] == "BM25_B40"
+        and row["treatment"] == "MURAL_B40"
         and row["metric"] == "hit"
     )
-    expect_close("Hybrid B40 Hit delta over BM25", pct(b40_hybrid["delta"]), 2.2, budget_paired_source)
-    expect_equal("Hybrid B40 Hit wins over BM25", int(b40_hybrid["wins"]), 17, budget_paired_source)
-    expect_equal("Hybrid B40 Hit losses over BM25", int(b40_hybrid["losses"]), 6, budget_paired_source)
+    expect_close("Budget B40 MURAL-BM25 Hit delta", pct(b40["delta"]), 2.6, budget_paired_source)
+    expect_close("Budget B40 Hit CI low", pct(b40["ci95_low"]), 0.8, budget_paired_source)
+    expect_close("Budget B40 Hit CI high", pct(b40["ci95_high"]), 4.4, budget_paired_source)
+    expect_equal("Budget B40 Hit wins", int(b40["wins"]), 17, budget_paired_source)
+    expect_equal("Budget B40 Hit losses", int(b40["losses"]), 4, budget_paired_source)
     expect_close(
-        "Hybrid B40 exact p over BM25",
-        float(b40_hybrid["exact_mcnemar_p"]),
-        0.03468966484069824,
+        "Budget B40 exact p",
+        float(b40["exact_mcnemar_p"]),
+        0.007197380065917969,
         budget_paired_source,
         tol=1e-15,
     )
@@ -594,13 +600,14 @@ def verify_retrieve_then_localize_controls() -> None:
     key_rows = [
         row
         for row in disagreements
-        if row["baseline"] == "GLM5_KG_filelocal" and row["treatment"] == "GLM5_BM25_filelocal"
+        if row["baseline"] == "GLM5_KG_filelocal"
+        and row["treatment"] == "GLM5_BM25_filelocal"
     ]
-    expect_equal("Retrieve/localize KG-vs-BM25 disagreement count", len(key_rows), 58, disagreement_source)
+    expect_equal("Retrieve/localize KG-vs-BM25 disagreement count", len(key_rows), 57, disagreement_source)
     expect_equal(
         "Retrieve/localize KG-vs-BM25 treatment-only count",
         sum(row["direction"] == "treatment_only" for row in key_rows),
-        39,
+        38,
         disagreement_source,
     )
     expect_equal(
@@ -610,26 +617,257 @@ def verify_retrieve_then_localize_controls() -> None:
         disagreement_source,
     )
 
+def verify_rrf_sensitivity() -> None:
+    source = "rrf_sensitivity_summary_20260715.tsv"
+    rows = read_tsv(source)
+    expected_hits = {
+        "k10": 64.8,
+        "k30": 63.2,
+        "k60": 62.6,
+        "k100": 62.4,
+        "w30_70": 57.8,
+        "w40_60": 57.2,
+        "w60_40": 58.8,
+        "w70_30": 59.2,
+    }
+    expect_row_set("RRF sensitivity row set", rows, "name", list(expected_hits), source)
+    for name, expected_hit in expected_hits.items():
+        expect_close(
+            f"RRF sensitivity {name} Hit",
+            pct(row_by(rows, "name", name)["hit_rate"]),
+            expected_hit,
+            source,
+        )
+
+    paired_source = "rrf_sensitivity_paired_20260715.tsv"
+    paired = read_tsv(paired_source)
+    k10 = next(
+        row
+        for row in paired
+        if row["baseline"] == "k60"
+        and row["treatment"] == "k10"
+        and row["metric"] == "hit"
+    )
+    expect_close("RRF k10-k60 Hit delta", pct(k10["delta"]), 2.2, paired_source)
+    expect_close("RRF k10-k60 Hit CI low", pct(k10["ci95_low"]), 0.6, paired_source)
+    expect_close("RRF k10-k60 Hit CI high", pct(k10["ci95_high"]), 4.0, paired_source)
+    expect_equal("RRF k10-k60 Hit wins", int(k10["wins"]), 15, paired_source)
+    expect_equal("RRF k10-k60 Hit losses", int(k10["losses"]), 4, paired_source)
+    expect_close(
+        "RRF k10-k60 exact p",
+        float(k10["exact_mcnemar_p"]),
+        0.0192108154296875,
+        paired_source,
+        tol=1e-15,
+    )
+
+
+def verify_external_localizers() -> None:
+    source = "external_localizer_fusion_summary_20260715.tsv"
+    rows = read_tsv(source)
+    expected = {
+        "CoSIL-Qwen2.5-32B+MURAL-2": (93.2, 70.7, 53.7, 79.8),
+        "LocAgent-Qwen2.5-32B+MURAL-2": (90.0, 67.5, 56.2, 75.8),
+        "Agentless-Qwen2.5-32B+MURAL-2": (91.6, 65.7, 46.2, 74.4),
+        "CoSIL-Qwen2.5-32B": (85.0, 55.9, 52.0, 65.6),
+        "LocAgent-Qwen2.5-32B": (76.2, 52.0, 53.0, 61.2),
+        "Agentless-Qwen2.5-32B": (81.4, 48.3, 43.2, 57.8),
+        "OrcaLoca-Qwen2.5-32B+MURAL-2": (85.2, 40.1, 22.8, 48.2),
+        "OrcaLoca-Qwen2.5-32B": (69.0, 17.6, 16.8, 21.4),
+    }
+    expect_row_set("External localizer row set", rows, "name", list(expected), source)
+    for name, values in expected.items():
+        expect_metric_row(source, row_by(rows, "name", name), values, f"External localizer {name}")
+
+    paired_source = "external_localizer_fusion_paired_20260715.tsv"
+    paired = read_tsv(paired_source)
+    expected_paired = {
+        "CoSIL-Qwen2.5-32B": (14.2, 11.2, 17.2, 71, 0, 8.470329472543003e-22),
+        "Agentless-Qwen2.5-32B": (16.6, 13.4, 20.0, 84, 1, 4.446095792472524e-24),
+        "LocAgent-Qwen2.5-32B": (14.6, 11.6, 17.8, 74, 1, 4.0234064994579266e-21),
+        "OrcaLoca-Qwen2.5-32B": (26.8, 23.0, 30.8, 134, 0, 9.183549615799121e-41),
+    }
+    expect_equal(
+        "External localizer paired baseline set",
+        [row["baseline"] for row in paired],
+        list(expected_paired),
+        paired_source,
+    )
+    for baseline, values in expected_paired.items():
+        row = row_by(paired, "baseline", baseline)
+        delta, low, high, wins, losses, p_value = values
+        expect_close(f"{baseline} MURAL Hit delta", pct(row["delta"]), delta, paired_source)
+        expect_close(f"{baseline} MURAL Hit CI low", pct(row["ci95_low"]), low, paired_source)
+        expect_close(f"{baseline} MURAL Hit CI high", pct(row["ci95_high"]), high, paired_source)
+        expect_equal(f"{baseline} MURAL Hit wins", int(row["wins"]), wins, paired_source)
+        expect_equal(f"{baseline} MURAL Hit losses", int(row["losses"]), losses, paired_source)
+        expect_close(
+            f"{baseline} MURAL exact p",
+            float(row["exact_mcnemar_p"]),
+            p_value,
+            paired_source,
+            tol=1e-15,
+        )
+
+def verify_repository_localization() -> None:
+    source = "repository_localization_breakdown_20260715.tsv"
+    rows = read_tsv(source)
+    repositories = sorted({row["repository"] for row in rows if row["repository"] != "ALL"})
+    expect_equal("Localization repository count", len(repositories), 12, source)
+    expect_equal(
+        "Localization repository instance total",
+        sum(
+            int(next(row["N"] for row in rows if row["repository"] == repo))
+            for repo in repositories
+        ),
+        500,
+        source,
+    )
+    wins = ties = losses = 0
+    for repo in repositories:
+        baseline = next(
+            row for row in rows
+            if row["repository"] == repo and row["method"] == "BM25-local"
+        )
+        treatment = next(
+            row for row in rows
+            if row["repository"] == repo and row["method"] == "MURAL-3"
+        )
+        delta = float(treatment["hit_rate"]) - float(baseline["hit_rate"])
+        wins += delta > 1e-12
+        losses += delta < -1e-12
+        ties += abs(delta) <= 1e-12
+    expect_equal("MURAL-3 repository Hit wins", wins, 8, source)
+    expect_equal("MURAL-3 repository Hit ties", ties, 4, source)
+    expect_equal("MURAL-3 repository Hit losses", losses, 0, source)
+
+    expected_all = {
+        "BM25-local": (73.6, 50.1, 28.8, 57.0),
+        "MURAL-2": (77.0, 55.2, 32.0, 62.6),
+        "MURAL-3": (83.0, 59.6, 34.5, 67.2),
+    }
+    for name, values in expected_all.items():
+        row = next(
+            row for row in rows
+            if row["repository"] == "ALL" and row["method"] == name
+        )
+        observed = (
+            pct(row["file_rate"]),
+            pct(row["entity_coverage"]),
+            pct(row["mrr"]),
+            pct(row["hit_rate"]),
+        )
+        for metric, value, expected_value in zip(
+            ("file", "entity", "mrr", "hit"),
+            observed,
+            values,
+        ):
+            expect_close(
+                f"Repository localization ALL {name} {metric}",
+                value,
+                expected_value,
+                source,
+            )
+
+
+def verify_repository_repair() -> None:
+    source = "repository_repair_breakdown_20260715.tsv"
+    rows = read_tsv(source)
+    repositories = sorted({row["repository"] for row in rows if row["repository"] != "ALL"})
+    expect_equal("Repair repository count", len(repositories), 12, source)
+    expect_equal(
+        "Repair repository instance total",
+        sum(
+            int(next(row["N"] for row in rows if row["repository"] == repo))
+            for repo in repositories
+        ),
+        500,
+        source,
+    )
+    wins = ties = losses = 0
+    for repo in repositories:
+        baseline = next(
+            row for row in rows
+            if row["repository"] == repo and row["variant"] == "issue"
+        )
+        treatment = next(
+            row for row in rows
+            if row["repository"] == repo and row["variant"] == "mural"
+        )
+        delta = float(treatment["resolved_rate"]) - float(baseline["resolved_rate"])
+        wins += delta > 1e-12
+        losses += delta < -1e-12
+        ties += abs(delta) <= 1e-12
+    expect_equal("MURAL repair repository wins", wins, 8, source)
+    expect_equal("MURAL repair repository ties", ties, 4, source)
+    expect_equal("MURAL repair repository losses", losses, 0, source)
+
+    expected_all = {
+        "issue": (416, 415, 112, 22.4),
+        "bm25": (453, 451, 134, 26.8),
+        "mural": (450, 446, 146, 29.2),
+    }
+    for name, values in expected_all.items():
+        row = next(
+            row for row in rows
+            if row["repository"] == "ALL" and row["variant"] == name
+        )
+        nonempty, applied, resolved, rate = values
+        expect_equal(f"Repository repair ALL {name} nonempty", int(row["nonempty"]), nonempty, source)
+        expect_equal(f"Repository repair ALL {name} applied", int(row["applied"]), applied, source)
+        expect_equal(f"Repository repair ALL {name} resolved", int(row["resolved"]), resolved, source)
+        expect_close(f"Repository repair ALL {name} rate", pct(row["resolved_rate"]), rate, source)
+
+
+def verify_context_construction_cost() -> None:
+    source = "context_construction_cost_20260715.tsv"
+    rows = read_tsv(source)
+    expect_row_set(
+        "Context-construction cost stage set",
+        rows,
+        "stage",
+        ["structural_adapter", "bm25_file_local", "equal_weight_rrf"],
+        source,
+    )
+    structural = row_by(rows, "stage", "structural_adapter")
+    expect_equal("Structural timing instances", int(structural["N"]), 500, source)
+    expect_close("Structural timing total seconds", float(structural["total_s"]), 37685.355161, source, tol=1e-6)
+    expect_close("Structural timing mean seconds", float(structural["mean_s"]), 75.370710322, source, tol=1e-9)
+    expect_close("Structural timing median seconds", float(structural["median_s"]), 66.9057985, source, tol=1e-9)
+    expect_close("Structural timing p95 seconds", float(structural["p95_s"]), 167.398309, source, tol=1e-6)
+    expect_close("Structural timing max seconds", float(structural["max_s"]), 248.492437, source, tol=1e-6)
+
+    bm25 = row_by(rows, "stage", "bm25_file_local")
+    expect_close("BM25-local total seconds", float(bm25["total_s"]), 920.45, source, tol=1e-6)
+    expect_close("BM25-local mean seconds", float(bm25["mean_s"]), 1.8409, source, tol=1e-9)
+    expect_close("BM25-local max RSS MiB", float(bm25["max_rss_mib"]), 203.33203125, source, tol=1e-9)
+
+    rrf = row_by(rows, "stage", "equal_weight_rrf")
+    expect_close("RRF total seconds", float(rrf["total_s"]), 5.21, source, tol=1e-6)
+    expect_close("RRF mean seconds", float(rrf["mean_s"]), 0.01042, source, tol=1e-9)
+    expect_close("RRF max RSS MiB", float(rrf["max_rss_mib"]), 25.24609375, source, tol=1e-9)
 
 def verify_rq2() -> None:
     source = "retrieve_then_localize_top20_20260711.tsv"
     rows = read_tsv(source)
     expected = {
         "GLM5_issue": (87.4, 53.0, 51.2, 62.4),
-        "GLM5_KG_filelocal": (93.2, 65.5, 53.7, 74.0),
+        "GLM5_KG_filelocal": (93.2, 65.9, 53.7, 74.2),
         "GLM5_BM25_filelocal": (94.2, 69.2, 54.4, 78.0),
-        "GLM5_BM25_KG_RRF_filelocal": (94.6, 70.9, 54.7, 79.0),
+        "GLM5_BM25_KG_RRF_filelocal": (94.6, 71.1, 54.8, 79.2),
     }
     for name, values in expected.items():
         expect_metric_row(source, row_by(rows, "name", name), values, f"RQ2 {name}")
 
     controls_source = "glm5_baseline_fusion_controls_top10_20260614.tsv"
     controls = read_tsv(controls_source)
-    control_rows = [
-        "GLM5_issue_only",
-        "GLM5_CodeGraph_ht10",
-    ]
-    expect_row_set("RQ2 GLM-5 tail-control row set", controls, "name", control_rows, controls_source)
+    expect_row_set(
+        "RQ2 GLM-5 tail-control row set",
+        controls,
+        "name",
+        ["GLM5_issue_only", "GLM5_CodeGraph_ht10"],
+        controls_source,
+    )
     control_expected = {
         "GLM5_issue_only": (87.4, 53.0, 51.2, 62.4, 0, 0),
         "GLM5_CodeGraph_ht10": (93.6, 60.9, 53.0, 69.6, 36, 0),
@@ -640,6 +878,7 @@ def verify_rq2() -> None:
         expect_equal(f"RQ2 GLM tail {name} hit wins", int(row["hit_wins_vs_issue"]), values[4], controls_source)
         expect_equal(f"RQ2 GLM tail {name} hit losses", int(row["hit_losses_vs_issue"]), values[5], controls_source)
 
+    verify_external_localizers()
 
 def verify_rq4() -> None:
     summary_source = "repair_glm5_summary_20260715.tsv"
@@ -981,45 +1220,56 @@ def verify_rq4() -> None:
     )
 
 
+    verify_repository_repair()
+
 def verify_patch_derived_context() -> None:
     source = "patch_derived_context_summary_20260702.tsv"
     rows = read_tsv(source)
-    expected_rows = [
-        "BM25",
-        "KGCompass w/o file-local paths",
-        "KGCompass",
-        "GLM-5 issue-only",
-        "GLM-5+KGCompass",
-        "BM25 files + file-local",
-        "BM25+KG RRF file-local",
-        "GLM-5 + BM25 files + file-local",
-        "GLM-5 + BM25+KG RRF file-local",
-    ]
-    expect_row_set("Patch-derived context row set", rows, "name", expected_rows, source)
     expected = {
         "BM25": (500, 39.2, 35.0),
-        "KGCompass w/o file-local paths": (500, 33.8, 30.8),
-        "KGCompass": (500, 45.4, 41.4),
+        "KG graph-only": (500, 33.8, 30.8),
+        "BM25 files + local": (500, 50.1, 44.6),
+        "KG file-local": (500, 45.3, 41.2),
+        "MURAL-2": (500, 55.2, 49.0),
         "GLM-5 issue-only": (500, 53.0, 46.2),
-        "GLM-5+KGCompass": (500, 65.5, 58.8),
-        "BM25 files + file-local": (500, 50.1, 44.6),
-        "BM25+KG RRF file-local": (500, 55.3, 49.0),
-        "GLM-5 + BM25 files + file-local": (500, 69.2, 62.2),
-        "GLM-5 + BM25+KG RRF file-local": (500, 70.9, 64.2),
+        "GLM-5 + KG local": (500, 65.9, 59.2),
+        "GLM-5 + BM25 local": (500, 69.2, 62.0),
+        "GLM-5 + MURAL-2": (500, 71.1, 64.4),
     }
+    expect_row_set("Patch-derived context row set", rows, "name", list(expected), source)
     for name, values in expected.items():
         row = row_by(rows, "name", name)
         n, edit_recall, complete_edit = values
         expect_equal(f"Patch context {name} N", int(row["N"]), n, source)
-        expect_close(f"Patch context {name} edit target recall", pct(row["edit_target_recall"]), edit_recall, source)
-        expect_close(f"Patch context {name} complete edit target", pct(row["complete_edit_target_rate"]), complete_edit, source)
+        expect_close(
+            f"Patch context {name} edit target recall",
+            pct(row["edit_target_recall"]),
+            edit_recall,
+            source,
+        )
+        expect_close(
+            f"Patch context {name} complete edit target",
+            pct(row["complete_edit_target_rate"]),
+            complete_edit,
+            source,
+        )
 
     json_source = "patch_derived_context_summary_20260702.json"
     json_rows = read_json(json_source)["rows"]
-    expect_equal("Patch context JSON row set", sorted(json_rows), sorted(expected), json_source)
+    expect_equal("Patch context JSON row set", list(json_rows), list(expected), json_source)
     for name, (_, edit_recall, complete_edit) in expected.items():
-        expect_close(f"Patch context JSON {name} edit target recall", pct(json_rows[name]["edit_target_recall"]), edit_recall, json_source)
-        expect_close(f"Patch context JSON {name} complete edit target", pct(json_rows[name]["complete_edit_target_rate"]), complete_edit, json_source)
+        expect_close(
+            f"Patch context JSON {name} edit target recall",
+            pct(json_rows[name]["edit_target_recall"]),
+            edit_recall,
+            json_source,
+        )
+        expect_close(
+            f"Patch context JSON {name} complete edit target",
+            pct(json_rows[name]["complete_edit_target_rate"]),
+            complete_edit,
+            json_source,
+        )
 
     target_source = "patch_derived_context_targets_20260702.json"
     targets = read_json(target_source)
@@ -1041,22 +1291,27 @@ def verify_patch_derived_context() -> None:
     )
 
     paired_source = "edit_target_paired_stats_20260713.tsv"
-    paired_rows = read_tsv(paired_source)
+    paired = read_tsv(paired_source)
     expected_paired = {
-        ("BM25", "BM25_filelocal", "edit_recall"): (10.9, 6.6, 15.1, 121, 54, None),
-        ("BM25", "BM25_filelocal", "complete_edit"): (9.6, 5.4, 14.0, 88, 40, 2.6629957497431587e-05),
-        ("KG_grounded", "KG_filelocal", "edit_recall"): (11.7, 8.8, 14.6, 79, 10, None),
-        ("KG_grounded", "KG_filelocal", "complete_edit"): (10.6, 7.6, 13.8, 60, 7, 1.3280368233066497e-11),
-        ("BM25_filelocal", "MURAL", "edit_recall"): (5.2, 2.6, 7.9, 49, 21, None),
-        ("BM25_filelocal", "MURAL", "complete_edit"): (4.4, 1.8, 7.2, 35, 13, 0.0020881073339964473),
-        ("GLM5_BM25_filelocal", "GLM5_MURAL", "edit_recall"): (1.6, -0.2, 3.6, 27, 17, None),
-        ("GLM5_BM25_filelocal", "GLM5_MURAL", "complete_edit"): (2.0, 0.0, 4.0, 19, 9, 0.08715855330228806),
+        ("BM25 raw", "BM25 local", "edit_recall"): (10.9, 6.6, 15.2, 122, 55, None),
+        ("BM25 raw", "BM25 local", "complete_edit"): (9.6, 5.2, 14.0, 89, 41, 3.092192388382927e-05),
+        ("KG raw", "KG local", "edit_recall"): (11.5, 8.7, 14.4, 80, 9, None),
+        ("KG raw", "KG local", "complete_edit"): (10.4, 7.4, 13.6, 59, 7, 2.3834933267526115e-11),
+        ("BM25 local", "MURAL-2", "edit_recall"): (5.1, 2.4, 7.8, 50, 22, None),
+        ("BM25 local", "MURAL-2", "complete_edit"): (4.4, 1.8, 7.2, 36, 14, 0.0026021714567221466),
+        ("GLM issue", "GLM+MURAL-2", "edit_recall"): (18.1, 15.1, 21.3, 123, 0, None),
+        ("GLM issue", "GLM+MURAL-2", "complete_edit"): (18.2, 14.8, 21.6, 91, 0, 8.077935669463161e-28),
+        ("GLM+BM25", "GLM+MURAL-2", "edit_recall"): (2.0, 0.0, 3.9, 29, 17, None),
+        ("GLM+BM25", "GLM+MURAL-2", "complete_edit"): (2.4, 0.2, 4.6, 21, 9, 0.04277394525706768),
     }
-    observed_keys = [(row["baseline"], row["treatment"], row["metric"]) for row in paired_rows]
-    expect_equal("Patch context paired row set", observed_keys, list(expected_paired), paired_source)
-    for row in paired_rows:
-        key = (row["baseline"], row["treatment"], row["metric"])
-        delta, low, high, wins, losses, p_value = expected_paired[key]
+    observed = {
+        (row["baseline"], row["treatment"], row["metric"]): row
+        for row in paired
+    }
+    for key, values in expected_paired.items():
+        expect_equal(f"Patch context paired row exists {key}", key in observed, True, paired_source)
+        row = observed[key]
+        delta, low, high, wins, losses, p_value = values
         prefix = f"Patch context paired {key[0]}->{key[1]} {key[2]}"
         expect_equal(f"{prefix} N", int(row["N"]), 500, paired_source)
         expect_close(f"{prefix} delta", pct(row["delta"]), delta, paired_source)
@@ -1067,8 +1322,13 @@ def verify_patch_derived_context() -> None:
         if p_value is None:
             expect_equal(f"{prefix} exact p", row["exact_mcnemar_p"], "NA", paired_source)
         else:
-            expect_close(f"{prefix} exact p", float(row["exact_mcnemar_p"]), p_value, paired_source, tol=1e-15)
-
+            expect_close(
+                f"{prefix} exact p",
+                float(row["exact_mcnemar_p"]),
+                p_value,
+                paired_source,
+                tol=1e-15,
+            )
 
 def verify_boundary() -> None:
     audit_source = "kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json"

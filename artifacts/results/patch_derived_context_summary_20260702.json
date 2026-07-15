@@ -11,21 +11,37 @@
       "edit_target_recall": 0.3920462481962482,
       "complete_edit_target_rate": 0.35
     },
-    "KGCompass w/o file-local paths": {
-      "name": "KGCompass w/o file-local paths",
+    "KG graph-only": {
+      "name": "KG graph-only",
       "family": "controlled",
       "source": "runs/kg_verified_evidence_graph/tse_timesafe_main_20260529_v6",
       "N": 500,
       "edit_target_recall": 0.3377373737373737,
       "complete_edit_target_rate": 0.308
     },
-    "KGCompass": {
-      "name": "KGCompass",
+    "BM25 files + local": {
+      "name": "BM25 files + local",
       "family": "controlled",
-      "source": "runs/kg_verified_evidence_graph/tse_timesafe_main_20260531_pathunion_v1",
+      "source": "temp_run/mural_experiment_additions/selector_minimal_20260715c/title_exact_file_rank_ast",
       "N": 500,
-      "edit_target_recall": 0.4542596681096681,
-      "complete_edit_target_rate": 0.414
+      "edit_target_recall": 0.5010113275613275,
+      "complete_edit_target_rate": 0.446
+    },
+    "KG file-local": {
+      "name": "KG file-local",
+      "family": "controlled",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/kg_local",
+      "N": 500,
+      "edit_target_recall": 0.4527596681096681,
+      "complete_edit_target_rate": 0.412
+    },
+    "MURAL-2": {
+      "name": "MURAL-2",
+      "family": "controlled",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_2src",
+      "N": 500,
+      "edit_target_recall": 0.5519722222222222,
+      "complete_edit_target_rate": 0.49
     },
     "GLM-5 issue-only": {
       "name": "GLM-5 issue-only",
@@ -35,45 +51,29 @@
       "edit_target_recall": 0.529893573093573,
       "complete_edit_target_rate": 0.462
     },
-    "GLM-5+KGCompass": {
-      "name": "GLM-5+KGCompass",
+    "GLM-5 + KG local": {
+      "name": "GLM-5 + KG local",
       "family": "fusion",
-      "source": "temp_run/fusions_glm5_baseline_controls_20260614_head10/GLM5_KGCompass_ht10",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_kg_b20_p10",
       "N": 500,
-      "edit_target_recall": 0.6547932484182485,
-      "complete_edit_target_rate": 0.588
+      "edit_target_recall": 0.6585265817515819,
+      "complete_edit_target_rate": 0.592
     },
-    "BM25 files + file-local": {
-      "name": "BM25 files + file-local",
-      "family": "bm25_filelocal",
-      "source": "temp_run/private_bm25_filelocal_20260704/bm25_top20_files_filelocal",
+    "GLM-5 + BM25 local": {
+      "name": "GLM-5 + BM25 local",
+      "family": "fusion",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_bm25_b20_p10",
       "N": 500,
-      "edit_target_recall": 0.5007613275613275,
-      "complete_edit_target_rate": 0.446
+      "edit_target_recall": 0.691663197913198,
+      "complete_edit_target_rate": 0.62
     },
-    "BM25+KG RRF file-local": {
-      "name": "BM25+KG RRF file-local",
-      "family": "bm25_kg_rrf_filelocal",
-      "source": "temp_run/private_bm25_filelocal_20260704/hybrid_rrf/BM25_KG_deterministic_rrf",
+    "GLM-5 + MURAL-2": {
+      "name": "GLM-5 + MURAL-2",
+      "family": "fusion",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural2_b20_p10",
       "N": 500,
-      "edit_target_recall": 0.5528888888888888,
-      "complete_edit_target_rate": 0.49
-    },
-    "GLM-5 + BM25 files + file-local": {
-      "name": "GLM-5 + BM25 files + file-local",
-      "family": "glm5_bm25_filelocal",
-      "source": "temp_run/private_bm25_filelocal_20260704/budget_fusions/GLM5_BM25FileLocal_b20_p10",
-      "N": 500,
-      "edit_target_recall": 0.6922465312465312,
-      "complete_edit_target_rate": 0.622
-    },
-    "GLM-5 + BM25+KG RRF file-local": {
-      "name": "GLM-5 + BM25+KG RRF file-local",
-      "family": "glm5_bm25_kg_rrf_filelocal",
-      "source": "temp_run/private_bm25_filelocal_20260704/hybrid_rrf/deterministic_budget_fusions/GLM5_Hybrid_b20_p10",
-      "N": 500,
-      "edit_target_recall": 0.7086232267732268,
-      "complete_edit_target_rate": 0.642
+      "edit_target_recall": 0.7112065601065601,
+      "complete_edit_target_rate": 0.644
     }
   }
 }

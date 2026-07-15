@@ -1,0 +1,9 @@
+name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
+k10	500	20	0.798	0.5704615079365081	0.32641340521363726	0.648	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k10_w50_50
+k30	500	20	0.776	0.5563246031746031	0.32101329935114764	0.632	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k30_w50_50
+k60	500	20	0.77	0.5519722222222222	0.3199049013765731	0.626	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k60_w50_50
+k100	500	20	0.77	0.5499722222222222	0.31983574932978953	0.624	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k100_w50_50
+w30_70	500	20	0.688	0.520216919191919	0.3190994323787667	0.578	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k60_w30_70
+w40_60	500	20	0.678	0.5124835858585858	0.31392100153888075	0.572	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k60_w40_60
+w60_40	500	20	0.718	0.5174676767676767	0.31091918318179923	0.588	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k60_w60_40
+w70_30	500	20	0.724	0.5200391053391054	0.3132493153045784	0.592	temp_run/mural_experiment_additions/selector_compact_main_20260715/rrf_sensitivity/k60_w70_30

@@ -1,49 +1,23 @@
 # MURAL
 
-MURAL (Multi-source Unification of Retrieval And Localization) is a
-fixed-budget repair-context system for issue-driven repository repair. It
-passes BM25 and typed-knowledge-graph file rankings through the same
-source-agnostic local selector, fuses the resulting entity rankings, and can
-fill the unused tail of an existing localizer's context window.
+MURAL (Multi-source Unification of Retrieval And Localization) constructs a
+fixed-budget code context for issue-driven repository repair. Ranked-file
+sources pass through one compact file-local selector, completed entity rankings
+are combined with reciprocal-rank fusion (RRF), and an optional localizer prefix
+is preserved while MURAL fills the remaining positions.
 
-This repository is the public artifact for the MURAL manuscript. It keeps the
-demo, core scripts, and submission-facing ledgers needed to audit the reported
-quantitative claims and the separately compiled supplementary material.
-Older diagnostics, unreported ablations, partial intermediate results, and the
-retired KG-only downstream repair study are intentionally omitted from
-`artifacts/results/`.
-The `kgcompass/` package name and frozen `KGCompass` result labels are retained
-for compatibility; the artifact notes map them to the manuscript terminology.
+This repository is the public artifact for the MURAL manuscript and its
+separately compiled supplementary material. The historical `kgcompass/`
+package name remains for API compatibility. In frozen ledgers, `KGCompass`
+corresponds to the paper's `KG-local` source.
 
-## Repository Layout
-
-| Path | Purpose |
-| --- | --- |
-| `app.py`, `demo_web.py`, `static/`, `templates/` | Local web demo. |
-| `kgcompass/` | Core localization and repair modules (legacy package name). |
-| `scripts/` | Workspace scripts used to build localization and summary ledgers. |
-| `artifacts/` | Submission-facing result ledgers, prompts, audit notes, and verifier. |
-| `artifacts/results/` | Small committed ledgers aligned with manuscript tables and claims. |
-| `artifacts/repair_protocol_glm5_20260715.json` | Fingerprinted RQ-4 repair protocol. |
-| `artifacts/RESULT_TRACEABILITY.md` | Mapping from manuscript claims to artifact files and rerun commands. |
-
-## Quick Start
-
-Create a Python environment:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Run the submission-side verifier:
+## Verify the reported results
 
 ```bash
 python3 artifacts/scripts/verify_paper_results.py
 ```
 
-Expected result:
+A successful run reports:
 
 ```json
 {
@@ -53,45 +27,52 @@ Expected result:
 }
 ```
 
-The verifier reads only files committed under `artifacts/results/` and checks
-the ground-truth mapping, controlled context windows, fixed-prefix fusion,
-supplementary budget sensitivity, mapped edit-target coverage, the complete
-GLM-5 repair ledger and request audit, and leakage/sensitivity statements.
+The verifier checks the exact result inventory and 1,500+ values and contracts,
+including target mapping, localization, paired significance tests, edit-target
+coverage, official repair outcomes, complete benchmark splits, repository
+breakdowns, and context-construction cost.
 
-## Submission-Facing Results
+## Repository layout
 
-The main ledgers are:
+| Path | Purpose |
+| --- | --- |
+| `kgcompass/` | Core localization and repair implementation. |
+| `scripts/` | Full-workspace experiment and aggregation scripts. |
+| `artifacts/scripts/` | Submission-side exporters, evaluators, analyzers, and verifier. |
+| `artifacts/results/` | Ledgers used by the manuscript and supplementary material. |
+| `artifacts/inputs/` | Frozen provenance records and Java structural-source inputs. |
+| `artifacts/prompts/` | Verbatim localization and repair prompts. |
+| `artifacts/RESULT_TRACEABILITY.md` | Claim-to-ledger mapping and rerun commands. |
 
-- `artifacts/results/tse_gt_mapping_v6.tsv`
-- `artifacts/results/path_mining_file_expansion_ablation_20260531.tsv`
-- `artifacts/results/retrieve_then_localize_top20_20260711.tsv`
-- `artifacts/results/retrieve_then_localize_paired_20260711.tsv`
-- `artifacts/results/retrieve_then_localize_budget_curve_20260711.tsv`
-- `artifacts/results/glm5_baseline_fusion_controls_top10_20260614.tsv`
-- `artifacts/results/patch_derived_context_summary_20260702.tsv`
-- `artifacts/results/repair_glm5_summary_20260715.tsv`
-- `artifacts/results/repair_glm5_outcomes_20260715.tsv`
-- `artifacts/results/repair_glm5_assembly_20260715.tsv`
-- `artifacts/results/repair_glm5_context_rendering_20260715.tsv`
-- `artifacts/results/repair_glm5_prediction_mapping_20260715.tsv`
+The main result families are:
 
-See `artifacts/RESULT_TRACEABILITY.md` for the complete file-to-claim mapping
-and the full-workspace commands used to produce the ledgers.
+- controlled BM25, KG, dense, and MURAL localization;
+- compact-selector simplification and RRF/budget sensitivity;
+- fixed-prefix GLM-5 and released Qwen2.5-32B localizer augmentation;
+- mapped edit-target recall and complete coverage;
+- the complete 500-by-3 GLM-5 repair outcome ledger;
+- the complete 91-instance SWE-bench-Java Verified evaluation;
+- per-repository and context-construction-cost breakdowns.
 
-## Web Demo
+See `artifacts/README.md` for the retained file inventory and
+`artifacts/RESULT_TRACEABILITY.md` for exact provenance.
 
-Install the smaller web-demo dependency set if you only want to run the UI:
+## Environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Full reruns additionally require benchmark checkouts and archived model outputs
+described in `artifacts/RESULT_TRACEABILITY.md`.
+
+## Web demo
 
 ```bash
 pip install -r requirements_web.txt
 python3 demo_web.py
 ```
 
-Or start the Flask app directly:
-
-```bash
-python3 app.py
-```
-
-The web app writes generated outputs to `web_outputs/` at runtime. Those outputs
-are intentionally ignored by the repository.
+The Flask entry point is also available through `python3 app.py`.

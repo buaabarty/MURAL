@@ -66,7 +66,6 @@ def make_seed(instance_id: str, file_info: dict, support_mode: str, source_name:
     rank = int(file_info["file_rank"])
     support = int(file_info["support"]) if support_mode == "count" else 0
     source_upper = source_name.upper()
-    source_display = "BM25" if source_name == "bm25" else source_name.capitalize()
     score_field = "best_bm25_score" if source_name == "bm25" else "best_method_score"
     return {
         "type": "method",
@@ -95,7 +94,7 @@ def make_seed(instance_id: str, file_info: dict, support_mode: str, source_name:
                 "start_type": "issue",
                 "end_type": "file",
                 "type": f"{source_upper}_FILE_SEED",
-                "description": f"selected by {source_display} file ranking",
+                "description": f"selected by {source_name} file ranking",
                 "file_rank": rank,
                 "best_method_rank": int(file_info["best_method_rank"]),
                 score_field: float(file_info["best_method_score"]),
@@ -110,8 +109,8 @@ def convert_one(
     max_files: int,
     scan_methods: int | None,
     support_mode: str,
-    source_name: str = "bm25",
-    uses_embeddings: bool = False,
+    source_name: str,
+    uses_embeddings: bool,
 ) -> dict:
     files = select_files(ranked_methods(payload), max_files, scan_methods)
     output = deepcopy(payload)

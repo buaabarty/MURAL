@@ -16,6 +16,7 @@ import keyword
 import os
 import re
 import sys
+import tempfile
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -25,21 +26,16 @@ from datasets import Dataset
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+PLAYGROUND_ROOT = REPO_ROOT / "playground"
 sys.path.insert(0, str(REPO_ROOT / "kgcompass"))
 import utils  # type: ignore  # noqa: E402
 
 
-SELECTOR_GROUPS = {"G1", "G2", "G3", "G4", "G5"}
-_selector_ablation_raw = os.environ.get("MURAL_ABLATE", "").strip().upper()
-if _selector_ablation_raw in {"", "FULL"}:
-    SELECTOR_ABLATION = None
-elif _selector_ablation_raw in SELECTOR_GROUPS:
-    SELECTOR_ABLATION = _selector_ablation_raw
-else:
-    raise ValueError(
-        "MURAL_ABLATE must be empty, FULL, or one of "
-        f"{', '.join(sorted(SELECTOR_GROUPS))}; got {_selector_ablation_raw!r}"
-    )
+SELECTOR_VERSION = "compact_title_exact_file_rank_ast_v1"
+# The shared parser materializes source files, so isolate concurrent exporters.
+PARSER_TEMP_ROOT = Path(tempfile.gettempdir()) / f"mural-selector-{os.getpid()}"
+PARSER_TEMP_ROOT.mkdir(parents=True, exist_ok=True)
+tempfile.tempdir = str(PARSER_TEMP_ROOT)
 
 
 STOPWORDS = {
@@ -304,7 +300,7 @@ def load_ids(ids_file: Path) -> List[str]:
 def iter_local_repo_roots(repo_full_name: str) -> Iterable[Path]:
     repo_id = repo_full_name.replace("/", "__")
     repo_name = repo_full_name.split("/")[-1]
-    for root in [REPO_ROOT / "playground" / repo_id, REPO_ROOT / "playground" / repo_name]:
+    for root in [PLAYGROUND_ROOT / repo_id, PLAYGROUND_ROOT / repo_name]:
         if root.is_dir():
             yield root
 
@@ -454,7 +450,58 @@ def parse_file_entities(repo: str, base_commit: str, file_path: str) -> Tuple[Li
     if content is None:
         return [], []
     classes, methods = utils.get_class_and_method_from_content(content, file_path, repo)
+    for method in methods or []:
+        method["signature"] = canonical_signature(method)
     return classes or [], methods or []
+
+
+def contains_set_literal(value: object) -> bool:
+    if isinstance(value, set):
+        return True
+    if isinstance(value, dict):
+        return any(
+            contains_set_literal(key) or contains_set_literal(item)
+            for key, item in value.items()
+        )
+    if isinstance(value, (list, tuple)):
+        return any(contains_set_literal(item) for item in value)
+    return False
+
+
+def stable_literal_repr(value: object) -> str:
+    if isinstance(value, set):
+        if not value:
+            return "set()"
+        values = sorted(stable_literal_repr(item) for item in value)
+        return "{" + ", ".join(values) + "}"
+    if isinstance(value, dict):
+        values = (
+            f"{stable_literal_repr(key)}: {stable_literal_repr(item)}"
+            for key, item in value.items()
+        )
+        return "{" + ", ".join(values) + "}"
+    if isinstance(value, list):
+        return "[" + ", ".join(stable_literal_repr(item) for item in value) + "]"
+    if isinstance(value, tuple):
+        body = ", ".join(stable_literal_repr(item) for item in value)
+        if len(value) == 1:
+            body += ","
+        return "(" + body + ")"
+    return repr(value)
+
+
+def canonical_signature(item: dict) -> str:
+    signature = str(item.get("signature") or item.get("name") or "")
+    if " = " not in signature:
+        return signature
+    prefix, raw_value = signature.split(" = ", 1)
+    try:
+        value = ast.literal_eval(raw_value)
+    except (SyntaxError, ValueError):
+        return signature
+    if not contains_set_literal(value):
+        return signature
+    return f"{prefix} = {stable_literal_repr(value)}"
 
 
 def score_item(item: dict, file_ev: dict, sections: dict, original_rank: int | None) -> dict:
@@ -500,48 +547,20 @@ def score_item(item: dict, file_ev: dict, sections: dict, original_rank: int | N
         "source_only_matches": sorted(source_only_signal),
         "original_kg_rank": original_rank,
     }
-    # The named groups match Table II in the manuscript. Concatenating every
-    # group preserves the released Full key exactly; MURAL_ABLATE removes one
-    # complete group for a leave-one-group-out analysis.
-    stable_fallback = [
-        1 if is_boilerplate(item) else 0,
+    boilerplate = 1 if is_boilerplate(item) else 0
+    if diagnostic_symbol and not (title_symbol or exact_symbol or narrative_symbol or source_only_signal):
+        boilerplate += 1
+    key = [
+        -len(title_symbol),
+        -len(title_source),
+        -len(exact_symbol),
+        -len(exact_source),
+        boilerplate,
+        int(file_ev.get("best_rank") or 999),
         int(item.get("start_line") or 0),
         item.get("name") or "",
     ]
-    if diagnostic_symbol and not (title_symbol or exact_symbol or narrative_symbol or source_only_signal):
-        stable_fallback[0] += 1
-    # G4 and G5 are signal families rather than contiguous slices: the
-    # released key places boilerplate demotion before the final source-rank
-    # tie-breaks. Keep that 15-component order unchanged for Full.
-    key_parts = [
-        ("G1", [-len(title_symbol), -len(title_source)]),
-        ("G2", [-len(exact_symbol), -len(exact_source)]),
-        ("G3", [-len(narrative_symbol), -len(source_only_signal), -len(narrative_source)]),
-        (
-            "G4",
-            [
-                -int(file_ev.get("support") or 0),
-                int(file_ev.get("distance") or 999),
-                0 if file_ev.get("anchor_match") else 1,
-            ],
-        ),
-        ("G5", stable_fallback[:1]),
-        (
-            "G4",
-            [
-                int(file_ev.get("best_rank") or 999),
-                int(original_rank or 9999),
-            ],
-        ),
-        ("G5", stable_fallback[1:]),
-    ]
-    key = [
-        value
-        for group_name, group_values in key_parts
-        if group_name != SELECTOR_ABLATION
-        for value in group_values
-    ]
-    evidence["path_mining"]["selector_ablation"] = SELECTOR_ABLATION or "FULL"
+    evidence["path_mining"]["selector_version"] = SELECTOR_VERSION
     item["ranking_key"] = key
     return item
 
@@ -549,7 +568,7 @@ def score_item(item: dict, file_ev: dict, sections: dict, original_rank: int | N
 def original_rank_map(items: List[dict]) -> Dict[str, int]:
     out = {}
     for idx, item in enumerate(items, start=1):
-        sig = item.get("signature") or item.get("name")
+        sig = canonical_signature(item)
         if sig and sig not in out:
             out[sig] = idx
     return out
@@ -629,25 +648,33 @@ def rerank_instance(data: dict, dataset_item: dict) -> dict:
     kg_params = out.setdefault("kg_params", {})
     source_uses_embeddings = bool(kg_params.get("uses_embeddings"))
     kg_params["retrieval_mode"] = "path_mined_file_local_expansion"
-    kg_params["score"] = "lexicographic_issue_file_source_path_mining"
+    kg_params["score"] = SELECTOR_VERSION
     kg_params["uses_embeddings"] = source_uses_embeddings
     kg_params["selector_uses_embeddings"] = False
     kg_params["uses_edge_weights"] = False
     kg_params["uses_discussion_comments"] = False
     kg_params["tunable_retrieval_parameters"] = []
-    kg_params["selector_ablation"] = SELECTOR_ABLATION or "FULL"
+    kg_params["selector_version"] = SELECTOR_VERSION
     out.setdefault("artifact_stats", {})["path_mined_files"] = len(file_map)
     return out
 
 
 def main() -> None:
+    global PLAYGROUND_ROOT
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--ids-file", default="SWE-bench_Verified_ids.jsonl", type=Path)
+    parser.add_argument(
+        "--playground-root",
+        type=Path,
+        default=PLAYGROUND_ROOT,
+        help="Directory containing repository checkouts named owner__repo or repo.",
+    )
     parser.add_argument("--limit", default=50, type=int)
     args = parser.parse_args()
 
+    PLAYGROUND_ROOT = args.playground_root
     ids = load_ids(args.ids_file)
     dataset = load_dataset_items(ids)
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -662,7 +689,7 @@ def main() -> None:
         out["related_entities"]["classes"] = out["related_entities"]["classes"][: args.limit]
         out.setdefault("run_meta", {})["path_mining_source_dir"] = str(args.input_dir)
         out.setdefault("run_meta", {})["tag"] = args.output_dir.name
-        out.setdefault("run_meta", {})["selector_ablation"] = SELECTOR_ABLATION or "FULL"
+        out.setdefault("run_meta", {})["selector_version"] = SELECTOR_VERSION
         (args.output_dir / f"{iid}.json").write_text(json.dumps(out, separators=(",", ":")))
         done += 1
         if done % 50 == 0 or done == len(ids):

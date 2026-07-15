@@ -1,147 +1,117 @@
 # MURAL Submission Artifacts
 
-This directory contains the files that directly support the MURAL manuscript
-and its separately compiled supplementary material. The result ledgers under
-`artifacts/results/` are restricted to reported rows and audit records.
-Unreported diagnostics, obsolete ablations, partial shard metrics, and the
-retired KG-only downstream repair study are not included.
+This directory contains the source snapshots, prompts, inputs, and result
+ledgers referenced by the MURAL manuscript and supplementary material.
 
-The implementation package and several frozen result-row names predate the
-MURAL framing. In retained ledgers, `KGCompass` denotes the manuscript's
-`KG-local` source, `BM25+KG RRF file-local` denotes standalone MURAL, and
-`GLM-5 + BM25+KG RRF file-local` denotes GLM-5+MURAL. Historical labels remain
-unchanged so archived commands and checksums stay stable.
+Frozen names predate the MURAL framing:
 
-## Top-Level Files
+- `KGCompass` means the `KG-local` source.
+- `BM25+KG RRF file-local` means standalone MURAL-2.
+- `GLM-5 + BM25+KG RRF file-local` means GLM-5+MURAL-2.
 
-- `motivating_case_django_15503.json`: evidence for the motivating example.
-- `issue_comment_boundary.json`: input-boundary and leakage-audit note.
-- `prompts/llm_fault_location_prompt.md`: verbatim LLM localization prompt,
-  reproduced in the supplementary material.
-- `prompts/glm5_repair_prompt.md`: verbatim system and user repair templates.
-- `repair_protocol_glm5_20260715.json`: dated endpoint, decoding, context
-  rendering, retry, deduplication, and official-test contracts for RQ-4.
-- `RESULT_TRACEABILITY.md`: file-to-claim mapping and reproduction commands.
-- `scripts/verify_paper_results.py`: strict result-inventory and value checker.
-- `scripts/export_ranked_file_seeds.py`: converts any ranked code-entity output
-  to source-labelled file records for the shared file-local selector; the
-  defaults preserve the original BM25 export.
-- `scripts/export_selector_ablation.py`: exports the Full selector and all five
-  leave-one-signal-family-out variants while caching parsed source files.
-- `scripts/export_fixed_prefix_fusion.py`: builds prefix-preserving context
-  windows under a fixed output budget.
-- `scripts/export_equal_rrf_fusion.py`: combines BM25-local and KG-local
-  rankings with deterministic RRF; defaults reproduce the manuscript's
-  predefined equal-weight configuration.
-- `scripts/export_multi_source_rrf_fusion.py`: applies the same deterministic
-  RRF contract to two or more named entity-ranking sources.
-- `scripts/analyze_retrieve_localize_controls.py`: computes aggregate metrics,
-  paired bootstrap intervals, exact McNemar tests, and disagreement records.
-- `scripts/evaluate_patch_derived_context.py`: computes mapped edit-target
-  recall and complete edit-target coverage.
-- `scripts/analyze_edit_target_paired_stats.py`: computes paired bootstrap
-  intervals and exact McNemar tests for the primary RQ-3 comparisons.
-- `scripts/assemble_repair_profile_predictions.py`: validates every frozen
-  request audit and emits complete per-variant SWE-bench prediction ledgers.
-- `scripts/deduplicate_repair_predictions.py`: maps exact same-instance patch
-  hashes to canonical official-evaluation slots without consulting an oracle.
-- `scripts/collect_swebench_reports.py`: normalizes strict official reports,
-  records harness-confirmed patch-application failures and test timeouts as
-  unresolved, and fails closed on infrastructure failures.
-- `scripts/materialize_repair_variant_reports.py`: maps canonical reports back
-  to every context variant after verifying the exact patch hash.
-- `scripts/analyze_repair_outcomes.py`: builds the complete 500-by-3 outcome
-  ledger and recomputes Resolved rates, paired intervals, and exact tests.
-- `scripts/run_repair_profile_batch.py`: reruns frozen location files with an
-  explicit first-attempt context profile and token limits, sequentially records
-  prompt/audit metadata, and resumes completed instances without sharing a
-  mutable repository checkout across workers.
-- `scripts/audit_repair_context_rendering.py`: audits candidate, rendered,
-  source-bearing, rank-band, and prompt-token counts without model calls.
-- `scripts/shard_repair_ids_by_repository.py`: creates repository-disjoint
-  generation shards so workers never mutate the same checkout.
-- `scripts/export_java_kg_file_seeds.py`: converts the archived Java structural
-  source to the same ranked-file contract without retaining entity source text
-  or graph traversal records; direct issue/PR-to-file provenance is retained as
-  aggregate file-level fields, with structural entity rank used to break tied
-  file-evidence records.
-- `scripts/evaluate_java_retrieve_localize.py`: rebuilds base-commit Java
-  entities, applies BM25 and the shared selector, freezes rankings, and then
-  maps official patches for the supplementary cross-language check.
-- `inputs/java_cross_language_manifest_20260714.json` and
-  `inputs/java_kg_ranked_file_seeds_20260714.jsonl`: provenance and the 91
-  ranked-file inputs for the Java structural source.
+## Core files
 
-## Main-Manuscript Ledgers
+- `motivating_case_django_15503.json`: motivating-example evidence.
+- `issue_comment_boundary.json`: evaluated information boundary.
+- `repair_protocol_glm5_20260715.json`: endpoint, decoding, context-rendering,
+  retry, deduplication, and official-test contracts for RQ-4.
+- `prompts/llm_fault_location_prompt.md`: localization prompt.
+- `prompts/glm5_repair_prompt.md`: repair system and user templates.
+- `RESULT_TRACEABILITY.md`: claim-to-ledger mapping and rerun commands.
 
-- `tse_gt_mapping_v6.tsv`: target-mapping summary for all 500 instances.
-- `path_mining_file_expansion_ablation_20260531.tsv`: BM25, BLUiR, CodeGraph,
-  graph-only KG, and KG-local controlled rows.
-- `retrieve_then_localize_top20_20260711.tsv`: matched BM25/KG file-source,
-  file-local, MURAL, and GLM-5 fixed-prefix rows.
-- `retrieve_then_localize_paired_20260711.tsv`: paired deltas, bootstrap
-  intervals, win/loss counts, and exact tests for the main comparisons.
-- `retrieve_then_localize_disagreements_20260711.tsv`: per-instance Hit@20
-  disagreement records for the reported source comparisons.
-- `ranked_file_source_coverage_20260711.tsv` and
-  `ranked_file_source_paired_20260711.tsv`: first-stage Top-20 file coverage.
-- `glm5_baseline_fusion_controls_top10_20260614.tsv`: fixed-prefix CodeGraph and
-  KG-local controls used in RQ-2.
-- `patch_derived_context_summary_20260702.tsv` and `.json`: mapped edit-target
-  coverage used in RQ-3.
-- `patch_derived_context_targets_20260702.json`: deterministic edit-target
-  cache used by the patch-derived evaluation.
-- `edit_target_paired_stats_20260713.tsv`: paired uncertainty for edit-target
-  recall and complete edit-target coverage in the primary RQ-3 comparisons.
-- `repair_glm5_summary_20260715.tsv`: aggregate and paired RQ-4 statistics for
-  the fixed audited GLM-5 repair workflow.
-- `repair_glm5_outcomes_20260715.tsv`: all 1,500 per-instance nonempty,
-  applicable, Resolved, and terminal-error indicators underlying that table.
-- `repair_glm5_assembly_20260715.tsv`: per-request frozen-dataset, context,
-  prompt, retry, applicability, and patch-hash audit.
-- `time_boundary_external_artifact_sensitivity_20260531.tsv`: external-artifact
-  sensitivity statement in threats to validity.
-- `kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json`: final
-  leakage-sentinel audit.
+## Retained scripts
 
-## Supplementary Ledgers
+### Source adaptation and context construction
 
-- `retrieve_then_localize_budget_curve_20260711.tsv` and
-  `retrieve_then_localize_budget_paired_20260711.tsv`: budgets 5, 10, 20, and
-  40 for KG-local, BM25-local, and MURAL tails.
-- `selector_ablation_summary_20260714.tsv` and
-  `selector_ablation_paired_20260714.tsv`: BM25-local Full and five
-  leave-one-signal-family-out selector variants, including paired uncertainty
-  and exact Hit@20 tests.
-- `dense_third_source_summary_20260714.tsv` and
-  `dense_third_source_paired_20260714.tsv`: the Jina code-embedding source,
-  its shared-selector output, two- and three-source MURAL, and GLM-5
-  fixed-prefix controls with paired uncertainty and exact Hit@20 tests.
-- `java_cross_language_summary_20260714.tsv` and
-  `java_cross_language_paired_20260714.tsv`: the complete 91-instance
-  SWE-bench-Java Verified check (no sampling or exclusions), including the
-  BM25-to-BM25-local selector comparison and the corrected structural-source
-  diagnostic. The benchmark is hosted under the historical Hugging Face
-  repository name `Daoguang/Multi-SWE-bench`; it is not the later
-  Multi-SWE-bench benchmark.
-- `java_cross_language_instances_20260714.jsonl` and
-  `java_cross_language_targets_20260714.json`: the per-instance ranking ledger
-  and deterministic patch-to-base-commit-entity target cache for that Java
-  check; auxiliary and newly added files are audited separately from targets.
-- `repair_glm5_context_rendering_20260715.tsv`: all 1,500 offline rendering
-  audits, including prefix/tail source-excerpt counts and prompt tokens.
-- `repair_glm5_prediction_mapping_20260715.tsv` and
-  `repair_glm5_deduplication_summary_20260715.json`: exact patch-hash mapping
-  from 1,319 nonempty variant predictions to 1,035 canonical official tests.
+- `export_ranked_file_seeds.py`: converts ranked entity outputs to the shared
+  ranked-file record.
+- `export_path_mined_filelocal.py`: applies the compact selector based on title
+  agreement, exact issue anchors, source file rank, boilerplate demotion, and
+  stable source order.
+- `export_equal_rrf_fusion.py`: deterministic two-source RRF.
+- `export_multi_source_rrf_fusion.py`: deterministic RRF for two or more sources.
+- `export_fixed_prefix_fusion.py`: preserves an existing prefix and fills the
+  residual budget.
+- `export_selector_simplification.py`: exports the expanded selector and the
+  jointly simplified selector variants.
 
-## Verifier
+### Evaluation and statistics
 
-Run:
+- `analyze_retrieve_localize_controls.py`: aggregate metrics, paired bootstrap
+  intervals, exact McNemar tests, and disagreement records.
+- `analyze_ranked_file_sources.py`: first-stage ranked-file coverage.
+- `evaluate_patch_derived_context.py`: mapped edit-target recall and complete
+  edit-target coverage.
+- `analyze_edit_target_paired_stats.py`: paired edit-target statistics.
+- `evaluate_external_localizer_fusion.py`: four released Qwen2.5-32B prefixes
+  with a MURAL-2 tail.
+- `analyze_repository_breakdown.py`: complete localization and repair
+  per-repository ledgers.
+- `analyze_context_construction_cost.py`: structural, BM25-local, and RRF timing
+  and memory summary.
+- `verify_paper_results.py`: strict inventory and value checker.
+
+### Repair and cross-language evaluation
+
+- `run_repair_profile_batch.py`, `assemble_repair_profile_predictions.py`,
+  `deduplicate_repair_predictions.py`, `collect_swebench_reports.py`,
+  `materialize_repair_variant_reports.py`, and
+  `analyze_repair_outcomes.py`: the fixed RQ-4 workflow.
+- `audit_repair_context_rendering.py`: all 1,500 rendered-context audits.
+- `export_java_kg_file_seeds.py` and
+  `evaluate_java_retrieve_localize.py`: complete SWE-bench-Java Verified
+  construction and evaluation.
+- `audit_kg_leakage.py`: input-boundary audit.
+
+## Main-manuscript ledgers
+
+- `results/tse_gt_mapping_v6.tsv`
+- `results/path_mining_file_expansion_ablation_20260531.tsv`
+- `results/ranked_file_source_coverage_20260711.tsv`
+- `results/ranked_file_source_paired_20260711.tsv`
+- `results/retrieve_then_localize_top20_20260711.tsv`
+- `results/retrieve_then_localize_paired_20260711.tsv`
+- `results/retrieve_then_localize_disagreements_20260711.tsv`
+- `results/glm5_baseline_fusion_controls_top10_20260614.tsv`
+- `results/patch_derived_context_summary_20260702.tsv`
+- `results/patch_derived_context_summary_20260702.json`
+- `results/patch_derived_context_targets_20260702.json`
+- `results/edit_target_paired_stats_20260713.tsv`
+- `results/repair_glm5_summary_20260715.tsv`
+- `results/repair_glm5_outcomes_20260715.tsv`
+- `results/repair_glm5_assembly_20260715.tsv`
+
+## Supplementary ledgers
+
+- selector simplification:
+  `selector_simplification_{summary,paired,disagreements}_20260715.tsv`;
+- RRF sensitivity:
+  `rrf_sensitivity_{summary,paired,disagreements}_20260715.tsv`;
+- budget sensitivity:
+  `retrieve_then_localize_budget_{curve,paired,disagreements}_20260711.tsv`;
+- dense third source:
+  `dense_third_source_{summary,paired,disagreements}_20260714.tsv`;
+- released localizers:
+  `external_localizer_fusion_{summary,paired}_20260715.tsv`;
+- Java:
+  `java_cross_language_{summary,paired,instances,targets}_20260714.*`;
+- repositories:
+  `repository_{localization,repair}_breakdown_20260715.tsv`;
+- cost:
+  `context_construction_cost_20260715.tsv`;
+- repair audit:
+  `repair_glm5_context_rendering_20260715.tsv`,
+  `repair_glm5_prediction_mapping_20260715.tsv`, and
+  `repair_glm5_deduplication_summary_20260715.json`;
+- information boundary:
+  `kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json` and
+  `time_boundary_external_artifact_sensitivity_20260531.tsv`.
+
+## Verification
 
 ```bash
 python3 artifacts/scripts/verify_paper_results.py
 ```
 
-The verifier checks every retained main-manuscript and supplementary value. It
-also fails when an unexpected file appears under `artifacts/results/`, which
-keeps the public result inventory aligned with the submitted documents.
+The checker fails if a retained value changes or an unexpected file appears in
+`artifacts/results/`.
