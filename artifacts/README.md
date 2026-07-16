@@ -28,7 +28,7 @@ contrasts use the two-sided exact McNemar test.
 - `evaluate_java_retrieve_localize.py`: complete Java adapter evaluation.
 - `run_repair_profile_batch.py`: fixed GLM-5.2 generation protocol.
 - `assemble_repair_profile_predictions.py` and
-  `deduplicate_repair_predictions.py`: prediction audit and exact-patch reuse.
+  `deduplicate_repair_predictions.py`: prediction audit and exact prompt-and-patch reuse.
 - `select_repair_retry_ids.py`: provider-failure-only batch resumption.
 - `audit_repair_context_rendering.py`: executed candidate and prompt audit.
 - `collect_swebench_reports.py`, `materialize_repair_variant_reports.py`, and

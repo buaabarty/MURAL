@@ -47,6 +47,33 @@ class RepairPredictionDeduplicationTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "prediction IDs do not match"):
             MODULE.assign_slots(predictions, ["issue", "mural"])
 
+    def test_reuse_requires_identical_prompt_when_audit_is_supplied(self):
+        predictions = {
+            "issue": {"a": {"model_patch": "patch-a"}},
+            "bm25": {"a": {"model_patch": "patch-a"}},
+            "mural": {"a": {"model_patch": "patch-a"}},
+        }
+        prompt_hashes = {
+            ("issue", "a"): "1" * 64,
+            ("bm25", "a"): "2" * 64,
+            ("mural", "a"): "2" * 64,
+        }
+        slots, mapping = MODULE.assign_slots(
+            predictions,
+            ["issue", "bm25", "mural"],
+            prompt_hashes,
+        )
+        self.assertEqual([len(slot) for slot in slots], [1, 1, 0])
+        self.assertEqual([row["slot"] for row in mapping], [0, 1, 1])
+        self.assertEqual(
+            [row["reused_identical_patch"] for row in mapping],
+            [0, 0, 1],
+        )
+        self.assertEqual(
+            [row["prompt_sha256"] for row in mapping],
+            ["1" * 64, "2" * 64, "2" * 64],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

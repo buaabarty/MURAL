@@ -574,15 +574,30 @@ def repair() -> None:
         mapping_source,
     )
     mapping_failures = []
+    seen_reuse_keys: set[tuple[str, str, str, str]] = set()
     for key, row in mapping_by_key.items():
         assembly = assembly_by_key[key]
+        reuse_key = (
+            row["instance_id"],
+            row["slot"],
+            row["patch_sha256"],
+            row["prompt_sha256"],
+        )
+        expected_reuse = int(
+            int(row["nonempty"]) == 1 and reuse_key in seen_reuse_keys
+        )
         valid = (
             int(row["nonempty"]) == int(assembly["nonempty"])
             and row["patch_sha256"] == assembly["patch_sha256"]
+            and row["prompt_sha256"]
+            == rendering_by_key[key]["prompt_sha256"]
             and bool(row["canonical_model"]) == bool(int(row["nonempty"]))
+            and int(row["reused_identical_patch"]) == expected_reuse
         )
         if not valid:
             mapping_failures.append(key)
+        if int(row["nonempty"]):
+            seen_reuse_keys.add(reuse_key)
     check("prediction mapping consistency", len(mapping_failures), 0, mapping_source)
 
     dedup_source = "repair_glm52_deduplication_summary_20260716.json"
@@ -591,6 +606,18 @@ def repair() -> None:
     reuses = sum(int(row["reused_identical_patch"]) for row in mapping_rows)
     canonical = nonempty - reuses
     check("dedup variants", dedup["variants"], list(variants), dedup_source)
+    check(
+        "dedup prompt-match requirement",
+        dedup["reuse_requires_prompt_match"],
+        True,
+        dedup_source,
+    )
+    check(
+        "dedup prompt-audit hash",
+        dedup["prompt_audit_sha256"],
+        hashlib.sha256((RESULTS / rendering_source).read_bytes()).hexdigest(),
+        dedup_source,
+    )
     check("dedup variant predictions", dedup["variant_predictions"], 1500, dedup_source)
     check(
         "dedup nonempty predictions",
