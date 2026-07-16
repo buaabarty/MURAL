@@ -29,6 +29,8 @@ contrasts use the two-sided exact McNemar test.
 - `run_repair_profile_batch.py`: fixed GLM-5.2 generation protocol.
 - `assemble_repair_profile_predictions.py` and
   `deduplicate_repair_predictions.py`: prediction audit and exact-patch reuse.
+- `select_repair_retry_ids.py`: provider-failure-only batch resumption.
+- `audit_repair_context_rendering.py`: executed candidate and prompt audit.
 - `collect_swebench_reports.py`, `materialize_repair_variant_reports.py`, and
   `analyze_repair_outcomes.py`: official SWE-bench outcome analysis.
 - `verify_paper_results.py`: exact inventory and value verification.
@@ -67,6 +69,11 @@ contrasts use the two-sided exact McNemar test.
 The Java benchmark contains all 91 official instances. Its available adapters
 are lexical and structural; it tests the shared projection and fusion interface
 without representing the default three-source Python configuration.
+
+### Repair rendering protocol
+
+- `prompts/glm52_repair_prompt.md`
+- `results/repair_glm52_context_rendering_20260716.tsv`
 
 ## Verification
 

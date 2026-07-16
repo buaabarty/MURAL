@@ -146,7 +146,8 @@ def main() -> None:
                 row.get("error") == "patch_apply_failed" for row in reports.values()
             ),
             "test_timeout": sum(
-                row.get("error") == "test_timeout" for row in reports.values()
+                str(row.get("error") or "").startswith("test_timeout")
+                for row in reports.values()
             ),
         }
 

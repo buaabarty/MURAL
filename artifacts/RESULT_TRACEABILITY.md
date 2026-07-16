@@ -160,6 +160,21 @@ python3 artifacts/scripts/run_repair_profile_batch.py \
 
 No credential is written to a run configuration or result ledger.
 
+The executed candidate pools and rendered prompts are reconstructed offline
+from the same frozen inputs and base commits:
+
+```bash
+python3 artifacts/scripts/audit_repair_context_rendering.py \
+  --input-root temp_run/repair_inputs \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --dataset-file temp_run/generated/SWE-bench_Verified.jsonl \
+  --playground-root playground --shared-playground \
+  --variant issue=issue --variant bm25=bm25 --variant mural=mural3 \
+  --preset local_qwen3coder30b --round-tag _base \
+  --prompt-token-limit 5000 \
+  --output temp_run/repair_glm52_context_rendering.tsv
+```
+
 ### Context-construction cost
 
 ```bash

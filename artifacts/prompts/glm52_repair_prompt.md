@@ -1,4 +1,4 @@
-# GLM-5 Repair Prompt
+# GLM-5.2 Repair Prompt
 
 Used for the official-test repair experiment in RQ-4. Braced fields are
 replaced by the issue report, selected base-commit context, language, and

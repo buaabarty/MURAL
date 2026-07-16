@@ -324,21 +324,309 @@ def costs_and_audits() -> None:
         value = json_file(RESULTS / source)
         check(f"{source} nonempty", bool(value), True, source)
 
+    rendering_source = "repair_glm52_context_rendering_20260716.tsv"
+    rendering_path = RESULTS / rendering_source
+    if rendering_path.exists():
+        rendering_rows = tsv(rendering_source)
+        expected_ids = set(
+            json_file(RESULTS / "patch_derived_context_targets_20260702.json")[
+                "items"
+            ]
+        )
+        rendering_keys = {
+            (row["variant"], row["instance_id"]) for row in rendering_rows
+        }
+        check("context rendering rows", len(rendering_rows), 1500, rendering_source)
+        check(
+            "context rendering keys unique",
+            len(rendering_keys),
+            len(rendering_rows),
+            rendering_source,
+        )
+        for variant in ("issue", "bm25", "mural"):
+            observed_ids = {
+                row["instance_id"]
+                for row in rendering_rows
+                if row["variant"] == variant
+            }
+            check(
+                f"{variant} context rendering IDs",
+                observed_ids,
+                expected_ids,
+                rendering_source,
+            )
+
 
 def repair() -> None:
-    source = "repair_glm52_summary_20260716.tsv"
-    rows = tsv(source)
-    check("repair summary rows", len(rows), 3, source)
-    for item in rows:
-        check("repair profile N", int(item["N"]), 500, source)
-    expected_rows = {
-        "repair_glm52_assembly_20260716.tsv": 1500,
-        "repair_glm52_context_rendering_20260716.tsv": 1500,
-        "repair_glm52_outcomes_20260716.tsv": 1500,
-        "repair_glm52_prediction_mapping_20260716.tsv": 1500,
+    variants = ("issue", "bm25", "mural")
+    outcome_source = "repair_glm52_outcomes_20260716.tsv"
+    outcome_rows = tsv(outcome_source)
+    outcome_by_key = {
+        (row["variant"], row["instance_id"]): row for row in outcome_rows
     }
-    for source, expected in expected_rows.items():
-        check(f"{source} rows", len(tsv(source)), expected, source)
+    check("repair outcome rows", len(outcome_rows), 1500, outcome_source)
+    check(
+        "repair outcome keys unique",
+        len(outcome_by_key),
+        len(outcome_rows),
+        outcome_source,
+    )
+    id_sets = {
+        variant: {
+            row["instance_id"] for row in outcome_rows if row["variant"] == variant
+        }
+        for variant in variants
+    }
+    for variant in variants:
+        check(f"{variant} repair N", len(id_sets[variant]), 500, outcome_source)
+    check(
+        "repair variants share IDs",
+        len({frozenset(values) for values in id_sets.values()}),
+        1,
+        outcome_source,
+    )
+    invalid_flags = []
+    for row in outcome_rows:
+        flags = tuple(int(row[field]) for field in ("nonempty", "applied", "resolved"))
+        if any(value not in (0, 1) for value in flags) or not (
+            flags[2] <= flags[1] <= flags[0]
+        ):
+            invalid_flags.append((row["variant"], row["instance_id"], flags))
+    check("repair outcome flag consistency", len(invalid_flags), 0, outcome_source)
+
+    summary_source = "repair_glm52_summary_20260716.tsv"
+    summary_rows = tsv(summary_source)
+    variant_rows = [row for row in summary_rows if row["kind"] == "variant"]
+    contrast_rows = [row for row in summary_rows if row["kind"] == "contrast"]
+    check("repair summary rows", len(summary_rows), 6, summary_source)
+    check(
+        "repair summary variants",
+        sorted(row["name"] for row in variant_rows),
+        sorted(variants),
+        summary_source,
+    )
+    check("repair contrast rows", len(contrast_rows), 3, summary_source)
+    resolved_by_variant: dict[str, dict[str, bool]] = {}
+    for variant in variants:
+        rows = [row for row in outcome_rows if row["variant"] == variant]
+        summary = one(variant_rows, "name", variant)
+        resolved_by_variant[variant] = {
+            row["instance_id"]: bool(int(row["resolved"])) for row in rows
+        }
+        expected = {
+            "nonempty": sum(int(row["nonempty"]) for row in rows),
+            "applicable": sum(int(row["applied"]) for row in rows),
+            "resolved": sum(int(row["resolved"]) for row in rows),
+            "patch_apply_failed": sum(
+                row["error"] == "patch_apply_failed" for row in rows
+            ),
+            "test_timeout": sum(
+                row["error"].startswith("test_timeout") for row in rows
+            ),
+        }
+        for field, value in expected.items():
+            check(f"{variant} {field}", int(summary[field]), value, summary_source)
+        close(
+            f"{variant} resolved percent",
+            float(summary["resolved_percent"]),
+            100.0 * expected["resolved"] / 500,
+            summary_source,
+            5e-4,
+        )
+
+    def exact_mcnemar(wins: int, losses: int) -> float:
+        discordant = wins + losses
+        if discordant == 0:
+            return 1.0
+        tail = sum(
+            math.comb(discordant, index)
+            for index in range(min(wins, losses) + 1)
+        )
+        return min(1.0, 2.0 * tail / (2**discordant))
+
+    contrast_specs = (
+        ("bm25_vs_issue", "issue", "bm25"),
+        ("mural_vs_issue", "issue", "mural"),
+        ("mural_vs_bm25", "bm25", "mural"),
+    )
+    for name, baseline, treatment in contrast_specs:
+        row = one(contrast_rows, "name", name)
+        check(f"{name} baseline", row["baseline"], baseline, summary_source)
+        check(f"{name} treatment", row["treatment"], treatment, summary_source)
+        ids = id_sets[baseline]
+        wins = sum(
+            resolved_by_variant[treatment][instance_id]
+            and not resolved_by_variant[baseline][instance_id]
+            for instance_id in ids
+        )
+        losses = sum(
+            resolved_by_variant[baseline][instance_id]
+            and not resolved_by_variant[treatment][instance_id]
+            for instance_id in ids
+        )
+        delta = (
+            sum(resolved_by_variant[treatment].values())
+            - sum(resolved_by_variant[baseline].values())
+        ) / 5.0
+        close(f"{name} delta", float(row["delta_pp"]), delta, summary_source, 5e-4)
+        check(f"{name} wins", int(row["wins"]), wins, summary_source)
+        check(f"{name} losses", int(row["losses"]), losses, summary_source)
+        close(
+            f"{name} exact p",
+            float(row["p_exact"]),
+            exact_mcnemar(wins, losses),
+            summary_source,
+            5e-10,
+        )
+        low, high = float(row["ci95_low"]), float(row["ci95_high"])
+        check(
+            f"{name} CI contains effect",
+            (low, delta, high),
+            "low <= delta <= high",
+            summary_source,
+            low <= delta <= high,
+        )
+
+    assembly_source = "repair_glm52_assembly_20260716.tsv"
+    assembly_rows = tsv(assembly_source)
+    assembly_by_key = {
+        (row["variant"], row["instance_id"]): row for row in assembly_rows
+    }
+    check("repair assembly rows", len(assembly_rows), 1500, assembly_source)
+    check(
+        "repair assembly keys",
+        set(assembly_by_key),
+        set(outcome_by_key),
+        assembly_source,
+    )
+    protocol_failures = []
+    for key, row in assembly_by_key.items():
+        try:
+            extra_body = json.loads(row["generation_extra_body"])
+        except json.JSONDecodeError:
+            extra_body = {}
+        valid = (
+            row["first_prompt_profile"] == "compact"
+            and row["context_profile_version"] == "rank_stratified_v3_allfiles"
+            and int(row["response_prefill"]) == 0
+            and int(row["max_retries"]) == 1
+            and 0 < int(row["first_prompt_tokens"]) <= 5000
+            and extra_body.get("enable_thinking") is False
+            and int(row["nonempty"]) == int(outcome_by_key[key]["nonempty"])
+        )
+        if not valid:
+            protocol_failures.append(key)
+    check("repair assembly protocol", len(protocol_failures), 0, assembly_source)
+
+    rendering_source = "repair_glm52_context_rendering_20260716.tsv"
+    rendering_rows = tsv(rendering_source)
+    rendering_by_key = {
+        (row["variant"], row["instance_id"]): row for row in rendering_rows
+    }
+    check("context rendering rows", len(rendering_rows), 1500, rendering_source)
+    check(
+        "context rendering keys",
+        set(rendering_by_key),
+        set(outcome_by_key),
+        rendering_source,
+    )
+    rendering_failures = []
+    for key, row in rendering_by_key.items():
+        candidate = int(row["candidate_entities"])
+        rendered = int(row["rendered_entities"])
+        source_entities = int(row["source_entities"])
+        valid = (
+            0 <= source_entities <= rendered <= candidate <= 20
+            and 0 < int(row["prompt_tokens"]) <= 5000
+            and len(row["context_sha256"]) == 64
+            and len(row["prompt_sha256"]) == 64
+        )
+        if not valid:
+            rendering_failures.append(key)
+    check("context rendering protocol", len(rendering_failures), 0, rendering_source)
+    expected_rendering = {
+        "issue": (1879, 1195, 1008457, 4105),
+        "bm25": (8914, 3319, 2034218, 4988),
+        "mural": (8921, 3225, 1937200, 4991),
+    }
+    for variant, expected in expected_rendering.items():
+        rows = [
+            row for row in rendering_rows if row["variant"] == variant
+        ]
+        observed = (
+            sum(int(row["candidate_entities"]) for row in rows),
+            sum(int(row["source_entities"]) for row in rows),
+            sum(int(row["prompt_tokens"]) for row in rows),
+            max(int(row["prompt_tokens"]) for row in rows),
+        )
+        check(f"{variant} rendering aggregate", observed, expected, rendering_source)
+
+    mapping_source = "repair_glm52_prediction_mapping_20260716.tsv"
+    mapping_rows = tsv(mapping_source)
+    mapping_by_key = {
+        (row["variant"], row["instance_id"]): row for row in mapping_rows
+    }
+    check("prediction mapping rows", len(mapping_rows), 1500, mapping_source)
+    check(
+        "prediction mapping keys",
+        set(mapping_by_key),
+        set(outcome_by_key),
+        mapping_source,
+    )
+    mapping_failures = []
+    for key, row in mapping_by_key.items():
+        assembly = assembly_by_key[key]
+        valid = (
+            int(row["nonempty"]) == int(assembly["nonempty"])
+            and row["patch_sha256"] == assembly["patch_sha256"]
+            and bool(row["canonical_model"]) == bool(int(row["nonempty"]))
+        )
+        if not valid:
+            mapping_failures.append(key)
+    check("prediction mapping consistency", len(mapping_failures), 0, mapping_source)
+
+    dedup_source = "repair_glm52_deduplication_summary_20260716.json"
+    dedup = json_file(RESULTS / dedup_source)
+    nonempty = sum(int(row["nonempty"]) for row in mapping_rows)
+    reuses = sum(int(row["reused_identical_patch"]) for row in mapping_rows)
+    canonical = nonempty - reuses
+    check("dedup variants", dedup["variants"], list(variants), dedup_source)
+    check("dedup variant predictions", dedup["variant_predictions"], 1500, dedup_source)
+    check(
+        "dedup nonempty predictions",
+        dedup["nonempty_variant_predictions"],
+        nonempty,
+        dedup_source,
+    )
+    check("dedup identical reuses", dedup["identical_patch_reuses"], reuses, dedup_source)
+    check("dedup canonical predictions", dedup["canonical_predictions"], canonical, dedup_source)
+    check(
+        "dedup slot total",
+        sum(int(value) for value in dedup["slot_counts"].values()),
+        canonical,
+        dedup_source,
+    )
+
+    repository_source = "mural_repository_repair_20260716.tsv"
+    repository_rows = [
+        row for row in tsv(repository_source) if row["repository"] == "ALL"
+    ]
+    check("repository repair ALL rows", len(repository_rows), 3, repository_source)
+    for variant in variants:
+        row = one(repository_rows, "variant", variant)
+        summary = one(variant_rows, "name", variant)
+        check(f"{variant} repository N", int(row["N"]), 500, repository_source)
+        for field, summary_field in (
+            ("nonempty", "nonempty"),
+            ("applied", "applicable"),
+            ("resolved", "resolved"),
+        ):
+            check(
+                f"{variant} repository {field}",
+                int(row[field]),
+                int(summary[summary_field]),
+                repository_source,
+            )
 
 
 def main() -> int:

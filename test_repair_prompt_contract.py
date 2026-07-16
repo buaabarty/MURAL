@@ -311,6 +311,29 @@ def target(value):
             [("pkg.same()", True), ("pkg.same()", False)],
         )
 
+    def test_rendering_audit_maps_publication_and_run_variant_names(self):
+        import argparse
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("context_audit", AUDIT_SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+        args = argparse.Namespace(
+            variants=["unused"],
+            variant_specs=["issue=issue", "mural=mural3"],
+        )
+        self.assertEqual(
+            module.parse_variant_specs(args),
+            [("issue", "issue"), ("mural", "mural3")],
+        )
+        self.assertEqual(
+            module.playground_repo_path(
+                Path("/repos"), "mural3", "org__repo", True
+            ),
+            Path("/repos/org__repo"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

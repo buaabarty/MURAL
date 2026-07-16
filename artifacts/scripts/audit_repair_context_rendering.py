@@ -27,10 +27,46 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--playground-root", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--variants", nargs="+", default=["issue", "bm25", "mural"])
+    parser.add_argument(
+        "--variant",
+        action="append",
+        dest="variant_specs",
+        metavar="LABEL=RUN_VARIANT",
+        help="Map a publication label to its input-directory name.",
+    )
     parser.add_argument("--preset", required=True)
     parser.add_argument("--round-tag", default="_base")
     parser.add_argument("--prompt-token-limit", type=int, default=5000)
+    parser.add_argument(
+        "--shared-playground",
+        action="store_true",
+        help="Read repositories directly below PLAYGROUND_ROOT for every variant.",
+    )
     return parser.parse_args()
+
+
+def parse_variant_specs(args: argparse.Namespace) -> list[tuple[str, str]]:
+    if not args.variant_specs:
+        return [(variant, variant) for variant in args.variants]
+    pairs: list[tuple[str, str]] = []
+    for raw in args.variant_specs:
+        if "=" not in raw:
+            raise ValueError(f"Invalid --variant {raw!r}; expected LABEL=RUN_VARIANT")
+        label, run_variant = (part.strip() for part in raw.split("=", 1))
+        if not label or not run_variant:
+            raise ValueError(f"Invalid --variant {raw!r}; empty name")
+        pairs.append((label, run_variant))
+    if len({label for label, _ in pairs}) != len(pairs):
+        raise ValueError("Publication labels must be unique")
+    if len({run_variant for _, run_variant in pairs}) != len(pairs):
+        raise ValueError("Run-variant names must be unique")
+    return pairs
+
+
+def playground_repo_path(
+    root: Path, run_variant: str, repo_id: str, shared: bool
+) -> Path:
+    return root / repo_id if shared else root / run_variant / repo_id
 
 
 def parse_rendered_blocks(content: str) -> list[tuple[str, bool]]:
@@ -70,11 +106,11 @@ def main() -> int:
     )
 
     rows = []
-    for variant in args.variants:
+    for variant, run_variant in parse_variant_specs(args):
         for instance_id in ids:
             location_path = (
                 args.input_root
-                / variant
+                / run_variant
                 / args.preset
                 / args.round_tag
                 / instance_id
@@ -86,7 +122,12 @@ def main() -> int:
             problem = repairer._build_issue_context(location, dataset).replace("\r", "")
             methods = (location.get("related_entities") or {}).get("methods") or []
             repo_id = instance_id.rsplit("-", 1)[0]
-            repo_path = args.playground_root / variant / repo_id
+            repo_path = playground_repo_path(
+                args.playground_root,
+                run_variant,
+                repo_id,
+                args.shared_playground,
+            )
             methods = repairer._enrich_methods_with_file_context(
                 methods, str(repo_path), dataset["commit_id"]
             )
@@ -121,7 +162,12 @@ def main() -> int:
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), delimiter="\t")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=list(rows[0]),
+            delimiter="\t",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
     print(f"wrote {args.output} ({len(rows)} rows)")
