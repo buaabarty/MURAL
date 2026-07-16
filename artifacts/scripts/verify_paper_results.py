@@ -398,20 +398,28 @@ def repair() -> None:
     summary_rows = tsv(summary_source)
     variant_rows = [row for row in summary_rows if row["kind"] == "variant"]
     contrast_rows = [row for row in summary_rows if row["kind"] == "contrast"]
-    check("repair summary rows", len(summary_rows), 6, summary_source)
+    check("repair summary rows", len(summary_rows), 12, summary_source)
     check(
         "repair summary variants",
         sorted(row["name"] for row in variant_rows),
         sorted(variants),
         summary_source,
     )
-    check("repair contrast rows", len(contrast_rows), 3, summary_source)
-    resolved_by_variant: dict[str, dict[str, bool]] = {}
+    check("repair contrast rows", len(contrast_rows), 9, summary_source)
+    metric_fields = (
+        ("nonempty", "nonempty"),
+        ("applicable", "applied"),
+        ("resolved", "resolved"),
+    )
+    outcomes_by_variant: dict[str, dict[str, dict[str, bool]]] = {}
     for variant in variants:
         rows = [row for row in outcome_rows if row["variant"] == variant]
         summary = one(variant_rows, "name", variant)
-        resolved_by_variant[variant] = {
-            row["instance_id"]: bool(int(row["resolved"])) for row in rows
+        outcomes_by_variant[variant] = {
+            metric: {
+                row["instance_id"]: bool(int(row[outcome_field])) for row in rows
+            }
+            for metric, outcome_field in metric_fields
         }
         expected = {
             "nonempty": sum(int(row["nonempty"]) for row in rows),
@@ -426,13 +434,18 @@ def repair() -> None:
         }
         for field, value in expected.items():
             check(f"{variant} {field}", int(summary[field]), value, summary_source)
-        close(
-            f"{variant} resolved percent",
-            float(summary["resolved_percent"]),
-            100.0 * expected["resolved"] / 500,
-            summary_source,
-            5e-4,
-        )
+        for count_field, percent_field in (
+            ("nonempty", "nonempty_percent"),
+            ("applicable", "applicable_percent"),
+            ("resolved", "resolved_percent"),
+        ):
+            close(
+                f"{variant} {count_field} percent",
+                float(summary[percent_field]),
+                100.0 * expected[count_field] / 500,
+                summary_source,
+                5e-4,
+            )
 
     def exact_mcnemar(wins: int, losses: int) -> float:
         discordant = wins + losses
@@ -450,42 +463,42 @@ def repair() -> None:
         ("mural_vs_bm25", "bm25", "mural"),
     )
     for name, baseline, treatment in contrast_specs:
-        row = one(contrast_rows, "name", name)
-        check(f"{name} baseline", row["baseline"], baseline, summary_source)
-        check(f"{name} treatment", row["treatment"], treatment, summary_source)
-        ids = id_sets[baseline]
-        wins = sum(
-            resolved_by_variant[treatment][instance_id]
-            and not resolved_by_variant[baseline][instance_id]
-            for instance_id in ids
-        )
-        losses = sum(
-            resolved_by_variant[baseline][instance_id]
-            and not resolved_by_variant[treatment][instance_id]
-            for instance_id in ids
-        )
-        delta = (
-            sum(resolved_by_variant[treatment].values())
-            - sum(resolved_by_variant[baseline].values())
-        ) / 5.0
-        close(f"{name} delta", float(row["delta_pp"]), delta, summary_source, 5e-4)
-        check(f"{name} wins", int(row["wins"]), wins, summary_source)
-        check(f"{name} losses", int(row["losses"]), losses, summary_source)
-        close(
-            f"{name} exact p",
-            float(row["p_exact"]),
-            exact_mcnemar(wins, losses),
-            summary_source,
-            5e-10,
-        )
-        low, high = float(row["ci95_low"]), float(row["ci95_high"])
-        check(
-            f"{name} CI contains effect",
-            (low, delta, high),
-            "low <= delta <= high",
-            summary_source,
-            low <= delta <= high,
-        )
+        for metric, _ in metric_fields:
+            row = pair(contrast_rows, baseline, treatment, metric)
+            check(f"{name}/{metric} name", row["name"], name, summary_source)
+            ids = id_sets[baseline]
+            baseline_values = outcomes_by_variant[baseline][metric]
+            treatment_values = outcomes_by_variant[treatment][metric]
+            wins = sum(
+                treatment_values[instance_id] and not baseline_values[instance_id]
+                for instance_id in ids
+            )
+            losses = sum(
+                baseline_values[instance_id] and not treatment_values[instance_id]
+                for instance_id in ids
+            )
+            delta = (
+                sum(treatment_values.values()) - sum(baseline_values.values())
+            ) / 5.0
+            label = f"{name}/{metric}"
+            close(f"{label} delta", float(row["delta_pp"]), delta, summary_source, 5e-4)
+            check(f"{label} wins", int(row["wins"]), wins, summary_source)
+            check(f"{label} losses", int(row["losses"]), losses, summary_source)
+            close(
+                f"{label} exact p",
+                float(row["p_exact"]),
+                exact_mcnemar(wins, losses),
+                summary_source,
+                5e-10,
+            )
+            low, high = float(row["ci95_low"]), float(row["ci95_high"])
+            check(
+                f"{label} CI contains effect",
+                (low, delta, high),
+                "low <= delta <= high",
+                summary_source,
+                low <= delta <= high,
+            )
 
     assembly_source = "repair_glm52_assembly_20260716.tsv"
     assembly_rows = tsv(assembly_source)

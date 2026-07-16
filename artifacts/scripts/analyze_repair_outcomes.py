@@ -29,7 +29,7 @@ def read_timeout_outcomes(path: Path | None) -> dict[tuple[str, str], dict]:
         return {}
     with path.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle, delimiter="\t"))
-    outcomes = {}
+    outcomes: dict[tuple[str, str], dict] = {}
     for row in rows:
         key = (row["variant"], row["instance_id"])
         if key in outcomes:
@@ -91,7 +91,7 @@ def main() -> None:
     unknown_timeout_ids = {instance_id for _, instance_id in timeout_outcomes} - id_set
     if unknown_timeout_ids:
         raise ValueError(f"Timeout outcomes contain unknown IDs: {sorted(unknown_timeout_ids)[:5]}")
-    outcomes = {}
+    outcomes: dict[str, dict[str, np.ndarray]] = {}
     outcome_rows = []
     summaries = {}
 
@@ -123,8 +123,17 @@ def main() -> None:
         if any(row.get("resolved") and not row.get("patch_successfully_applied") for row in reports.values()):
             raise ValueError(f"{variant}: a resolved prediction was not applicable")
 
+        nonempty_flags = np.array([key in nonempty for key in ids], dtype=bool)
+        applicable = np.array(
+            [bool(reports.get(key, {}).get("patch_successfully_applied")) for key in ids],
+            dtype=bool,
+        )
         resolved = np.array([bool(reports.get(key, {}).get("resolved")) for key in ids], dtype=bool)
-        outcomes[variant] = resolved
+        outcomes[variant] = {
+            "nonempty": nonempty_flags,
+            "applicable": applicable,
+            "resolved": resolved,
+        }
         for instance_id in ids:
             report = reports.get(instance_id, {})
             outcome_rows.append(
@@ -138,8 +147,10 @@ def main() -> None:
                 }
             )
         summaries[variant] = {
-            "nonempty": len(nonempty),
-            "applicable": sum(bool(row.get("patch_successfully_applied")) for row in reports.values()),
+            "nonempty": int(nonempty_flags.sum()),
+            "nonempty_percent": float(nonempty_flags.mean() * 100),
+            "applicable": int(applicable.sum()),
+            "applicable_percent": float(applicable.mean() * 100),
             "resolved": int(resolved.sum()),
             "resolved_percent": float(resolved.mean() * 100),
             "patch_apply_failed": sum(
@@ -158,7 +169,10 @@ def main() -> None:
             {
                 "kind": "variant",
                 "name": variant,
+                "metric": "all",
                 **row,
+                "nonempty_percent": f"{row['nonempty_percent']:.3f}",
+                "applicable_percent": f"{row['applicable_percent']:.3f}",
                 "resolved_percent": f"{row['resolved_percent']:.3f}",
                 "baseline": "NA",
                 "treatment": "NA",
@@ -171,25 +185,27 @@ def main() -> None:
             }
         )
     for name, baseline_name, treatment_name in CONTRASTS:
-        baseline = outcomes[baseline_name]
-        treatment = outcomes[treatment_name]
-        wins = int(np.sum(treatment & ~baseline))
-        losses = int(np.sum(baseline & ~treatment))
-        low, high = paired_bootstrap_ci(baseline, treatment)
-        summary_rows.append(
-            {
-                "kind": "contrast",
-                "name": name,
-                "baseline": baseline_name,
-                "treatment": treatment_name,
-                "delta_pp": f"{(treatment.mean() - baseline.mean()) * 100:.3f}",
-                "ci95_low": f"{low:.3f}",
-                "ci95_high": f"{high:.3f}",
-                "wins": wins,
-                "losses": losses,
-                "p_exact": f"{exact_mcnemar(wins, losses):.12g}",
-            }
-        )
+        for metric in ("nonempty", "applicable", "resolved"):
+            baseline = outcomes[baseline_name][metric]
+            treatment = outcomes[treatment_name][metric]
+            wins = int(np.sum(treatment & ~baseline))
+            losses = int(np.sum(baseline & ~treatment))
+            low, high = paired_bootstrap_ci(baseline, treatment)
+            summary_rows.append(
+                {
+                    "kind": "contrast",
+                    "name": name,
+                    "metric": metric,
+                    "baseline": baseline_name,
+                    "treatment": treatment_name,
+                    "delta_pp": f"{(treatment.mean() - baseline.mean()) * 100:.3f}",
+                    "ci95_low": f"{low:.3f}",
+                    "ci95_high": f"{high:.3f}",
+                    "wins": wins,
+                    "losses": losses,
+                    "p_exact": f"{exact_mcnemar(wins, losses):.12g}",
+                }
+            )
 
     args.output_outcomes.parent.mkdir(parents=True, exist_ok=True)
     with args.output_outcomes.open("w", newline="", encoding="utf-8") as handle:
@@ -198,9 +214,10 @@ def main() -> None:
         writer.writerows(outcome_rows)
 
     fields = [
-        "kind", "name", "nonempty", "applicable", "resolved", "resolved_percent",
-        "patch_apply_failed", "test_timeout", "baseline", "treatment", "delta_pp",
-        "ci95_low", "ci95_high", "wins", "losses", "p_exact",
+        "kind", "name", "metric", "nonempty", "nonempty_percent", "applicable",
+        "applicable_percent", "resolved", "resolved_percent", "patch_apply_failed",
+        "test_timeout", "baseline", "treatment", "delta_pp", "ci95_low", "ci95_high",
+        "wins", "losses", "p_exact",
     ]
     with args.output_summary.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t", extrasaction="ignore")

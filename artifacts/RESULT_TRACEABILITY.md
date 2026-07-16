@@ -58,7 +58,7 @@ per manifest ID. No instance is excluded.
 | Executed generation rows and selected attempts | `results/repair_glm52_assembly_20260716.tsv` |
 | Rendered context and prompt hashes | `results/repair_glm52_context_rendering_20260716.tsv` |
 | Canonical prediction slots and exact reuse audit | `results/repair_glm52_prediction_mapping_20260716.tsv` and `results/repair_glm52_deduplication_summary_20260716.json` |
-| Per-instance outcomes and paired tests | `results/repair_glm52_outcomes_20260716.tsv` and `results/repair_glm52_summary_20260716.tsv` |
+| Per-instance nonempty, applicable, and resolved outcomes with paired tests | `results/repair_glm52_outcomes_20260716.tsv` and `results/repair_glm52_summary_20260716.tsv` |
 | Repository strata | `results/mural_repository_repair_20260716.tsv` |
 
 ### Supplementary analyses

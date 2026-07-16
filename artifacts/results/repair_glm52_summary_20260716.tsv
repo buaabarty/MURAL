@@ -1,7 +1,13 @@
-kind	name	nonempty	applicable	resolved	resolved_percent	patch_apply_failed	test_timeout	baseline	treatment	delta_pp	ci95_low	ci95_high	wins	losses	p_exact
-variant	issue	326	322	100	20.000	4	2	NA	NA	NA	NA	NA	NA	NA	NA
-variant	bm25	366	361	111	22.200	5	0	NA	NA	NA	NA	NA	NA	NA	NA
-variant	mural	360	356	113	22.600	4	0	NA	NA	NA	NA	NA	NA	NA	NA
-contrast	bm25_vs_issue							issue	bm25	2.200	-1.000	5.400	39	28	0.221548729645
-contrast	mural_vs_issue							issue	mural	2.600	-0.400	5.600	36	23	0.117477350245
-contrast	mural_vs_bm25							bm25	mural	0.400	-2.400	3.200	27	25	0.889883965277
+kind	name	metric	nonempty	nonempty_percent	applicable	applicable_percent	resolved	resolved_percent	patch_apply_failed	test_timeout	baseline	treatment	delta_pp	ci95_low	ci95_high	wins	losses	p_exact
+variant	issue	all	326	65.200	322	64.400	100	20.000	4	2	NA	NA	NA	NA	NA	NA	NA	NA
+variant	bm25	all	366	73.200	361	72.200	111	22.200	5	0	NA	NA	NA	NA	NA	NA	NA	NA
+variant	mural	all	360	72.000	356	71.200	113	22.600	4	0	NA	NA	NA	NA	NA	NA	NA	NA
+contrast	bm25_vs_issue	nonempty									issue	bm25	8.000	2.800	13.200	108	68	0.00317196707511
+contrast	bm25_vs_issue	applicable									issue	bm25	7.800	2.600	13.000	106	67	0.00373771904669
+contrast	bm25_vs_issue	resolved									issue	bm25	2.200	-1.000	5.400	39	28	0.221548729645
+contrast	mural_vs_issue	nonempty									issue	mural	6.800	1.800	11.800	101	67	0.0106792931274
+contrast	mural_vs_issue	applicable									issue	mural	6.800	1.800	11.600	100	66	0.0102126631526
+contrast	mural_vs_issue	resolved									issue	mural	2.600	-0.400	5.600	36	23	0.117477350245
+contrast	mural_vs_bm25	nonempty									bm25	mural	-1.200	-6.000	3.600	73	79	0.68520875107
+contrast	mural_vs_bm25	applicable									bm25	mural	-1.000	-5.800	3.800	73	78	0.744913878251
+contrast	mural_vs_bm25	resolved									bm25	mural	0.400	-2.400	3.200	27	25	0.889883965277

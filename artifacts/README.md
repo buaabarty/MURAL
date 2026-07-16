@@ -83,6 +83,14 @@ without representing the default three-source Python configuration.
 - `results/repair_glm52_summary_20260716.tsv`
 - `results/mural_repository_repair_20260716.tsv`
 
+The repair summary reports counts and rates for nonempty, applicable, and
+test-resolved patches, plus paired bootstrap intervals and exact McNemar tests
+for all three binary outcomes.
+Here, applicable means that the official harness records
+`patch_successfully_applied=1`; resolved means that the official test oracles
+accept the prediction. Every rate retains all 500 benchmark instances in its
+denominator.
+
 ## Verification
 
 ```bash
