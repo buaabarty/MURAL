@@ -1,20 +1,19 @@
 import argparse
 import importlib.util
+import json
+import tempfile
 import unittest
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
-SCRIPT = ROOT / "artifacts" / "scripts" / "assemble_repair_profile_predictions.py"
-SPEC = importlib.util.spec_from_file_location(
-    "assemble_repair_profile_predictions", SCRIPT
-)
+SCRIPT = Path(__file__).parent / "artifacts" / "scripts" / "assemble_repair_profile_predictions.py"
+SPEC = importlib.util.spec_from_file_location("assemble_repair_profile_predictions", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
 
-class RepairAssemblyAuditTest(unittest.TestCase):
+class AssembleRepairProfilePredictionsTest(unittest.TestCase):
     def make_args(self, **overrides):
         values = {
             "expected_dataset_source": "/data/verified.jsonl",
@@ -43,8 +42,36 @@ class RepairAssemblyAuditTest(unittest.TestCase):
         values.update(overrides)
         return values
 
+    def write_run(self, root: Path, shard: str, error: str | None) -> Path:
+        run_dir = root / "issue" / shard / "issue"
+        patches = run_dir / "instance-1" / "patches"
+        patches.mkdir(parents=True)
+        audit = {
+            "failed_files": [] if error is None else [{"error": error}],
+            "final_status": "success" if error is None else "failed",
+        }
+        (patches / "instance-1.run.json").write_text(
+            json.dumps(audit), encoding="utf-8"
+        )
+        (patches / "patch_results.jsonl").write_text(
+            json.dumps({"fix_patch": ""}) + "\n", encoding="utf-8"
+        )
+        return run_dir
+
+    def test_variant_mapping(self):
+        args = argparse.Namespace(
+            variants=["unused"],
+            variant_specs=["issue=issue", "mural=mural3"],
+        )
+        self.assertEqual(
+            MODULE.parse_variant_specs(args),
+            [("issue", "issue"), ("mural", "mural3")],
+        )
+
     def test_frozen_protocol_audit_passes(self):
-        MODULE.validate_audit(self.make_audit(), "mural", "org__repo-1", self.make_args())
+        MODULE.validate_audit(
+            self.make_audit(), "mural", "org__repo-1", self.make_args()
+        )
 
     def test_stale_context_profile_fails_closed(self):
         with self.assertRaisesRegex(ValueError, "Unexpected context profile"):
@@ -72,6 +99,26 @@ class RepairAssemblyAuditTest(unittest.TestCase):
                 "org__repo-1",
                 self.make_args(),
             )
+
+    def test_selects_provider_clean_retry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_run(root, "shard_0", "Error type: insufficient_balance")
+            expected = self.write_run(root, "retry_1", None)
+            selected = MODULE.select_sharded_run_dir(
+                root, "issue", "issue", "instance-1", ["shard_0", "retry_1"]
+            )
+            self.assertEqual(selected, expected)
+
+    def test_rejects_two_provider_clean_runs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_run(root, "shard_0", None)
+            self.write_run(root, "retry_1", None)
+            with self.assertRaisesRegex(ValueError, "one provider-clean run"):
+                MODULE.select_sharded_run_dir(
+                    root, "issue", "issue", "instance-1", ["shard_0", "retry_1"]
+                )
 
 
 if __name__ == "__main__":

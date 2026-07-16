@@ -18,6 +18,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--variants", nargs="+", default=["issue", "bm25", "mural"]
     )
+    parser.add_argument(
+        "--variant",
+        action="append",
+        dest="variant_specs",
+        metavar="LABEL=RUN_VARIANT",
+        help=(
+            "Map a publication label to its run-directory name. Repeat for "
+            "each variant; when omitted, --variants supplies identity mappings."
+        ),
+    )
     parser.add_argument("--model-prefix", default="glm5_corrected")
     parser.add_argument(
         "--nested-variant",
@@ -40,6 +50,78 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--require-no-prefill", action="store_true")
     parser.add_argument("--require-thinking-disabled", action="store_true")
     return parser.parse_args()
+
+
+PROVIDER_FAILURE_MARKERS = (
+    "insufficient_balance",
+    "insufficient account balance",
+    "connection error",
+    "rate limit",
+    "service unavailable",
+    "gateway timeout",
+    "request timed out",
+)
+
+
+def parse_variant_specs(args: argparse.Namespace) -> list[tuple[str, str]]:
+    if not args.variant_specs:
+        return [(variant, variant) for variant in args.variants]
+    pairs: list[tuple[str, str]] = []
+    for raw in args.variant_specs:
+        if "=" not in raw:
+            raise ValueError(f"Invalid --variant {raw!r}; expected LABEL=RUN_VARIANT")
+        label, run_variant = (part.strip() for part in raw.split("=", 1))
+        if not label or not run_variant:
+            raise ValueError(f"Invalid --variant {raw!r}; empty name")
+        pairs.append((label, run_variant))
+    labels = [label for label, _ in pairs]
+    run_variants = [run_variant for _, run_variant in pairs]
+    if len(labels) != len(set(labels)):
+        raise ValueError(f"Duplicate publication labels: {labels}")
+    if len(run_variants) != len(set(run_variants)):
+        raise ValueError(f"Duplicate run variants: {run_variants}")
+    return pairs
+
+
+def provider_failure(audit: dict[str, object]) -> bool:
+    errors = "\n".join(
+        str(item.get("error") or "")
+        for item in audit.get("failed_files", [])
+        if isinstance(item, dict)
+    ).lower()
+    return any(marker in errors for marker in PROVIDER_FAILURE_MARKERS)
+
+
+def select_sharded_run_dir(
+    run_root: Path,
+    label: str,
+    run_variant: str,
+    instance_id: str,
+    shards: list[str],
+) -> Path:
+    usable: list[Path] = []
+    rejected: list[tuple[Path, str]] = []
+    for shard in shards:
+        run_dir = run_root / run_variant / shard / run_variant
+        patches_dir = run_dir / instance_id / "patches"
+        audit_path = patches_dir / f"{instance_id}.run.json"
+        result_path = patches_dir / "patch_results.jsonl"
+        if not patches_dir.exists():
+            continue
+        if not audit_path.exists() or not result_path.exists():
+            rejected.append((run_dir, "incomplete"))
+            continue
+        audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        if provider_failure(audit):
+            rejected.append((run_dir, "provider_failure"))
+        else:
+            usable.append(run_dir)
+    if len(usable) != 1:
+        raise ValueError(
+            f"Expected one provider-clean run for {label}/{instance_id}; "
+            f"usable={usable}, rejected={rejected}"
+        )
+    return usable[0]
 
 
 def load_ids(path: Path) -> list[str]:
@@ -127,27 +209,25 @@ def main() -> int:
     run_root = args.run_root.resolve()
     output_root = args.output_root.resolve()
     instance_ids = load_ids(args.ids_file.resolve())
+    variant_pairs = parse_variant_specs(args)
     output_root.mkdir(parents=True, exist_ok=True)
     ledger_rows: list[dict[str, object]] = []
 
-    for variant in args.variants:
+    for variant, run_variant in variant_pairs:
         predictions: list[dict[str, str]] = []
         for instance_id in instance_ids:
             if args.shards:
-                candidates = [
-                    run_root / variant / shard / variant / instance_id
-                    for shard in args.shards
-                ]
-                matches = [candidate for candidate in candidates if candidate.exists()]
-                if len(matches) != 1:
-                    raise ValueError(
-                        f"Expected one shard for {variant}/{instance_id}, found {matches}"
-                    )
-                run_dir = matches[0].parent
+                run_dir = select_sharded_run_dir(
+                    run_root,
+                    variant,
+                    run_variant,
+                    instance_id,
+                    args.shards,
+                )
             else:
-                run_dir = run_root / variant
+                run_dir = run_root / run_variant
                 if args.nested_variant:
-                    run_dir /= variant
+                    run_dir /= run_variant
             patches_dir = run_dir / instance_id / "patches"
             result_path = patches_dir / "patch_results.jsonl"
             audit_path = patches_dir / f"{instance_id}.run.json"
@@ -158,6 +238,10 @@ def main() -> int:
 
             result, result_rows = read_last_jsonl(result_path)
             audit = json.loads(audit_path.read_text(encoding="utf-8"))
+            if provider_failure(audit):
+                raise ValueError(
+                    f"Provider-failed run cannot be assembled: {variant}/{instance_id}"
+                )
             validate_audit(audit, variant, instance_id, args)
             patch = str(result.get("fix_patch") or "").strip()
             predictions.append(
