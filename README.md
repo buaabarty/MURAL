@@ -20,12 +20,13 @@ compatibility.
 ## Verify the paper-facing results
 
 ```bash
-python3 artifacts/scripts/verify_paper_results.py --scope core
+python3 artifacts/scripts/verify_paper_results.py --scope all
 ```
 
 The verifier checks the exact retained result inventory, benchmark completeness,
-aggregate values, paired bootstrap intervals, exact McNemar tests, and the
-cross-language ID-set contract. No API key is stored in this repository.
+aggregate values, paired bootstrap intervals, exact McNemar tests, repair
+prediction provenance, and the cross-language ID-set contract. No API key is
+stored in this repository.
 
 ## Repository layout
 
@@ -47,6 +48,8 @@ The retained evaluation covers:
 - source composition, RRF, budget, and repository-level analyses;
 - all 91 official SWE-bench-Java Verified instances for the cross-language
   adapter check;
+- end-to-end GLM-5.2 repair and official test-oracle outcomes on all 500
+  SWE-bench Verified instances;
 - measured context-construction time and memory.
 
 See `artifacts/README.md` for the publication inventory and

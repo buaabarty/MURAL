@@ -51,6 +51,16 @@ per manifest ID. No instance is excluded.
 | Paired intervals and exact tests | `results/mural_edit_target_paired_20260716.tsv` |
 | Per-instance mapped targets | `results/patch_derived_context_targets_20260702.json` |
 
+### RQ-4: end-to-end repair
+
+| Result | Ledger |
+| --- | --- |
+| Executed generation rows and selected attempts | `results/repair_glm52_assembly_20260716.tsv` |
+| Rendered context and prompt hashes | `results/repair_glm52_context_rendering_20260716.tsv` |
+| Canonical prediction slots and exact reuse audit | `results/repair_glm52_prediction_mapping_20260716.tsv` and `results/repair_glm52_deduplication_summary_20260716.json` |
+| Per-instance outcomes and paired tests | `results/repair_glm52_outcomes_20260716.tsv` and `results/repair_glm52_summary_20260716.tsv` |
+| Repository strata | `results/mural_repository_repair_20260716.tsv` |
+
 ### Supplementary analyses
 
 | Analysis | Ledger |
@@ -75,7 +85,7 @@ python3 artifacts/scripts/export_ranked_file_seeds.py \
   --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
   --max-files 20 --support-mode count
 
-python3 artifacts/scripts/export_path_mined_filelocal.py \
+python3 artifacts/scripts/export_entity_projection.py \
   --input-dir temp_run/bm25_file_seeds \
   --output-dir temp_run/bm25_projection \
   --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
@@ -175,6 +185,68 @@ python3 artifacts/scripts/audit_repair_context_rendering.py \
   --output temp_run/repair_glm52_context_rendering.tsv
 ```
 
+Provider-failure retries are assembled before official testing. The assembly
+checks the frozen dataset, context profile, prompt ceiling, decoding settings,
+and model endpoint recorded by every contributing shard.
+
+```bash
+python3 artifacts/scripts/assemble_repair_profile_predictions.py \
+  --run-root temp_run/repair_glm52_runs \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --output-root temp_run/repair_glm52_final/predictions \
+  --variant issue=issue --variant bm25=bm25 --variant mural=mural3 \
+  --shards shard_0 shard_1 retry_0 retry_1 retry_2a retry_2b \
+  --model-prefix glm52 \
+  --expected-dataset-source temp_run/generated/SWE-bench_Verified.jsonl \
+  --dataset-label temp_run/generated/SWE-bench_Verified.jsonl \
+  --expected-context-profile rank_stratified_v3_allfiles \
+  --expected-max-retries 1 --max-prompt-tokens 5000 \
+  --require-no-prefill --require-thinking-disabled
+
+python3 artifacts/scripts/deduplicate_repair_predictions.py \
+  --predictions-root temp_run/repair_glm52_final/predictions \
+  --output-root temp_run/repair_glm52_final/canonical \
+  --variants issue bm25 mural --model-prefix glm52 \
+  --prompt-audit artifacts/results/repair_glm52_context_rendering_20260716.tsv
+```
+
+Reuse requires the same instance, rendered-prompt SHA-256, and patch SHA-256.
+The executed run therefore maps 1,052 nonempty variant predictions to 1,051
+official evaluations.
+
+Each canonical slot is evaluated with the official SWE-bench harness. The
+registry mirror changes image transport only; image tags, benchmark records,
+patches, and test oracles are unchanged.
+
+```bash
+for slot in 0 1 2; do
+  python3 -m swebench.harness.run_evaluation \
+    --dataset_name temp_run/generated/SWE-bench_Verified.jsonl \
+    --predictions_path temp_run/repair_glm52_final/canonical/slot_${slot}/predictions.jsonl \
+    --max_workers 8 --timeout 1800 \
+    --namespace dockerproxy.net/swebench \
+    --run_id mural_glm52_slot_${slot}_20260716
+
+  python3 artifacts/scripts/collect_swebench_reports.py \
+    --predictions temp_run/repair_glm52_final/canonical/slot_${slot}/predictions.jsonl \
+    --run-id mural_glm52_slot_${slot}_20260716 \
+    --output temp_run/repair_glm52_final/canonical/slot_${slot}/official_results.jsonl \
+    --normalize-terminal-errors
+done
+
+python3 artifacts/scripts/materialize_repair_variant_reports.py \
+  --canonical-root temp_run/repair_glm52_final/canonical \
+  --output-root temp_run/repair_glm52_final/official \
+  --variants issue bm25 mural
+
+python3 artifacts/scripts/analyze_repair_outcomes.py \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --predictions-root temp_run/repair_glm52_final/predictions \
+  --official-root temp_run/repair_glm52_final/official \
+  --output-outcomes temp_run/repair_glm52_outcomes.tsv \
+  --output-summary temp_run/repair_glm52_summary.tsv
+```
+
 ### Context-construction cost
 
 ```bash
@@ -204,5 +276,5 @@ python3 artifacts/scripts/evaluate_java_retrieve_localize.py \
 ### Verification
 
 ```bash
-python3 artifacts/scripts/verify_paper_results.py --scope core
+python3 artifacts/scripts/verify_paper_results.py --scope all
 ```

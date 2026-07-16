@@ -1,0 +1,7 @@
+kind	name	nonempty	applicable	resolved	resolved_percent	patch_apply_failed	test_timeout	baseline	treatment	delta_pp	ci95_low	ci95_high	wins	losses	p_exact
+variant	issue	326	322	100	20.000	4	2	NA	NA	NA	NA	NA	NA	NA	NA
+variant	bm25	366	361	111	22.200	5	0	NA	NA	NA	NA	NA	NA	NA	NA
+variant	mural	360	356	113	22.600	4	0	NA	NA	NA	NA	NA	NA	NA	NA
+contrast	bm25_vs_issue							issue	bm25	2.200	-1.000	5.400	39	28	0.221548729645
+contrast	mural_vs_issue							issue	mural	2.600	-0.400	5.600	36	23	0.117477350245
+contrast	mural_vs_bm25							bm25	mural	0.400	-2.400	3.200	27	25	0.889883965277

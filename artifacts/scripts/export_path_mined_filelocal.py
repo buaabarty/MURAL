@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Expand ranked files into file-local code-entity rankings.
+"""Project ranked files into normalized code-entity rankings.
 
 This script is intentionally export-only: it does not query Neo4j and it does
 not use ground-truth patches. It starts from a ranked-file JSON export, keeps
-the source's issue-to-file evidence, and mines local source structure inside
+the source's issue-to-file evidence, and parses concrete code entities within
 those files to rank candidate methods/classes.
 """
 
@@ -414,7 +414,7 @@ def path_for_item(file_ev: dict, item: dict, cls: dict | None) -> List[dict]:
                 "start_type": "file",
                 "end_type": "class",
                 "type": "CONTAINS",
-                "description": "file-local class scope",
+                "description": "class scope within ranked file",
             }
         )
         path.append(
@@ -426,7 +426,7 @@ def path_for_item(file_ev: dict, item: dict, cls: dict | None) -> List[dict]:
                 "start_type": "class",
                 "end_type": "method",
                 "type": "CONTAINS",
-                "description": "class-local method scope",
+                "description": "method scope within class",
             }
         )
     else:
@@ -439,7 +439,7 @@ def path_for_item(file_ev: dict, item: dict, cls: dict | None) -> List[dict]:
                 "start_type": "file",
                 "end_type": "method",
                 "type": "CONTAINS",
-                "description": "file-local method scope",
+                "description": "method scope within ranked file",
             }
         )
     return path
@@ -627,7 +627,7 @@ def rerank_instance(data: dict, dataset_item: dict) -> dict:
                     "start_type": "file",
                     "end_type": "class",
                     "type": "CONTAINS",
-                    "description": "file-local class scope",
+                    "description": "class scope within ranked file",
                 },
             ]
             sig = cls.get("signature") or cls.get("name")

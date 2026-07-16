@@ -17,8 +17,7 @@ contrasts use the two-sided exact McNemar test.
 ## Main scripts
 
 - `export_ranked_file_seeds.py`: adapts ranked retrieval output to ranked files.
-- `export_path_mined_filelocal.py`: historical filename for the shared Entity
-  Projection implementation.
+- `export_entity_projection.py`: shared Entity Projection implementation.
 - `export_multi_source_rrf_fusion.py`: equal-weight multi-source entity fusion.
 - `export_fixed_prefix_fusion.py`: prefix-preserving context completion.
 - `analyze_retrieve_localize_controls.py`: localization metrics, paired
@@ -75,10 +74,19 @@ without representing the default three-source Python configuration.
 - `prompts/glm52_repair_prompt.md`
 - `results/repair_glm52_context_rendering_20260716.tsv`
 
+### End-to-end repair
+
+- `results/repair_glm52_assembly_20260716.tsv`
+- `results/repair_glm52_prediction_mapping_20260716.tsv`
+- `results/repair_glm52_deduplication_summary_20260716.json`
+- `results/repair_glm52_outcomes_20260716.tsv`
+- `results/repair_glm52_summary_20260716.tsv`
+- `results/mural_repository_repair_20260716.tsv`
+
 ## Verification
 
 ```bash
-python3 artifacts/scripts/verify_paper_results.py --scope core
+python3 artifacts/scripts/verify_paper_results.py --scope all
 ```
 
 The verifier fails on a missing, extra, duplicate, incomplete, or numerically
