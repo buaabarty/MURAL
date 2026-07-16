@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import shutil
@@ -34,12 +35,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--playground-dir", required=True, type=Path)
     parser.add_argument("--dataset-file", required=True, type=Path)
     parser.add_argument("--source-root", type=Path, default=artifact_root)
-    parser.add_argument("--model", default="glm-5")
+    parser.add_argument("--model", default="glm-5.2")
     parser.add_argument(
         "--base-url",
-        default="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        default="https://www.autodl.art/api/v1",
     )
-    parser.add_argument("--api-key-env", default="DASHSCOPE_API_KEY")
+    parser.add_argument("--api-key-env", default="AUTODL_API_KEY")
     parser.add_argument(
         "--extra-body-json",
         help="Additional frozen OpenAI-compatible generation options as JSON.",
@@ -80,8 +81,14 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_ids(path: Path) -> list[str]:
-    ids = [line.strip() for line in path.read_text(encoding="utf-8").splitlines()]
-    ids = [instance_id for instance_id in ids if instance_id and not instance_id.startswith("#")]
+    ids: list[str] = []
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("{"):
+            line = str(json.loads(line)["instance_id"])
+        ids.append(line)
     if not ids:
         raise ValueError(f"No instance ids in {path}")
     return list(dict.fromkeys(ids))
@@ -135,6 +142,16 @@ def write_summary(path: Path, rows: list[dict[str, object]]) -> None:
         writer.writerows(rows)
 
 
+def provider_account_blocked(path: Path) -> bool:
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8", errors="replace").lower()
+    return (
+        "insufficient_balance" in text
+        or "insufficient account balance" in text
+    )
+
+
 def main() -> int:
     args = parse_args()
     extra_body = build_extra_body(args)
@@ -144,6 +161,7 @@ def main() -> int:
     dataset_file = args.dataset_file.resolve()
     source_root = args.source_root.resolve()
     repair_script = source_root / "kgcompass" / "repair_claude.py"
+    repair_script_sha256 = hashlib.sha256(repair_script.read_bytes()).hexdigest()
     instance_ids = load_ids(args.ids_file.resolve())
 
     output_root.mkdir(parents=True, exist_ok=True)
@@ -151,12 +169,17 @@ def main() -> int:
         "input_root": str(input_root),
         "ids_file": str(args.ids_file.resolve()),
         "dataset_file": str(dataset_file),
+        "playground_dir": str(playground_dir),
+        "source_root": str(source_root),
+        "repair_script": str(repair_script),
+        "repair_script_sha256": repair_script_sha256,
         "instance_ids": instance_ids,
         "variants": args.variants,
         "preset": args.preset,
         "round_tag": args.round_tag,
         "model": args.model,
         "base_url": args.base_url,
+        "api_key_env": args.api_key_env,
         "generation_extra_body": extra_body,
         "first_prompt_profile": args.first_prompt_profile,
         "prompt_token_limit": args.prompt_token_limit,
@@ -315,6 +338,13 @@ def main() -> int:
                 }
             )
             write_summary(output_root / "run_summary.tsv", rows)
+            if returncode != 0 and provider_account_blocked(log_path):
+                print(
+                    "Provider account balance is insufficient; stopping this "
+                    "resumable batch before the next request.",
+                    file=sys.stderr,
+                )
+                return 2
 
     return 1 if failures else 0
 
