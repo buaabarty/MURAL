@@ -1,0 +1,13 @@
+name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
+Issue_B5	500	5	0.838	0.507898457098457	0.5093333333333334	0.604	temp_run/eval_aliyun_glm5_issueonly
+BM25_B5	500	5	0.884	0.5684414363414363	0.5328333333333334	0.664	temp_run/mural_experiment_additions/selector_compact_main_20260715/budget/bm25_b5_p3
+MURAL_B5	500	5	0.884	0.575998507048507	0.5372666666666668	0.67	temp_run/mural_experiment_additions/selector_compact_main_20260715/budget/mural3_b5_p3
+Issue_B10	500	10	0.87	0.529893573093573	0.5123071428571428	0.624	temp_run/eval_aliyun_glm5_issueonly
+BM25_B10	500	10	0.91	0.6345995393495394	0.5400920634920634	0.724	temp_run/mural_experiment_additions/selector_compact_main_20260715/budget/bm25_b10_p5
+MURAL_B10	500	10	0.922	0.6498864441114443	0.5453841269841269	0.738	temp_run/mural_experiment_additions/selector_compact_main_20260715/budget/mural3_b10_p5
+Issue_B20	500	20	0.874	0.529893573093573	0.5123071428571428	0.624	temp_run/eval_aliyun_glm5_issueonly
+BM25_B20	500	20	0.942	0.691663197913198	0.544059565752445	0.78	temp_run/mural_experiment_additions/selector_compact_main_20260715/budget/bm25_b20_p10
+MURAL_B20	500	20	0.952	0.71632668997669	0.5495297780564808	0.802	temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural3_b20_p10
+Issue_B40	500	40	0.874	0.529893573093573	0.5123071428571428	0.624	temp_run/eval_aliyun_glm5_issueonly
+BM25_B40	500	40	0.956	0.73386487956488	0.5452191556258528	0.814	temp_run/mural_experiment_additions/selector_compact_main_20260715/budget/bm25_b40_p20
+MURAL_B40	500	40	0.972	0.7836890859140861	0.5513492330731161	0.856	temp_run/mural_experiment_additions/selector_compact_main_20260715/budget/mural3_b40_p20

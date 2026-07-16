@@ -1,79 +1,95 @@
 {
   "top_k": 20,
-  "target_cache": "artifacts/results/patch_derived_context_targets_20260702.json",
+  "target_cache": "external/mural-artifact/artifacts/results/patch_derived_context_targets_20260702.json",
   "target_definition": "base-commit functions, methods, assignments, or classes mapped from official patch lines; patched-file fallback when no entity can be mapped",
   "rows": {
-    "BM25": {
-      "name": "BM25",
-      "family": "controlled",
+    "BM25 entities": {
+      "name": "BM25 entities",
+      "family": "retrieval",
       "source": "runs/text_baselines_nohints/2000",
       "N": 500,
       "edit_target_recall": 0.3920462481962482,
       "complete_edit_target_rate": 0.35
     },
-    "KG graph-only": {
-      "name": "KG graph-only",
-      "family": "controlled",
+    "Structural entities": {
+      "name": "Structural entities",
+      "family": "retrieval",
       "source": "runs/kg_verified_evidence_graph/tse_timesafe_main_20260529_v6",
       "N": 500,
       "edit_target_recall": 0.3377373737373737,
       "complete_edit_target_rate": 0.308
     },
-    "BM25 files + local": {
-      "name": "BM25 files + local",
-      "family": "controlled",
+    "BM25 + projection": {
+      "name": "BM25 + projection",
+      "family": "projection",
       "source": "temp_run/mural_experiment_additions/selector_minimal_20260715c/title_exact_file_rank_ast",
       "N": 500,
       "edit_target_recall": 0.5010113275613275,
       "complete_edit_target_rate": 0.446
     },
-    "KG file-local": {
-      "name": "KG file-local",
-      "family": "controlled",
+    "Structural + projection": {
+      "name": "Structural + projection",
+      "family": "projection",
       "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/kg_local",
       "N": 500,
       "edit_target_recall": 0.4527596681096681,
       "complete_edit_target_rate": 0.412
     },
-    "MURAL-2": {
-      "name": "MURAL-2",
-      "family": "controlled",
+    "Dense + projection": {
+      "name": "Dense + projection",
+      "family": "projection",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/dense_local/title_exact_file_rank_ast",
+      "N": 500,
+      "edit_target_recall": 0.5646061688311687,
+      "complete_edit_target_rate": 0.504
+    },
+    "MURAL w/o Dense": {
+      "name": "MURAL w/o Dense",
+      "family": "fusion",
       "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_2src",
       "N": 500,
       "edit_target_recall": 0.5519722222222222,
       "complete_edit_target_rate": 0.49
     },
-    "GLM-5 issue-only": {
-      "name": "GLM-5 issue-only",
+    "MURAL": {
+      "name": "MURAL",
       "family": "fusion",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src",
+      "N": 500,
+      "edit_target_recall": 0.5961367243867242,
+      "complete_edit_target_rate": 0.534
+    },
+    "GLM-5": {
+      "name": "GLM-5",
+      "family": "llm",
       "source": "temp_run/eval_aliyun_glm5_issueonly",
       "N": 500,
       "edit_target_recall": 0.529893573093573,
       "complete_edit_target_rate": 0.462
     },
-    "GLM-5 + KG local": {
-      "name": "GLM-5 + KG local",
-      "family": "fusion",
-      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_kg_b20_p10",
-      "N": 500,
-      "edit_target_recall": 0.6585265817515819,
-      "complete_edit_target_rate": 0.592
-    },
-    "GLM-5 + BM25 local": {
-      "name": "GLM-5 + BM25 local",
-      "family": "fusion",
+    "GLM-5 + BM25 projection": {
+      "name": "GLM-5 + BM25 projection",
+      "family": "llm_fusion",
       "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_bm25_b20_p10",
       "N": 500,
       "edit_target_recall": 0.691663197913198,
       "complete_edit_target_rate": 0.62
     },
-    "GLM-5 + MURAL-2": {
-      "name": "GLM-5 + MURAL-2",
-      "family": "fusion",
+    "GLM-5 + MURAL w/o Dense": {
+      "name": "GLM-5 + MURAL w/o Dense",
+      "family": "llm_fusion",
       "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural2_b20_p10",
       "N": 500,
       "edit_target_recall": 0.7112065601065601,
       "complete_edit_target_rate": 0.644
+    },
+    "GLM-5 + MURAL": {
+      "name": "GLM-5 + MURAL",
+      "family": "llm_fusion",
+      "source": "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural3_b20_p10",
+      "N": 500,
+      "edit_target_recall": 0.71632668997669,
+      "complete_edit_target_rate": 0.646
     }
   }
 }

@@ -43,8 +43,19 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_ids(path: Path) -> list[str]:
-    values = [line.strip() for line in path.read_text(encoding="utf-8").splitlines()]
-    values = [value for value in values if value and not value.startswith("#")]
+    values: list[str] = []
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("{"):
+            payload = json.loads(line)
+            value = str(payload.get("instance_id") or "").strip()
+            if not value:
+                raise ValueError(f"Missing instance_id in {path}: {line}")
+            values.append(value)
+        else:
+            values.append(line)
     if not values:
         raise ValueError(f"No instance ids in {path}")
     if len(values) != len(set(values)):

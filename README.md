@@ -1,60 +1,55 @@
 # MURAL
 
 MURAL (Multi-source Unification of Retrieval And Localization) constructs a
-fixed-budget code context for issue-driven repository repair. Ranked-file
-sources pass through one compact file-local selector, completed entity rankings
-are combined with reciprocal-rank fusion (RRF), and an optional localizer prefix
-is preserved while MURAL fills the remaining positions.
+fixed-budget code context for issue-driven repository repair. Each retrieval
+adapter emits ranked files, one shared Entity Projection operator resolves those
+files into concrete code entities, and reciprocal-rank fusion (RRF) combines the
+entity rankings. MURAL can also preserve an existing localizer prefix and fill
+only its remaining context slots.
 
-This repository is the public artifact for the MURAL manuscript and its
-separately compiled supplementary material. The historical `kgcompass/`
-package name remains for API compatibility. In frozen ledgers, `KGCompass`
-corresponds to the paper's `KG-local` source.
+The default configuration uses three interchangeable sources:
 
-## Verify the reported results
+- lexical file retrieval with BM25;
+- dense code retrieval;
+- a typed structural repository adapter.
+
+The structural adapter is one source implementation, not a prerequisite for the
+framework. The historical `kgcompass/` package name remains for API
+compatibility.
+
+## Verify the paper-facing results
 
 ```bash
-python3 artifacts/scripts/verify_paper_results.py
+python3 artifacts/scripts/verify_paper_results.py --scope core
 ```
 
-A successful run reports:
-
-```json
-{
-  "ok": true,
-  "scope": "all",
-  "failed": []
-}
-```
-
-The verifier checks the exact result inventory and 1,500+ values and contracts,
-including target mapping, localization, paired significance tests, edit-target
-coverage, official repair outcomes, complete benchmark splits, repository
-breakdowns, and context-construction cost.
+The verifier checks the exact retained result inventory, benchmark completeness,
+aggregate values, paired bootstrap intervals, exact McNemar tests, and the
+cross-language ID-set contract. No API key is stored in this repository.
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
-| `kgcompass/` | Core localization and repair implementation. |
-| `scripts/` | Full-workspace experiment and aggregation scripts. |
-| `artifacts/scripts/` | Submission-side exporters, evaluators, analyzers, and verifier. |
-| `artifacts/results/` | Ledgers used by the manuscript and supplementary material. |
+| `kgcompass/` | Source adapters, localization, context rendering, and repair integration. |
+| `artifacts/scripts/` | Exporters, evaluators, statistical analyzers, and the result verifier. |
+| `artifacts/results/` | Paper-facing aggregate and per-instance ledgers only. |
 | `artifacts/inputs/` | Frozen provenance records and Java structural-source inputs. |
 | `artifacts/prompts/` | Verbatim localization and repair prompts. |
 | `artifacts/RESULT_TRACEABILITY.md` | Claim-to-ledger mapping and rerun commands. |
 
-The main result families are:
+The retained evaluation covers:
 
-- controlled BM25, KG, dense, and MURAL localization;
-- compact-selector simplification and RRF/budget sensitivity;
-- fixed-prefix GLM-5 and released Qwen2.5-32B localizer augmentation;
-- mapped edit-target recall and complete coverage;
-- the complete 500-by-3 GLM-5 repair outcome ledger;
-- the complete 91-instance SWE-bench-Java Verified evaluation;
-- per-repository and context-construction-cost breakdowns.
+- all 500 SWE-bench Verified instances for localization and edit-target
+  coverage;
+- BM25, dense, structural, and released-LLM source controls under one Top-20
+  entity budget;
+- source composition, RRF, budget, and repository-level analyses;
+- all 91 official SWE-bench-Java Verified instances for the cross-language
+  adapter check;
+- measured context-construction time and memory.
 
-See `artifacts/README.md` for the retained file inventory and
+See `artifacts/README.md` for the publication inventory and
 `artifacts/RESULT_TRACEABILITY.md` for exact provenance.
 
 ## Environment
@@ -65,8 +60,10 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Full reruns additionally require benchmark checkouts and archived model outputs
-described in `artifacts/RESULT_TRACEABILITY.md`.
+Full reruns require the benchmark repositories and archived upstream localizer
+outputs listed in `artifacts/RESULT_TRACEABILITY.md`. Hosted repair generation
+reads its key from `AUTODL_API_KEY`; the key must be supplied through the
+environment.
 
 ## Web demo
 

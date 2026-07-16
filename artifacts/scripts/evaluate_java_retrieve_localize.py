@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Evaluate retrieve-then-localize controls on SWE-bench-Java Verified.
+"""Evaluate retrieval, entity projection, and fusion on SWE-bench-Java Verified.
 
-The script rebuilds base-commit Java entities, runs BM25 file retrieval, applies
-the same five-family lexicographic local selector used by MURAL, adapts archived
-KG ranked-file seeds to the same contract, and fuses the completed rankings with
-equal-weight RRF. Official patches are read only after rankings are frozen for
-patch-to-entity evaluation.
+The script rebuilds base-commit Java entities, runs BM25 file retrieval, projects
+ranked files into Java entities, adapts archived structural ranked-file seeds to
+the same contract, and fuses the completed rankings with equal-weight RRF.
+Official patches are read only after rankings are produced for patch-to-entity
+evaluation.
 """
 
 from __future__ import annotations
@@ -796,10 +796,10 @@ def main() -> int:
                 str(item.get("fix_patch") or ""), by_file
             )
             rows = {
-                "BM25": bm25_ranking,
-                "BM25_local": bm25_local,
-                "KG_local": kg_local,
-                "MURAL": mural,
+                "Raw_BM25_entities": bm25_ranking,
+                "BM25_projection": bm25_local,
+                "Structural_projection": kg_local,
+                "Lexical_structural_fusion": mural,
             }
             metrics = {
                 name: instance_metrics(
@@ -853,7 +853,12 @@ def main() -> int:
     if not per_instance:
         raise RuntimeError(f"Every Java instance failed: {failures[:3]}")
 
-    names = ["BM25", "BM25_local", "KG_local", "MURAL"]
+    names = [
+        "Raw_BM25_entities",
+        "BM25_projection",
+        "Structural_projection",
+        "Lexical_structural_fusion",
+    ]
     summary_rows: list[dict[str, Any]] = []
     for name in names:
         summary_rows.append(
@@ -871,10 +876,10 @@ def main() -> int:
         )
 
     comparisons = [
-        ("BM25", "BM25_local"),
-        ("BM25_local", "KG_local"),
-        ("BM25_local", "MURAL"),
-        ("KG_local", "MURAL"),
+        ("Raw_BM25_entities", "BM25_projection"),
+        ("BM25_projection", "Structural_projection"),
+        ("BM25_projection", "Lexical_structural_fusion"),
+        ("Structural_projection", "Lexical_structural_fusion"),
     ]
     paired_rows: list[dict[str, Any]] = []
     for baseline, treatment in comparisons:

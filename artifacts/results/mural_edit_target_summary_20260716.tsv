@@ -1,0 +1,12 @@
+name	family	N	edit_target_recall	complete_edit_target_rate	source
+BM25 entities	retrieval	500	0.392046	0.350000	runs/text_baselines_nohints/2000
+Structural entities	retrieval	500	0.337737	0.308000	runs/kg_verified_evidence_graph/tse_timesafe_main_20260529_v6
+BM25 + projection	projection	500	0.501011	0.446000	temp_run/mural_experiment_additions/selector_minimal_20260715c/title_exact_file_rank_ast
+Structural + projection	projection	500	0.452760	0.412000	temp_run/mural_experiment_additions/selector_compact_main_20260715/kg_local
+Dense + projection	projection	500	0.564606	0.504000	temp_run/mural_experiment_additions/selector_compact_main_20260715/dense_local/title_exact_file_rank_ast
+MURAL w/o Dense	fusion	500	0.551972	0.490000	temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_2src
+MURAL	fusion	500	0.596137	0.534000	temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src
+GLM-5	llm	500	0.529894	0.462000	temp_run/eval_aliyun_glm5_issueonly
+GLM-5 + BM25 projection	llm_fusion	500	0.691663	0.620000	temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_bm25_b20_p10
+GLM-5 + MURAL w/o Dense	llm_fusion	500	0.711207	0.644000	temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural2_b20_p10
+GLM-5 + MURAL	llm_fusion	500	0.716327	0.646000	temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural3_b20_p10

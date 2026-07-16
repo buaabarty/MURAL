@@ -1,4 +1,0 @@
-stage	scope	N	total_s	mean_s	median_s	p95_s	max_s	max_rss_mib
-structural_adapter	per_instance	500	37685.35516100004	75.370710322	66.9057985	167.39830899999998	248.492437	NA
-bm25_file_local	batch	500	920.45	1.8409	NA	NA	NA	203.33203125
-equal_weight_rrf	batch	500	5.21	0.01042	NA	NA	NA	25.24609375

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -46,11 +47,14 @@ def parse_rendered_blocks(content: str) -> list[tuple[str, bool]]:
 
 def main() -> int:
     args = parse_args()
-    ids = [
-        line.strip()
-        for line in args.ids_file.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
-    ]
+    ids = []
+    for raw_line in args.ids_file.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("{"):
+            line = str(json.loads(line)["instance_id"])
+        ids.append(line)
     os.environ["SWE_BENCH_LOCAL_FILE"] = str(args.dataset_file.resolve())
     os.environ["MURAL_REPAIR_FIRST_PROMPT_PROFILE"] = "compact"
     os.environ["MURAL_REPAIR_PROMPT_TOKEN_LIMIT"] = str(args.prompt_token_limit)
@@ -60,7 +64,7 @@ def main() -> int:
         language="python",
         api_type="openai_compat",
         temperature=0.0,
-        model_name_override="glm-5",
+        model_name_override="glm-5.2",
         base_url_override="http://127.0.0.1:1/v1",
         api_key_env="OPENAI_API_KEY",
     )
@@ -110,6 +114,8 @@ def main() -> int:
                         source for _, source in rendered[10:20]
                     ),
                     "prompt_tokens": repairer.count_tokens(prompt),
+                    "context_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                    "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
                 }
             )
 

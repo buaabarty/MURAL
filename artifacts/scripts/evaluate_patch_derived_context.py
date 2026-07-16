@@ -10,22 +10,52 @@ from pathlib import Path
 
 
 DEFAULT_ROWS = [
-    ("BM25", "controlled", "runs/text_baselines_nohints/2000"),
+    ("BM25 entities", "retrieval", "runs/text_baselines_nohints/2000"),
     (
-        "KGCompass w/o file-local paths",
-        "controlled",
+        "Structural entities",
+        "retrieval",
         "runs/kg_verified_evidence_graph/tse_timesafe_main_20260529_v6",
     ),
     (
-        "KGCompass",
-        "controlled",
-        "runs/kg_verified_evidence_graph/tse_timesafe_main_20260531_pathunion_v1",
+        "BM25 + projection",
+        "projection",
+        "temp_run/mural_experiment_additions/selector_minimal_20260715c/title_exact_file_rank_ast",
     ),
-    ("GLM-5 issue-only", "fusion", "temp_run/eval_aliyun_glm5_issueonly"),
     (
-        "GLM-5+KGCompass",
+        "Structural + projection",
+        "projection",
+        "temp_run/mural_experiment_additions/selector_compact_main_20260715/kg_local",
+    ),
+    (
+        "Dense + projection",
+        "projection",
+        "temp_run/mural_experiment_additions/selector_compact_main_20260715/dense_local/title_exact_file_rank_ast",
+    ),
+    (
+        "MURAL w/o Dense",
         "fusion",
-        "temp_run/fusions_glm5_baseline_controls_20260614_head10/GLM5_KGCompass_ht10",
+        "temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_2src",
+    ),
+    (
+        "MURAL",
+        "fusion",
+        "temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src",
+    ),
+    ("GLM-5", "llm", "temp_run/eval_aliyun_glm5_issueonly"),
+    (
+        "GLM-5 + BM25 projection",
+        "llm_fusion",
+        "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_bm25_b20_p10",
+    ),
+    (
+        "GLM-5 + MURAL w/o Dense",
+        "llm_fusion",
+        "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural2_b20_p10",
+    ),
+    (
+        "GLM-5 + MURAL",
+        "llm_fusion",
+        "temp_run/mural_experiment_additions/selector_compact_main_20260715/glm5_mural3_b20_p10",
     ),
 ]
 
@@ -46,12 +76,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-tsv",
         type=Path,
-        default=Path("artifacts/results/patch_derived_context_summary_20260702.tsv"),
+        default=Path("artifacts/results/mural_edit_target_summary_20260716.tsv"),
     )
     parser.add_argument(
         "--output-json",
         type=Path,
-        default=Path("artifacts/results/patch_derived_context_summary_20260702.json"),
+        default=Path("artifacts/results/mural_edit_target_summary_20260716.json"),
     )
     parser.add_argument("--top-k", type=int, default=20)
     parser.add_argument(

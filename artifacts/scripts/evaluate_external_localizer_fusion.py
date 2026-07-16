@@ -29,6 +29,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--top-k", type=int, default=20)
     parser.add_argument("--primary-prefix", type=int, default=10)
     parser.add_argument("--secondary-pool", type=int, default=20)
+    parser.add_argument(
+        "--tail-label",
+        default="MURAL",
+        help="Reader-facing label for the appended localization tail.",
+    )
     parser.add_argument("--bootstrap-iters", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--output-summary", type=Path, required=True)
@@ -416,7 +421,7 @@ def main() -> int:
             gt_map,
             args.top_k,
         )
-        treatment_name = f"{name}+MURAL-2"
+        treatment_name = f"{name}+{args.tail_label}"
         treatment_summary, treatment_eval = summarize(
             treatment_name,
             f"{source_path} + {args.mural_dir}",

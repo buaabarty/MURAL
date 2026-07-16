@@ -99,6 +99,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--logs-glob", required=True)
     parser.add_argument("--run-dir", required=True, type=Path)
     parser.add_argument("--bm25-time", required=True, type=Path)
+    parser.add_argument("--dense-time", required=True, type=Path)
     parser.add_argument("--rrf-time", required=True, type=Path)
     parser.add_argument("--instances", type=int, default=500)
     parser.add_argument("--output", required=True, type=Path)
@@ -112,6 +113,7 @@ def main() -> int:
     )
     durations = [row["duration_s"] for row in selected]
     bm25_s, bm25_rss = parse_gnu_time(args.bm25_time)
+    dense_s, dense_rss = parse_gnu_time(args.dense_time)
     rrf_s, rrf_rss = parse_gnu_time(args.rrf_time)
     rows = [
         {
@@ -126,7 +128,7 @@ def main() -> int:
             "max_rss_mib": "NA",
         },
         {
-            "stage": "bm25_file_local",
+            "stage": "bm25_entity_projection",
             "scope": "batch",
             "N": args.instances,
             "total_s": bm25_s,
@@ -137,7 +139,18 @@ def main() -> int:
             "max_rss_mib": bm25_rss,
         },
         {
-            "stage": "equal_weight_rrf",
+            "stage": "dense_entity_projection",
+            "scope": "batch",
+            "N": args.instances,
+            "total_s": dense_s,
+            "mean_s": dense_s / args.instances,
+            "median_s": "NA",
+            "p95_s": "NA",
+            "max_s": "NA",
+            "max_rss_mib": dense_rss,
+        },
+        {
+            "stage": "three_source_equal_weight_rrf",
             "scope": "batch",
             "N": args.instances,
             "total_s": rrf_s,

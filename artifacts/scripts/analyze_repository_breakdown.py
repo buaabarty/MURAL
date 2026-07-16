@@ -15,13 +15,20 @@ from typing import Any
 
 def load_eval_module() -> Any:
     repo_root = Path(__file__).resolve().parents[2]
-    path = repo_root / "scripts" / "eval_controls_v3.py"
-    spec = importlib.util.spec_from_file_location("eval_controls_v3", path)
-    if spec is None or spec.loader is None:
-        raise FileNotFoundError(f"Cannot import {path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    candidates = [
+        repo_root / "scripts" / "eval_controls_v3.py",
+        Path(__file__).with_name("eval_controls_v3.py"),
+    ]
+    for path in candidates:
+        if not path.exists():
+            continue
+        spec = importlib.util.spec_from_file_location("eval_controls_v3", path)
+        if spec is None or spec.loader is None:
+            continue
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    raise FileNotFoundError("Cannot locate eval_controls_v3.py")
 
 
 def parse_named_path(raw: str) -> tuple[str, Path]:
