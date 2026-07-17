@@ -151,6 +151,11 @@ def main() -> None:
             "nonempty_percent": float(nonempty_flags.mean() * 100),
             "applicable": int(applicable.sum()),
             "applicable_percent": float(applicable.mean() * 100),
+            "applicable_given_nonempty_percent": (
+                float(applicable.sum() / nonempty_flags.sum() * 100)
+                if nonempty_flags.any()
+                else 0.0
+            ),
             "resolved": int(resolved.sum()),
             "resolved_percent": float(resolved.mean() * 100),
             "patch_apply_failed": sum(
@@ -173,6 +178,9 @@ def main() -> None:
                 **row,
                 "nonempty_percent": f"{row['nonempty_percent']:.3f}",
                 "applicable_percent": f"{row['applicable_percent']:.3f}",
+                "applicable_given_nonempty_percent": (
+                    f"{row['applicable_given_nonempty_percent']:.3f}"
+                ),
                 "resolved_percent": f"{row['resolved_percent']:.3f}",
                 "baseline": "NA",
                 "treatment": "NA",
@@ -215,9 +223,10 @@ def main() -> None:
 
     fields = [
         "kind", "name", "metric", "nonempty", "nonempty_percent", "applicable",
-        "applicable_percent", "resolved", "resolved_percent", "patch_apply_failed",
-        "test_timeout", "baseline", "treatment", "delta_pp", "ci95_low", "ci95_high",
-        "wins", "losses", "p_exact",
+        "applicable_percent", "applicable_given_nonempty_percent", "resolved",
+        "resolved_percent", "patch_apply_failed", "test_timeout", "baseline",
+        "treatment", "delta_pp", "ci95_low", "ci95_high", "wins", "losses",
+        "p_exact",
     ]
     with args.output_summary.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t", extrasaction="ignore")

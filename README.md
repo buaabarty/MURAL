@@ -25,8 +25,9 @@ python3 artifacts/scripts/verify_paper_results.py --scope all
 
 The verifier checks the exact retained result inventory, benchmark completeness,
 aggregate values, paired bootstrap intervals, exact McNemar tests for
-nonempty, applicable, and resolved repair outcomes, prediction provenance, and
-the cross-language ID-set contract. No API key is
+nonempty, applicable-patch-yield, and resolved repair outcomes, conditional
+application rates, prediction provenance, and the cross-language ID set,
+selector version, evaluator hash, and output hashes. No API key is
 stored in this repository.
 
 ## Repository layout

@@ -67,7 +67,8 @@ contrasts use the two-sided exact McNemar test.
 
 The Java benchmark contains all 91 official instances. Its available adapters
 are lexical and structural; it tests the shared projection and fusion interface
-without representing the default three-source Python configuration.
+without representing the default three-source Python configuration. The
+manifest pins the compact selector version plus evaluator and output hashes.
 
 ### Repair rendering protocol
 
@@ -83,13 +84,14 @@ without representing the default three-source Python configuration.
 - `results/repair_glm52_summary_20260716.tsv`
 - `results/mural_repository_repair_20260716.tsv`
 
-The repair summary reports counts and rates for nonempty, applicable, and
-test-resolved patches, plus paired bootstrap intervals and exact McNemar tests
-for all three binary outcomes.
-Here, applicable means that the official harness records
-`patch_successfully_applied=1`; resolved means that the official test oracles
-accept the prediction. Every rate retains all 500 benchmark instances in its
-denominator.
+The repair summary reports counts and benchmark-level yields for nonempty,
+applicable, and test-resolved patches, plus paired bootstrap intervals and
+exact McNemar tests for all three binary outcomes. Here, applicable means that
+the official harness records `patch_successfully_applied=1`; resolved means
+that the official test oracles accept the prediction. The
+`applicable_given_nonempty_percent` field separately reports application
+success conditional on a nonempty prediction. Every benchmark-level yield
+retains all 500 instances in its denominator.
 
 ## Verification
 
@@ -97,5 +99,5 @@ denominator.
 python3 artifacts/scripts/verify_paper_results.py --scope all
 ```
 
-The verifier fails on a missing, extra, duplicate, incomplete, or numerically
-inconsistent paper-facing ledger.
+The verifier fails on a missing, extra, duplicate, incomplete, hash-inconsistent,
+or numerically inconsistent paper-facing ledger.

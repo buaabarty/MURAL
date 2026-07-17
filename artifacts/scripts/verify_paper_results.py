@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "artifacts" / "results"
 INPUTS = ROOT / "artifacts" / "inputs"
@@ -276,9 +278,9 @@ def repository_and_java() -> None:
     rows = tsv(source)
     expected = {
         "Raw_BM25_entities": (.6153846154, .1992583424, .1349881290, .3406593407),
-        "BM25_projection": (.6703296703, .3215412792, .2415589187, .4725274725),
-        "Structural_projection": (.6373626374, .3526560690, .2494900228, .5164835165),
-        "Lexical_structural_fusion": (.7032967033, .3513896716, .2649923709, .5494505495),
+        "BM25_projection": (.6703296703, .3193434770, .2414052262, .4725274725),
+        "Structural_projection": (.6373626374, .3473185494, .2435071169, .5164835165),
+        "Lexical_structural_fusion": (.7032967033, .3460521520, .2593452402, .5494505495),
     }
     check("Java row order", [item["name"] for item in rows], list(expected), source)
     for name, values in expected.items():
@@ -301,6 +303,31 @@ def repository_and_java() -> None:
     ), (91, 91, 0), "java_cross_language_manifest_20260714.json")
     check("Java instance-ID digest", digest, benchmark["instance_id_set_sha256"],
           "java_cross_language_manifest_20260714.json")
+
+    evaluation = manifest["evaluation"]
+    manifest_source = "java_cross_language_manifest_20260714.json"
+    check(
+        "Java evaluator hash",
+        hashlib.sha256((ROOT / evaluation["script"]).read_bytes()).hexdigest(),
+        evaluation["script_sha256"],
+        manifest_source,
+    )
+    output_files = {
+        "summary": "java_cross_language_summary_20260714.tsv",
+        "paired": "java_cross_language_paired_20260714.tsv",
+        "targets": "java_cross_language_targets_20260714.json",
+        "instances": "java_cross_language_instances_20260714.jsonl",
+    }
+    for label, filename in output_files.items():
+        check(
+            f"Java {label} hash",
+            hashlib.sha256((RESULTS / filename).read_bytes()).hexdigest(),
+            evaluation["output_sha256"][label],
+            manifest_source,
+        )
+    target_meta = json_file(RESULTS / output_files["targets"])["meta"]
+    check("Java selector version", target_meta["selector_version"],
+          evaluation["selector_version"], manifest_source)
 
 
 def costs_and_audits() -> None:
@@ -446,6 +473,13 @@ def repair() -> None:
                 summary_source,
                 5e-4,
             )
+        close(
+            f"{variant} applicable given nonempty percent",
+            float(summary["applicable_given_nonempty_percent"]),
+            100.0 * expected["applicable"] / expected["nonempty"],
+            summary_source,
+            5e-4,
+        )
 
     def exact_mcnemar(wins: int, losses: int) -> float:
         discordant = wins + losses
@@ -457,6 +491,32 @@ def repair() -> None:
         )
         return min(1.0, 2.0 * tail / (2**discordant))
 
+    def paired_bootstrap_ci(
+        baseline_values: dict[str, bool],
+        treatment_values: dict[str, bool],
+        ordered_ids: list[str],
+    ) -> tuple[float, float]:
+        difference = np.array(
+            [
+                float(treatment_values[instance_id])
+                - float(baseline_values[instance_id])
+                for instance_id in ordered_ids
+            ],
+            dtype=float,
+        )
+        rng = np.random.default_rng(7)
+        means = np.empty(10_000, dtype=float)
+        for start in range(0, 10_000, 500):
+            stop = min(start + 500, 10_000)
+            indexes = rng.integers(
+                0,
+                len(difference),
+                size=(stop - start, len(difference)),
+            )
+            means[start:stop] = difference[indexes].mean(axis=1)
+        low, high = np.percentile(means, [2.5, 97.5])
+        return float(low * 100), float(high * 100)
+
     contrast_specs = (
         ("bm25_vs_issue", "issue", "bm25"),
         ("mural_vs_issue", "issue", "mural"),
@@ -466,9 +526,9 @@ def repair() -> None:
         for metric, _ in metric_fields:
             row = pair(contrast_rows, baseline, treatment, metric)
             check(f"{name}/{metric} name", row["name"], name, summary_source)
-            ids = id_sets[baseline]
             baseline_values = outcomes_by_variant[baseline][metric]
             treatment_values = outcomes_by_variant[treatment][metric]
+            ids = list(baseline_values)
             wins = sum(
                 treatment_values[instance_id] and not baseline_values[instance_id]
                 for instance_id in ids
@@ -491,13 +551,24 @@ def repair() -> None:
                 summary_source,
                 5e-10,
             )
-            low, high = float(row["ci95_low"]), float(row["ci95_high"])
-            check(
-                f"{label} CI contains effect",
-                (low, delta, high),
-                "low <= delta <= high",
+            expected_low, expected_high = paired_bootstrap_ci(
+                baseline_values,
+                treatment_values,
+                ids,
+            )
+            close(
+                f"{label} CI low",
+                float(row["ci95_low"]),
+                expected_low,
                 summary_source,
-                low <= delta <= high,
+                5e-4,
+            )
+            close(
+                f"{label} CI high",
+                float(row["ci95_high"]),
+                expected_high,
+                summary_source,
+                5e-4,
             )
 
     assembly_source = "repair_glm52_assembly_20260716.tsv"

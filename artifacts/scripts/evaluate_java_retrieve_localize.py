@@ -28,6 +28,7 @@ from tree_sitter_language_pack import get_parser
 
 
 CACHE_VERSION = 1
+SELECTOR_VERSION = "compact_title_exact_file_rank_ast_v1"
 RRF_K = 60
 TOP_K = 20
 SOURCE_DEPTH = 50
@@ -189,16 +190,34 @@ def field_terms(*values: object) -> tuple[set[str], set[str]]:
 
 
 def issue_sections(title: str, body: str) -> dict[str, set[str]]:
+    diagnostic_lines: list[str] = []
+    narrative_lines: list[str] = []
+    in_traceback = False
+    for line in body.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("Traceback") or stripped == "Traceback:":
+            in_traceback = True
+        is_stack_line = bool(
+            re.match(r'File ["\'].*["\'], line \d+', stripped)
+            or re.match(r"[A-Za-z_][A-Za-z0-9_.]*Error:", stripped)
+        )
+        if in_traceback or is_stack_line:
+            diagnostic_lines.append(line)
+        else:
+            narrative_lines.append(line)
+
+    narrative = "\n".join(narrative_lines)
+    diagnostic = "\n".join(diagnostic_lines)
     code_spans = " ".join(re.findall(r"`([^`]+)`", f"{title}\n{body}"))
     quoted = " ".join(re.findall(r"['\"]([A-Za-z_][A-Za-z0-9_.-]+)['\"]", body))
     title_terms = set(split_identifier(title))
-    narrative_terms = set(split_identifier(body))
+    narrative_terms = set(split_identifier(narrative))
     title_exact = exact_terms(title)
     exact = (
         title_exact
         | exact_terms(code_spans)
         | exact_terms(quoted)
-        | {term for term in exact_terms(body) if "_" in term or "." in term}
+        | {term for term in exact_terms(narrative) if "_" in term or "." in term}
     )
     return {
         "title_terms": title_terms,
@@ -208,7 +227,15 @@ def issue_sections(title: str, body: str) -> dict[str, set[str]]:
         | set(split_identifier(code_spans))
         | set(split_identifier(quoted)),
         "exact_terms": exact,
+        "diagnostic_terms": exact_terms(diagnostic),
     }
+
+
+def is_boilerplate(item: dict[str, Any]) -> bool:
+    base = str(item.get("name") or "").lower().rsplit(".", 1)[-1]
+    if base in {"__all__", "__version__", "__doc__", "__bibtex__", "__citation__"}:
+        return True
+    return base.startswith("__") and base.endswith("__") and base != "__init__"
 
 
 def source_path_is_candidate(path: str) -> bool:
@@ -456,26 +483,22 @@ def selector_key(
     title_symbol = sections["title_terms"] & symbol_terms
     title_source = sections["title_terms"] & source_terms
     narrative_symbol = sections["narrative_terms"] & symbol_terms
-    narrative_source = sections["narrative_terms"] & source_terms
     exact_symbol = sections["exact_terms"] & symbol_exact
     exact_source = sections["exact_terms"] & exact_terms(
         f"{item.get('source_code') or ''}\n{item.get('doc_string') or ''}"
     )
     source_only = (sections["issue_terms"] & source_terms) - (sections["issue_terms"] & symbol_terms)
+    diagnostic_symbol = sections["diagnostic_terms"] & symbol_exact
+    penalty = int(is_boilerplate(item))
+    if diagnostic_symbol and not (title_symbol or exact_symbol or narrative_symbol or source_only):
+        penalty += 1
     return (
         -len(title_symbol),
         -len(title_source),
         -len(exact_symbol),
         -len(exact_source),
-        -len(narrative_symbol),
-        -len(source_only),
-        -len(narrative_source),
-        -int(file_evidence.get("support") or 0),
-        int(file_evidence.get("distance") or 999),
-        0 if file_evidence.get("anchor_match") else 1,
-        0,
+        penalty,
         int(file_evidence.get("best_rank") or 999),
-        int(original_rank or 9999),
         int(item.get("start_line") or 0),
         item.get("name") or "",
     )
@@ -949,6 +972,7 @@ def main() -> int:
     target_payload = {
         "meta": {
             "cache_version": CACHE_VERSION,
+            "selector_version": SELECTOR_VERSION,
             "N": len(per_instance),
             "requested_N": len(instance_ids),
             "failure_count": len(failures),

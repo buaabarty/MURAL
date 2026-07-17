@@ -1,6 +1,7 @@
 {
   "meta": {
     "cache_version": 1,
+    "selector_version": "compact_title_exact_file_rank_ast_v1",
     "N": 91,
     "requested_N": 91,
     "failure_count": 0,
