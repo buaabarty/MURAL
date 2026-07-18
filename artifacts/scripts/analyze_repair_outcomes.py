@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import itertools
 import json
 import math
 from pathlib import Path
@@ -12,19 +13,16 @@ from pathlib import Path
 import numpy as np
 
 
-VARIANTS = ("issue", "bm25", "mural")
-CONTRASTS = (
-    ("bm25_vs_issue", "issue", "bm25"),
-    ("mural_vs_issue", "issue", "mural"),
-    ("mural_vs_bm25", "bm25", "mural"),
-)
+DEFAULT_VARIANTS = ("issue", "bm25", "mural")
 
 
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def read_timeout_outcomes(path: Path | None) -> dict[tuple[str, str], dict]:
+def read_timeout_outcomes(
+    path: Path | None, variants: tuple[str, ...]
+) -> dict[tuple[str, str], dict]:
     if path is None:
         return {}
     with path.open(newline="", encoding="utf-8") as handle:
@@ -34,7 +32,7 @@ def read_timeout_outcomes(path: Path | None) -> dict[tuple[str, str], dict]:
         key = (row["variant"], row["instance_id"])
         if key in outcomes:
             raise ValueError(f"Duplicate timeout outcome for {key} in {path}")
-        if row["variant"] not in VARIANTS:
+        if row["variant"] not in variants:
             raise ValueError(f"Unknown timeout variant {row['variant']} in {path}")
         if int(row["resolved"]) != 0:
             raise ValueError("A timed-out evaluation must be recorded as unresolved")
@@ -80,14 +78,23 @@ def main() -> None:
     parser.add_argument("--ids-file", type=Path, required=True)
     parser.add_argument("--predictions-root", type=Path, required=True)
     parser.add_argument("--official-root", type=Path, required=True)
+    parser.add_argument("--variants", nargs="+", default=list(DEFAULT_VARIANTS))
     parser.add_argument("--timeout-outcomes", type=Path)
     parser.add_argument("--output-outcomes", type=Path, required=True)
     parser.add_argument("--output-summary", type=Path, required=True)
     args = parser.parse_args()
 
+    variants = tuple(args.variants)
+    if len(variants) < 2 or len(variants) != len(set(variants)):
+        raise ValueError("--variants requires at least two unique names")
+    contrasts = [
+        (f"{treatment}_vs_{baseline}", baseline, treatment)
+        for baseline, treatment in itertools.combinations(variants, 2)
+    ]
+
     ids = load_ids(args.ids_file)
     id_set = set(ids)
-    timeout_outcomes = read_timeout_outcomes(args.timeout_outcomes)
+    timeout_outcomes = read_timeout_outcomes(args.timeout_outcomes, variants)
     unknown_timeout_ids = {instance_id for _, instance_id in timeout_outcomes} - id_set
     if unknown_timeout_ids:
         raise ValueError(f"Timeout outcomes contain unknown IDs: {sorted(unknown_timeout_ids)[:5]}")
@@ -95,7 +102,7 @@ def main() -> None:
     outcome_rows = []
     summaries = {}
 
-    for variant in VARIANTS:
+    for variant in variants:
         prediction_path = args.predictions_root / variant / "predictions_all.jsonl"
         official_path = args.official_root / variant / "official_results.jsonl"
         prediction_rows = read_jsonl(prediction_path)
@@ -168,7 +175,7 @@ def main() -> None:
         }
 
     summary_rows = []
-    for variant in VARIANTS:
+    for variant in variants:
         row = summaries[variant]
         summary_rows.append(
             {
@@ -192,7 +199,7 @@ def main() -> None:
                 "p_exact": "NA",
             }
         )
-    for name, baseline_name, treatment_name in CONTRASTS:
+    for name, baseline_name, treatment_name in contrasts:
         for metric in ("nonempty", "applicable", "resolved"):
             baseline = outcomes[baseline_name][metric]
             treatment = outcomes[treatment_name][metric]
@@ -232,7 +239,12 @@ def main() -> None:
         writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t", extrasaction="ignore")
         writer.writeheader()
         writer.writerows(summary_rows)
-    print(json.dumps({"variants": summaries, "contrasts": summary_rows[3:]}, indent=2))
+    print(
+        json.dumps(
+            {"variants": summaries, "contrasts": summary_rows[len(variants):]},
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

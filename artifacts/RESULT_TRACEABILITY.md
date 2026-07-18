@@ -42,6 +42,11 @@ per manifest ID. No instance is excluded.
 | Released-localizer paired tests | `results/mural_external_localizer_paired_20260716.tsv` |
 | Per-instance released-localizer changes | `results/mural_external_localizer_disagreements_20260716.tsv` |
 | Repository strata | `results/mural_repository_localization_20260716.tsv` |
+| Equal rendered-token packing and changed-line coverage | `results/token_budget_context_{summary,paired,instances}_20260718.tsv` |
+| Simple selector controls | `results/selector_simple_{summary,paired,disagreements}_20260718.tsv` |
+| Complete fixed-prefix tails | `results/fixed_prefix_tail_{summary,paired,disagreements,counts}_20260718.tsv` |
+| Fallback-excluded localization | `results/localization_nonfallback_{summary,paired,disagreements}_20260718.tsv` |
+| Code-only/history source replacement | `results/history_ablation_{summary,paired,disagreements}_20260718.tsv` |
 
 ### RQ-3: complete edit-target coverage
 
@@ -55,11 +60,11 @@ per manifest ID. No instance is excluded.
 
 | Result | Ledger |
 | --- | --- |
-| Executed generation rows and selected attempts | `results/repair_glm52_assembly_20260716.tsv` |
-| Rendered context and prompt hashes | `results/repair_glm52_context_rendering_20260716.tsv` |
-| Canonical prediction slots and exact reuse audit | `results/repair_glm52_prediction_mapping_20260716.tsv` and `results/repair_glm52_deduplication_summary_20260716.json` |
-| Per-instance nonempty, applicable, and resolved outcomes with paired tests | `results/repair_glm52_outcomes_20260716.tsv` and `results/repair_glm52_summary_20260716.tsv` |
-| Repository strata | `results/mural_repository_repair_20260716.tsv` |
+| Executed generation rows and selected attempts | `results/repair_equal4000_assembly_20260718.tsv` |
+| Equal-4,000-token context audit | `results/repair_equal4000_context_{summary,rendering}_20260718.tsv` |
+| Canonical prediction slots and exact reuse audit | `results/repair_equal4000_prediction_mapping_20260718.tsv` and `results/repair_equal4000_deduplication_summary_20260718.json` |
+| Per-instance nonempty, applicable, and resolved outcomes with paired tests | `results/repair_equal4000_outcomes_20260718.tsv` and `results/repair_equal4000_summary_20260718.tsv` |
+| Direct BM25--MURAL repair transitions | `results/repair_equal4000_transition_summary_20260718.tsv` and `results/repair_equal4000_transitions_20260718.tsv` |
 
 ### Supplementary analyses
 
@@ -70,6 +75,8 @@ per manifest ID. No instance is excluded.
 | Complete Java benchmark | `results/java_cross_language_*_20260714.*` |
 | Context-construction cost | `results/context_construction_cost_20260716.tsv` |
 | External-artifact time boundary | `results/time_boundary_external_artifact_sensitivity_20260531.tsv` |
+| File-only-fallback exclusion | `results/localization_nonfallback_*_20260718.tsv` |
+| Historical-source replacement | `results/history_ablation_*_20260718.tsv` |
 
 ## Reproduction commands
 
@@ -124,6 +131,37 @@ python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
   --output-disagreements temp_run/mural_localization_disagreements.tsv
 ```
 
+### Equal rendered-token control
+
+```bash
+python3 artifacts/scripts/evaluate_token_budget_context.py \
+  --source BM25_projection=temp_run/bm25_projection \
+  --source Structural_projection=temp_run/structural_projection \
+  --source Dense_projection=temp_run/dense_projection \
+  --source MURAL=temp_run/mural \
+  --compare BM25_projection=MURAL \
+  --compare Structural_projection=MURAL \
+  --compare Dense_projection=MURAL \
+  --budget 2000 --budget 4000 --budget 8000 \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --dataset-file temp_run/generated/SWE-bench_Verified.jsonl \
+  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
+  --output-root temp_run/token_packed \
+  --output-summary temp_run/token_budget_summary.tsv \
+  --output-paired temp_run/token_budget_paired.tsv \
+  --output-instances temp_run/token_budget_instances.tsv
+```
+
+### Simple selector controls
+
+```bash
+python3 artifacts/scripts/export_selector_simple_baselines.py \
+  --input-dir temp_run/bm25_file_seeds \
+  --output-root temp_run/selector_simple \
+  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+  --playground-root playground --limit 50
+```
+
 ### Fixed-prefix construction
 
 ```bash
@@ -148,103 +186,110 @@ python3 artifacts/scripts/evaluate_external_localizer_fusion.py \
   --output-disagreements temp_run/external_disagreements.tsv
 ```
 
-### GLM-5.2 repair generation
+### Matched 4,000-token GLM-5.2 repair
+
+The primary repair comparison fixes the complete prompt ceiling at 4,000 tokens
+and changes only the projected BM25 or MURAL candidate pool. The hosted key is
+read from the environment and is never written to a configuration or ledger.
 
 ```bash
 export AUTODL_API_KEY='set-outside-the-repository'
 python3 artifacts/scripts/run_repair_profile_batch.py \
-  --input-root temp_run/repair_inputs \
-  --output-root temp_run/repair_glm52 \
+  --input-root temp_run/repair_equal4000/inputs \
+  --output-root temp_run/repair_equal4000/runs \
   --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --variants issue bm25 mural \
+  --variants bm25 mural \
   --preset local_qwen3coder30b --round-tag _base \
-  --playground-dir playground \
+  --playground-dir temp_run/repair_equal4000/playgrounds \
   --dataset-file temp_run/generated/SWE-bench_Verified.jsonl \
   --source-root . --model glm-5.2 \
   --base-url https://www.autodl.art/api/v1 \
   --api-key-env AUTODL_API_KEY --disable-thinking \
-  --first-prompt-profile compact --prompt-token-limit 5000 \
+  --first-prompt-profile compact --prompt-token-limit 4000 \
   --completion-max-tokens 2048 --response-prefill off \
   --max-retries 1 --temperature 0 --timeout 600
 ```
 
-No credential is written to a run configuration or result ledger.
-
-The executed candidate pools and rendered prompts are reconstructed offline
-from the same frozen inputs and base commits:
+The executed jobs were split into 21 disjoint ID shards. Retry batches contain
+only attempts rejected for provider or worktree infrastructure failure; the
+assembler requires exactly one infrastructure-clean attempt per variant and
+instance. The rendered prompt audit is reconstructed from the frozen inputs and
+base commits:
 
 ```bash
 python3 artifacts/scripts/audit_repair_context_rendering.py \
-  --input-root temp_run/repair_inputs \
+  --input-root temp_run/repair_equal4000/inputs \
   --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
   --dataset-file temp_run/generated/SWE-bench_Verified.jsonl \
-  --playground-root playground --shared-playground \
-  --variant issue=issue --variant bm25=bm25 --variant mural=mural3 \
+  --playground-root temp_run/repair_equal4000/playgrounds --shared-playground \
+  --variant bm25=bm25 --variant mural=mural \
   --preset local_qwen3coder30b --round-tag _base \
-  --prompt-token-limit 5000 \
-  --output temp_run/repair_glm52_context_rendering.tsv
-```
+  --prompt-token-limit 4000 \
+  --output artifacts/results/repair_equal4000_context_rendering_20260718.tsv
 
-Provider-failure retries are assembled before official testing. The assembly
-checks the frozen dataset, context profile, prompt ceiling, decoding settings,
-and model endpoint recorded by every contributing shard.
-
-```bash
 python3 artifacts/scripts/assemble_repair_profile_predictions.py \
-  --run-root temp_run/repair_glm52_runs \
+  --run-root temp_run/repair_equal4000/runs \
   --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --output-root temp_run/repair_glm52_final/predictions \
-  --variant issue=issue --variant bm25=bm25 --variant mural=mural3 \
-  --shards shard_0 shard_1 retry_0 retry_1 retry_2a retry_2b \
-  --model-prefix glm52 \
+  --output-root temp_run/repair_equal4000/final/predictions \
+  --variant bm25=bm25 --variant mural=mural \
+  --shards shard_00 shard_01 shard_02 shard_03 shard_04 shard_05 \
+    shard_06 shard_07 shard_08 shard_09 shard_10 shard_11 shard_12 \
+    shard_13 shard_14 shard_15 shard_16 shard_17 shard_18 shard_19 \
+    shard_20 retry_bm25 retry_mural retry3_smoke_mural \
+    retry3_mural retry3_bm25 \
+  --shard-first --model-prefix glm52_equal4000 \
   --expected-dataset-source temp_run/generated/SWE-bench_Verified.jsonl \
   --dataset-label temp_run/generated/SWE-bench_Verified.jsonl \
   --expected-context-profile rank_stratified_v3_allfiles \
-  --expected-max-retries 1 --max-prompt-tokens 5000 \
+  --expected-max-retries 1 --max-prompt-tokens 4000 \
   --require-no-prefill --require-thinking-disabled
 
 python3 artifacts/scripts/deduplicate_repair_predictions.py \
-  --predictions-root temp_run/repair_glm52_final/predictions \
-  --output-root temp_run/repair_glm52_final/canonical \
-  --variants issue bm25 mural --model-prefix glm52 \
-  --prompt-audit artifacts/results/repair_glm52_context_rendering_20260716.tsv
+  --predictions-root temp_run/repair_equal4000/final/predictions \
+  --output-root temp_run/repair_equal4000/final/canonical \
+  --variants bm25 mural --model-prefix glm52_equal4000 \
+  --prompt-audit artifacts/results/repair_equal4000_context_rendering_20260718.tsv
 ```
 
 Reuse requires the same instance, rendered-prompt SHA-256, and patch SHA-256.
-The executed run therefore maps 1,052 nonempty variant predictions to 1,051
-official evaluations.
-
-Each canonical slot is evaluated with the official SWE-bench harness. The
-registry mirror changes image transport only; image tags, benchmark records,
-patches, and test oracles are unchanged.
+The executed run maps 938 nonempty variant predictions to 932 canonical official
+evaluations. Both canonical slots use the official SWE-bench harness; the mirror
+changes image transport only.
 
 ```bash
-for slot in 0 1 2; do
+for slot in 0 1; do
   python3 -m swebench.harness.run_evaluation \
     --dataset_name temp_run/generated/SWE-bench_Verified.jsonl \
-    --predictions_path temp_run/repair_glm52_final/canonical/slot_${slot}/predictions.jsonl \
-    --max_workers 8 --timeout 1800 \
+    --predictions_path temp_run/repair_equal4000/final/canonical/slot_${slot}/predictions.jsonl \
+    --max_workers 10 --timeout 1800 \
     --namespace dockerproxy.net/swebench \
-    --run_id mural_glm52_slot_${slot}_20260716
+    --run_id mural_glm52_equal4000_slot_${slot}_20260718
 
   python3 artifacts/scripts/collect_swebench_reports.py \
-    --predictions temp_run/repair_glm52_final/canonical/slot_${slot}/predictions.jsonl \
-    --run-id mural_glm52_slot_${slot}_20260716 \
-    --output temp_run/repair_glm52_final/canonical/slot_${slot}/official_results.jsonl \
+    --predictions temp_run/repair_equal4000/final/canonical/slot_${slot}/predictions.jsonl \
+    --run-id mural_glm52_equal4000_slot_${slot}_20260718 \
+    --output temp_run/repair_equal4000/final/canonical/slot_${slot}/official_results.jsonl \
     --normalize-terminal-errors
 done
 
 python3 artifacts/scripts/materialize_repair_variant_reports.py \
-  --canonical-root temp_run/repair_glm52_final/canonical \
-  --output-root temp_run/repair_glm52_final/official \
-  --variants issue bm25 mural
+  --canonical-root temp_run/repair_equal4000/final/canonical \
+  --output-root temp_run/repair_equal4000/final/official \
+  --variants bm25 mural
 
 python3 artifacts/scripts/analyze_repair_outcomes.py \
   --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --predictions-root temp_run/repair_glm52_final/predictions \
-  --official-root temp_run/repair_glm52_final/official \
-  --output-outcomes temp_run/repair_glm52_outcomes.tsv \
-  --output-summary temp_run/repair_glm52_summary.tsv
+  --predictions-root temp_run/repair_equal4000/final/predictions \
+  --official-root temp_run/repair_equal4000/final/official \
+  --variants bm25 mural \
+  --output-outcomes artifacts/results/repair_equal4000_outcomes_20260718.tsv \
+  --output-summary artifacts/results/repair_equal4000_summary_20260718.tsv
+
+python3 artifacts/scripts/analyze_repair_transitions.py \
+  --outcomes artifacts/results/repair_equal4000_outcomes_20260718.tsv \
+  --baseline bm25 --treatment mural \
+  --output-summary artifacts/results/repair_equal4000_transition_summary_20260718.tsv \
+  --output-instances artifacts/results/repair_equal4000_transitions_20260718.tsv
 ```
 
 ### Context-construction cost

@@ -39,6 +39,11 @@ def parse_args() -> argparse.Namespace:
         nargs="+",
         help="Optional shard names below each variant; implies a nested variant level",
     )
+    parser.add_argument(
+        "--shard-first",
+        action="store_true",
+        help="Expect RUN_ROOT/SHARD/VARIANT/INSTANCE for sharded runs",
+    )
     parser.add_argument("--expected-dataset-source")
     parser.add_argument(
         "--dataset-label",
@@ -52,7 +57,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-PROVIDER_FAILURE_MARKERS = (
+INFRASTRUCTURE_FAILURE_MARKERS = (
     "insufficient_balance",
     "insufficient account balance",
     "connection error",
@@ -60,6 +65,7 @@ PROVIDER_FAILURE_MARKERS = (
     "service unavailable",
     "gateway timeout",
     "request timed out",
+    "repository path not found",
 )
 
 
@@ -83,13 +89,13 @@ def parse_variant_specs(args: argparse.Namespace) -> list[tuple[str, str]]:
     return pairs
 
 
-def provider_failure(audit: dict[str, object]) -> bool:
+def infrastructure_failure(audit: dict[str, object]) -> bool:
     errors = "\n".join(
         str(item.get("error") or "")
         for item in audit.get("failed_files", [])
         if isinstance(item, dict)
     ).lower()
-    return any(marker in errors for marker in PROVIDER_FAILURE_MARKERS)
+    return any(marker in errors for marker in INFRASTRUCTURE_FAILURE_MARKERS)
 
 
 def select_sharded_run_dir(
@@ -98,11 +104,16 @@ def select_sharded_run_dir(
     run_variant: str,
     instance_id: str,
     shards: list[str],
+    shard_first: bool = False,
 ) -> Path:
     usable: list[Path] = []
     rejected: list[tuple[Path, str]] = []
     for shard in shards:
-        run_dir = run_root / run_variant / shard / run_variant
+        run_dir = (
+            run_root / shard / run_variant
+            if shard_first
+            else run_root / run_variant / shard / run_variant
+        )
         patches_dir = run_dir / instance_id / "patches"
         audit_path = patches_dir / f"{instance_id}.run.json"
         result_path = patches_dir / "patch_results.jsonl"
@@ -112,13 +123,13 @@ def select_sharded_run_dir(
             rejected.append((run_dir, "incomplete"))
             continue
         audit = json.loads(audit_path.read_text(encoding="utf-8"))
-        if provider_failure(audit):
-            rejected.append((run_dir, "provider_failure"))
+        if infrastructure_failure(audit):
+            rejected.append((run_dir, "infrastructure_failure"))
         else:
             usable.append(run_dir)
     if len(usable) != 1:
         raise ValueError(
-            f"Expected one provider-clean run for {label}/{instance_id}; "
+            f"Expected one usable run for {label}/{instance_id}; "
             f"usable={usable}, rejected={rejected}"
         )
     return usable[0]
@@ -223,6 +234,7 @@ def main() -> int:
                     run_variant,
                     instance_id,
                     args.shards,
+                    args.shard_first,
                 )
             else:
                 run_dir = run_root / run_variant
@@ -238,9 +250,9 @@ def main() -> int:
 
             result, result_rows = read_last_jsonl(result_path)
             audit = json.loads(audit_path.read_text(encoding="utf-8"))
-            if provider_failure(audit):
+            if infrastructure_failure(audit):
                 raise ValueError(
-                    f"Provider-failed run cannot be assembled: {variant}/{instance_id}"
+                    f"Infrastructure-failed run cannot be assembled: {variant}/{instance_id}"
                 )
             validate_audit(audit, variant, instance_id, args)
             patch = str(result.get("fix_patch") or "").strip()

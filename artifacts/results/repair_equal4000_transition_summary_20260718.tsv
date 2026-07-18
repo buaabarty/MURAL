@@ -1,0 +1,4 @@
+outcome	N	both	baseline_only	treatment_only	neither	baseline	treatment
+nonempty	500	461	8	8	23	bm25	mural
+applied	500	457	10	8	25	bm25	mural
+resolved	500	102	19	25	354	bm25	mural

@@ -1,0 +1,8 @@
+name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
+EntityProjection	500	20	0.736	0.5010113275613275	0.28811683707589275	0.57	temp_run/mural_experiment_additions/selector_minimal_20260715c/title_exact_file_rank_ast
+FileSourceOrder	500	20	0.384	0.20362896825396826	0.06012938180670378	0.224	temp_run/mural_reviewer_controls_20260718/selector_simple/file_source_order
+FileNameOverlap	500	20	0.384	0.30936706349206355	0.16658033355533364	0.34	temp_run/mural_reviewer_controls_20260718/selector_simple/file_name_overlap
+WithinFileBM25	500	20	0.384	0.33878373015873026	0.26541292195936156	0.366	temp_run/mural_reviewer_controls_20260718/selector_simple/file_bm25
+EqualRoundRobin	500	20	0.804	0.383651875901876	0.29282991032015804	0.474	temp_run/mural_reviewer_controls_20260718/selector_simple/round_robin_bm25
+WeightedFeatures	500	20	0.77	0.5329405483405483	0.3344883147468286	0.6	temp_run/mural_reviewer_controls_20260718/selector_simple/weighted_features
+StableRandom	500	20	0.522	0.028028715728715733	0.013390376290376286	0.05	temp_run/mural_reviewer_controls_20260718/selector_simple/stable_random

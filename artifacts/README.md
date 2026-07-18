@@ -20,6 +20,12 @@ contrasts use the two-sided exact McNemar test.
 - `export_entity_projection.py`: shared Entity Projection implementation.
 - `export_multi_source_rrf_fusion.py`: equal-weight multi-source entity fusion.
 - `export_fixed_prefix_fusion.py`: prefix-preserving context completion.
+- `export_same_file_neighbor_tail.py`: same-file complete-tail control.
+- `export_selector_simple_baselines.py`: source-order, name, within-file BM25,
+  round-robin, weighted, and stable-random selector controls.
+- `evaluate_token_budget_context.py`: equal rendered-token packing, changed-line
+  coverage, and paired statistics.
+- `analyze_repair_transitions.py`: direct BM25--MURAL repair transitions.
 - `analyze_retrieve_localize_controls.py`: localization metrics, paired
   intervals, and disagreement ledgers.
 - `evaluate_patch_derived_context.py`: edit-target recall and complete coverage.
@@ -57,6 +63,11 @@ contrasts use the two-sided exact McNemar test.
 - `results/mural_rrf_sensitivity_{summary,paired,disagreements}_20260716.tsv`
 - `results/mural_external_localizer_{summary,paired,disagreements}_20260716.tsv`
 - `results/context_construction_cost_20260716.tsv`
+- `results/token_budget_context_{summary,paired,instances}_20260718.tsv`
+- `results/selector_simple_{summary,paired,disagreements}_20260718.tsv`
+- `results/fixed_prefix_tail_{summary,paired,disagreements,counts}_20260718.tsv`
+- `results/localization_nonfallback_{summary,paired,disagreements}_20260718.tsv`
+- `results/history_ablation_{summary,paired,disagreements}_20260718.tsv`
 
 ### Complete Java benchmark
 
@@ -73,18 +84,23 @@ manifest pins the compact selector version plus evaluator and output hashes.
 ### Repair rendering protocol
 
 - `prompts/glm52_repair_prompt.md`
-- `results/repair_glm52_context_rendering_20260716.tsv`
+- `results/repair_equal4000_context_rendering_20260718.tsv`
+- `results/repair_equal4000_context_summary_20260718.tsv`
 
 ### End-to-end repair
 
-- `results/repair_glm52_assembly_20260716.tsv`
-- `results/repair_glm52_prediction_mapping_20260716.tsv`
-- `results/repair_glm52_deduplication_summary_20260716.json`
-- `results/repair_glm52_outcomes_20260716.tsv`
-- `results/repair_glm52_summary_20260716.tsv`
-- `results/mural_repository_repair_20260716.tsv`
+- `results/repair_equal4000_assembly_20260718.tsv`
+- `results/repair_equal4000_prediction_mapping_20260718.tsv`
+- `results/repair_equal4000_deduplication_summary_20260718.json`
+- `results/repair_equal4000_outcomes_20260718.tsv`
+- `results/repair_equal4000_summary_20260718.tsv`
+- `results/repair_equal4000_transition_summary_20260718.tsv`
+- `results/repair_equal4000_transitions_20260718.tsv`
 
-The repair summary reports counts and benchmark-level yields for nonempty,
+The equal-4,000-token ledgers are the primary direct BM25--MURAL repair
+comparison. They contain 1,000 variant outcomes, 938 nonempty predictions,
+932 canonical official evaluations, and all paired transitions. The repair
+summary reports counts and benchmark-level yields for nonempty,
 applicable, and test-resolved patches, plus paired bootstrap intervals and
 exact McNemar tests for all three binary outcomes. Here, applicable means that
 the official harness records `patch_successfully_applied=1`; resolved means

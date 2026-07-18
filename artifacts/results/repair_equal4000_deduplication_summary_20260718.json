@@ -1,0 +1,16 @@
+{
+  "canonical_predictions": 932,
+  "identical_patch_reuses": 6,
+  "nonempty_variant_predictions": 938,
+  "prompt_audit_sha256": "587934e0f7a7738ad47e249a3e5d314930778334c12bd629c81b4c1e544cbadb",
+  "reuse_requires_prompt_match": true,
+  "slot_counts": {
+    "slot_0": 477,
+    "slot_1": 455
+  },
+  "variant_predictions": 1000,
+  "variants": [
+    "bm25",
+    "mural"
+  ]
+}

@@ -1,0 +1,5 @@
+name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
+BM25_projection	491	20	0.7372708757637475	0.4979748753170341	0.28654124617368576	0.5682281059063137	temp_run/mural_experiment_additions/selector_minimal_20260715c/title_exact_file_rank_ast
+Structural_projection	491	20	0.5926680244399185	0.45087542577359274	0.25777675805222733	0.505091649694501	temp_run/mural_experiment_additions/selector_compact_main_20260715/kg_local
+Dense_projection	491	20	0.8289205702647657	0.5586620863861188	0.3152536620180211	0.6313645621181263	temp_run/mural_experiment_additions/selector_compact_main_20260715/dense_local/title_exact_file_rank_ast
+MURAL	491	20	0.8289205702647657	0.590770595098497	0.33934019577750696	0.6680244399185336	temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src

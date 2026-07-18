@@ -110,12 +110,22 @@ class AssembleRepairProfilePredictionsTest(unittest.TestCase):
             )
             self.assertEqual(selected, expected)
 
+    def test_selects_retry_after_missing_worktree(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_run(root, "shard_0", "Repository path not found: /tmp/repo")
+            expected = self.write_run(root, "retry_1", None)
+            selected = MODULE.select_sharded_run_dir(
+                root, "issue", "issue", "instance-1", ["shard_0", "retry_1"]
+            )
+            self.assertEqual(selected, expected)
+
     def test_rejects_two_provider_clean_runs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.write_run(root, "shard_0", None)
             self.write_run(root, "retry_1", None)
-            with self.assertRaisesRegex(ValueError, "one provider-clean run"):
+            with self.assertRaisesRegex(ValueError, "one usable run"):
                 MODULE.select_sharded_run_dir(
                     root, "issue", "issue", "instance-1", ["shard_0", "retry_1"]
                 )

@@ -1,0 +1,11 @@
+tail	N	mean_candidates	median_candidates	p05_candidates	min_candidates	complete_20
+BM25Projection	500	20	20.0	20	20	500
+DenseProjection	500	20	20.0	20	20	500
+EqualRoundRobin	500	20	20.0	20	20	500
+FileSourceOrder	500	20	20.0	20	20	500
+MURAL	500	20	20.0	20	20	500
+OwnRemaining	500	6.042	6.0	0	0	1
+SameFileNeighbors	500	16.728	20.0	0	0	366
+StableRandom	500	20	20.0	20	20	500
+WeightedFeatures	500	20	20.0	20	20	500
+WithinFileBM25	500	20	20.0	20	20	500

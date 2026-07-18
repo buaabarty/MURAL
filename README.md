@@ -50,8 +50,8 @@ The retained evaluation covers:
 - source composition, RRF, budget, and repository-level analyses;
 - all 91 official SWE-bench-Java Verified instances for the cross-language
   adapter check;
-- end-to-end GLM-5.2 repair and official test-oracle outcomes on all 500
-  SWE-bench Verified instances;
+- matched 4,000-token GLM-5.2 repair and official test-oracle outcomes for
+  BM25 and MURAL on all 500 SWE-bench Verified instances;
 - measured context-construction time and memory.
 
 See `artifacts/README.md` for the publication inventory and
