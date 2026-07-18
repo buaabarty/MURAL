@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import sys
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,12 @@ CORE_FILES = {
     "history_ablation_disagreements_20260718.tsv",
     "history_ablation_paired_20260718.tsv",
     "history_ablation_summary_20260718.tsv",
+    "human_window_agreement_20260718.tsv",
+    "human_window_annotations_20260718.tsv",
+    "human_window_items_20260718.json",
+    "human_window_manifest_20260718.tsv",
+    "human_window_provenance_20260718.tsv",
+    "human_window_summary_20260718.tsv",
     "localization_nonfallback_disagreements_20260718.tsv",
     "localization_nonfallback_paired_20260718.tsv",
     "localization_nonfallback_summary_20260718.tsv",
@@ -412,6 +419,64 @@ def costs_and_audits() -> None:
             )
 
 
+def human_window_audit() -> None:
+    items_source = "human_window_items_20260718.json"
+    items_payload = json_file(RESULTS / items_source)
+    check("human window item rows", len(items_payload["items"]), 80, items_source)
+    check(
+        "human window item IDs",
+        len({item["annotation_id"] for item in items_payload["items"]}),
+        80,
+        items_source,
+    )
+    annotation_source = "human_window_annotations_20260718.tsv"
+    annotations = tsv(annotation_source)
+    check("human window judgments", len(annotations), 100, annotation_source)
+    check(
+        "human window annotators",
+        {row["annotator"] for row in annotations},
+        {"A", "B"},
+        annotation_source,
+    )
+    check(
+        "human window instances",
+        len({row["annotation_id"] for row in annotations}),
+        80,
+        annotation_source,
+    )
+    check(
+        "human window preference counts",
+        dict(Counter(row["preferred_method"] for row in annotations)),
+        {"MURAL": 54, "BM25-local": 19, "Comparable": 15, "Both insufficient": 12},
+        annotation_source,
+    )
+    manifest_source = "human_window_manifest_20260718.tsv"
+    manifest = tsv(manifest_source)
+    check("human window manifest rows", len(manifest), 80, manifest_source)
+    check(
+        "human window objective strata",
+        dict(Counter(row["objective_outcome"] for row in manifest)),
+        {"仅MURAL命中": 43, "仅BM25-local命中": 14, "两者均命中": 12, "两者均未命中": 11},
+        manifest_source,
+    )
+    summary_source = "human_window_summary_20260718.tsv"
+    summary = tsv(summary_source)
+    check("human window summary rows", len(summary), 17, summary_source)
+    agreement_source = "human_window_agreement_20260718.tsv"
+    agreement = tsv(agreement_source)
+    check("human window agreement rows", len(agreement), 1, agreement_source)
+    item = agreement[0]
+    check("human window overlap", int(item["overlap_n"]), 20, agreement_source)
+    check("human window agreements", int(item["agreement_n"]), 12, agreement_source)
+    close("human window observed agreement", float(item["observed_agreement"]), 0.60, agreement_source)
+    close(
+        "human window Cohen kappa",
+        float(item["cohen_kappa"]),
+        0.4666666666666666,
+        agreement_source,
+    )
+
+
 def reviewer_controls() -> None:
     token_source = "token_budget_context_summary_20260718.tsv"
     token_rows = tsv(token_source)
@@ -765,6 +830,7 @@ def main() -> int:
         external_localizers()
         repository_and_java()
         costs_and_audits()
+        human_window_audit()
         reviewer_controls()
         if args.scope == "all":
             repair_equal4000()

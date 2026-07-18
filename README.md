@@ -27,7 +27,8 @@ The verifier checks the exact retained result inventory, benchmark completeness,
 aggregate values, paired bootstrap intervals, exact McNemar tests for
 nonempty, applicable-patch-yield, and resolved repair outcomes, conditional
 application rates, prediction provenance, and the cross-language ID set,
-selector version, evaluator hash, and output hashes. No API key is
+selector version, evaluator hash, blinded-window annotation counts and
+agreement, and output hashes. No API key is
 stored in this repository.
 
 ## Repository layout
@@ -52,6 +53,7 @@ The retained evaluation covers:
   adapter check;
 - matched 4,000-token GLM-5.2 repair and official test-oracle outcomes for
   BM25 and MURAL on all 500 SWE-bench Verified instances;
+- 100 blinded MURAL--BM25 window judgments over 80 stratified instances;
 - measured context-construction time and memory.
 
 See `artifacts/README.md` for the publication inventory and

@@ -47,6 +47,7 @@ per manifest ID. No instance is excluded.
 | Complete fixed-prefix tails | `results/fixed_prefix_tail_{summary,paired,disagreements,counts}_20260718.tsv` |
 | Fallback-excluded localization | `results/localization_nonfallback_{summary,paired,disagreements}_20260718.tsv` |
 | Code-only/history source replacement | `results/history_ablation_{summary,paired,disagreements}_20260718.tsv` |
+| Blinded manual window comparison | `results/human_window_items_20260718.json`, `results/human_window_{annotations,manifest,summary,agreement,provenance}_20260718.tsv` |
 
 ### RQ-3: complete edit-target coverage
 
@@ -160,6 +161,22 @@ python3 artifacts/scripts/export_selector_simple_baselines.py \
   --output-root temp_run/selector_simple \
   --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
   --playground-root playground --limit 50
+```
+
+### Blinded human window audit
+
+The frozen manifest contains all 57 instances on which MURAL and BM25-local
+differ in objective Hit@20, plus 12 both-hit and 11 neither-hit controls.
+Window A/B order is randomized per instance. Two annotators each judge 50
+instances, including 20 shared instances; the public ledger removes annotator
+names and retains the blinded decision, decoded method preference, confidence,
+and rationale.
+
+```bash
+python3 artifacts/scripts/analyze_human_window_audit.py \
+  --annotations artifacts/results/human_window_annotations_20260718.tsv \
+  --summary-output artifacts/results/human_window_summary_20260718.tsv \
+  --agreement-output artifacts/results/human_window_agreement_20260718.tsv
 ```
 
 ### Fixed-prefix construction

@@ -26,6 +26,7 @@ contrasts use the two-sided exact McNemar test.
 - `evaluate_token_budget_context.py`: equal rendered-token packing, changed-line
   coverage, and paired statistics.
 - `analyze_repair_transitions.py`: direct BM25--MURAL repair transitions.
+- `analyze_human_window_audit.py`: blinded preference counts and Cohen's kappa.
 - `analyze_retrieve_localize_controls.py`: localization metrics, paired
   intervals, and disagreement ledgers.
 - `evaluate_patch_derived_context.py`: edit-target recall and complete coverage.
@@ -68,6 +69,20 @@ contrasts use the two-sided exact McNemar test.
 - `results/fixed_prefix_tail_{summary,paired,disagreements,counts}_20260718.tsv`
 - `results/localization_nonfallback_{summary,paired,disagreements}_20260718.tsv`
 - `results/history_ablation_{summary,paired,disagreements}_20260718.tsv`
+
+### Blinded human window audit
+
+- `results/human_window_annotations_20260718.tsv`
+- `results/human_window_items_20260718.json`
+- `results/human_window_manifest_20260718.tsv`
+- `results/human_window_summary_20260718.tsv`
+- `results/human_window_agreement_20260718.tsv`
+- `results/human_window_provenance_20260718.tsv`
+
+The audit contains 100 anonymized judgments over 80 unique instances. The JSON
+file preserves the exact issue, official patch, and randomized Window A/B
+contents shown to annotators. Twenty instances are independently double-coded
+for agreement analysis.
 
 ### Complete Java benchmark
 
