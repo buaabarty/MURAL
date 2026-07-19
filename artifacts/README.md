@@ -42,9 +42,10 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `export_compact_rankings.py`: compact ranking export.
 - `materialize_compact_rankings.py`: evaluator-compatible reconstruction.
 - `analyze_source_bearing_prompt_coverage.py`: rendered-prompt audit.
-- `analyze_human_strict_alignment.py`: manual-audit re-stratification.
-- `finalize_human_window_audit.py`: decoded-label and strict-stratum binding.
-- `verify_human_window_binding.py`: exact audit-window/ranking verification.
+- `freeze_human_window_rankings.py`: freezes the exact rankings shown to annotators.
+- `verify_human_window_binding.py`: verifies each rendered A/B window byte-for-byte.
+- `evaluate_human_window_exact_hits.py`: evaluates those exact windows against strict targets.
+- `analyze_human_strict_alignment.py`: re-stratifies judgments from exact-window hits.
 - `analyze_clustered_repair_stats.py`: clustered repair statistics.
 - `evaluate_java_retrieve_localize.py`: complete Java evaluator.
 - `build_submission_manifest.py`: protocol and digest manifest.
@@ -83,16 +84,21 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 - `results/human_window_{annotations,manifest,summary,agreement,provenance}_20260718.tsv`
 - `results/human_window_items_20260718.json`
 - `results/human_window_binding_20260719.tsv`
+- `results/human_window_exact_instances_20260719.tsv`
 - `results/human_window_strict_{judgments,summary}_20260719.tsv`
+- `frozen/human_window_rankings_20260712.jsonl.gz`
+- `frozen/human_window_rankings_manifest_20260719.json`
 - `results/java_cross_language_{summary,paired}_20260714.tsv`
 - `results/java_cross_language_instances_20260714.jsonl`
 - `results/java_cross_language_targets_20260714.json`
 
 The audit has 100 judgments over 80 instances, including 20 double-coded items.
-Every A/B window is an exact Top-20 view of either `BM25_projection` or
-`MURAL_2src` (equal-weight lexical plus structural fusion) from the same frozen
-500-instance SWE-bench Verified ranking ledger used by the main table. The
-binding ledger records both source labels and window SHA-256 values.
+The packet is preserved without relabeling or replacing any student-visible
+window. Its `MURAL` label denotes the lexical--structural two-source
+configuration used when the packet was frozen; `BM25-local` denotes BM25-ranked
+files passed through the same entity projection. The audit-specific ranking
+ledger does not overwrite the final benchmark ranking ledger.
+
 The Java evaluation retains all 91 instances pinned by
 `inputs/java_cross_language_manifest_20260714.json`.
 
@@ -102,8 +108,7 @@ The Java evaluation retains all 91 instances pinned by
 BM25 projection, the structural adapter, dense projection, two-source MURAL, and
 three-source MURAL for all 500 Python instances.
 `frozen/source_rankings_manifest_20260719.json` records the construction and
-canonical-identity contract for those five rankings and identifies the two
-rows used by the human audit.
+canonical-identity contract for those five rankings.
 `frozen/external_localizers_manifest.json` records the upstream repository commit
 and SHA-256 values for released localizer files.
 

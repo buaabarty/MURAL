@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Relabel blinded window judgments with strict objective-hit strata."""
+"""Relabel blinded judgments using hits from the exact displayed windows."""
 
 from __future__ import annotations
 
@@ -33,27 +33,21 @@ def write_tsv(path: Path, rows: list[dict], fields: list[str]) -> None:
 
 def strict_stratum(bm25_hit: int, mural_hit: int) -> str:
     if mural_hit and not bm25_hit:
-        return "MURAL_2src_only"
+        return "MURAL_only"
     if bm25_hit and not mural_hit:
-        return "BM25_projection_only"
+        return "BM25_only"
     if bm25_hit:
         return "both"
     return "neither"
 
 
 def directional_alignment(stratum: str, preference: str) -> str:
-    expected = (
-        "MURAL_2src"
-        if stratum == "MURAL_2src_only"
-        else "BM25_projection"
-        if stratum == "BM25_projection_only"
-        else ""
-    )
+    expected = "MURAL" if stratum == "MURAL_only" else "BM25-local" if stratum == "BM25_only" else ""
     if not expected:
         return "not_exclusive"
     if preference == expected:
         return "aligned"
-    if preference in {"MURAL_2src", "BM25_projection"}:
+    if preference in {"MURAL", "BM25-local"}:
         return "opposed"
     return "neutral"
 
@@ -62,14 +56,14 @@ def main() -> int:
     args = parse_args()
     hits: dict[tuple[str, str], int] = {}
     for row in read_tsv(args.strict_instances):
-        if row["approach"] in {"BM25_projection", "MURAL_2src"}:
+        if row["approach"] in {"BM25-local", "MURAL"}:
             hits[(row["instance_id"], row["approach"])] = int(row["hit"])
 
     judgments: list[dict] = []
     for row in read_tsv(args.annotations):
         instance_id = row["instance_id"]
         stratum = strict_stratum(
-            hits[(instance_id, "BM25_projection")], hits[(instance_id, "MURAL_2src")]
+            hits[(instance_id, "BM25-local")], hits[(instance_id, "MURAL")]
         )
         judgments.append(
             {
@@ -118,7 +112,7 @@ def main() -> int:
         summary.append(
             {
                 "scope": "exclusive_hit_judgments",
-                "strict_stratum": "MURAL_2src_only_or_BM25_projection_only",
+                "strict_stratum": "MURAL_only_or_BM25_only",
                 "decision": decision,
                 "count": count,
             }

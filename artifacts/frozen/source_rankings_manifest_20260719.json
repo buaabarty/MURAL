@@ -12,18 +12,7 @@
   "frozen_date": "2026-07-19",
   "frozen_rankings": {
     "path": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
-    "sha256": "ec7b4824719fe41a7a410172d2027b62f9adeb639a0b0e432ebc18364f2d48b9"
-  },
-  "human_audit_binding": {
-    "benchmark": "the same 500 SWE-bench Verified instances",
-    "binding_ledger": "artifacts/results/human_window_binding_20260719.tsv",
-    "items": 80,
-    "judgments": 100,
-    "sources": [
-      "BM25_projection",
-      "MURAL_2src"
-    ],
-    "window": "exact Top-20 entity ranking"
+    "sha256": "7f0ffa7c5561bf132b9ff075f1e8e8d23c0aff5f0237f03f69e08de704cf5b1d"
   },
   "rankings": {
     "BM25_projection": {

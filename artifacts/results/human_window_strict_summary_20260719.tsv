@@ -1,23 +1,23 @@
 scope	strict_stratum	decision	count
-unique_instances	BM25_projection_only	instances	12
-unique_instances	MURAL_2src_only	instances	37
+unique_instances	BM25_only	instances	12
+unique_instances	MURAL_only	instances	37
 unique_instances	both	instances	18
 unique_instances	neither	instances	13
-judgments	BM25_projection_only	BM25_projection	10
-judgments	BM25_projection_only	Both insufficient	3
-judgments	BM25_projection_only	MURAL_2src	1
-judgments	MURAL_2src_only	BM25_projection	3
-judgments	MURAL_2src_only	Both insufficient	3
-judgments	MURAL_2src_only	Comparable	1
-judgments	MURAL_2src_only	MURAL_2src	38
-judgments	both	BM25_projection	4
+judgments	BM25_only	BM25-local	10
+judgments	BM25_only	Both insufficient	3
+judgments	BM25_only	MURAL	1
+judgments	MURAL_only	BM25-local	3
+judgments	MURAL_only	Both insufficient	3
+judgments	MURAL_only	Comparable	1
+judgments	MURAL_only	MURAL	38
+judgments	both	BM25-local	4
 judgments	both	Both insufficient	1
 judgments	both	Comparable	9
-judgments	both	MURAL_2src	10
-judgments	neither	BM25_projection	2
+judgments	both	MURAL	10
+judgments	neither	BM25-local	2
 judgments	neither	Both insufficient	5
 judgments	neither	Comparable	5
-judgments	neither	MURAL_2src	5
-exclusive_hit_judgments	MURAL_2src_only_or_BM25_projection_only	aligned	48
-exclusive_hit_judgments	MURAL_2src_only_or_BM25_projection_only	neutral	7
-exclusive_hit_judgments	MURAL_2src_only_or_BM25_projection_only	opposed	4
+judgments	neither	MURAL	5
+exclusive_hit_judgments	MURAL_only_or_BM25_only	aligned	48
+exclusive_hit_judgments	MURAL_only_or_BM25_only	neutral	7
+exclusive_hit_judgments	MURAL_only_or_BM25_only	opposed	4

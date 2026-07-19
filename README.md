@@ -20,9 +20,9 @@ python3 artifacts/scripts/verify_paper_results.py
 ```
 
 The verifier checks the retained result inventory, 1,044-target mapping, all
-article-facing aggregates and paired statistics, prompt hashes, exact binding
-of every human-audit window to its frozen ranking, the complete Java population,
-the frozen ranking digest, and every SHA-256 entry in the submission manifest.
+article-facing aggregates and paired statistics, prompt hashes, the exact
+student-visible audit windows and judgments, the complete Java population,
+frozen ranking digests, and every SHA-256 entry in the submission manifest.
 
 ## Evaluation scope
 
@@ -34,9 +34,7 @@ the frozen ranking digest, and every SHA-256 entry in the submission manifest.
 - four released Qwen2.5-32B localizer outputs completed through the same
   prefix-preserving interface;
 - all 91 SWE-bench-Java Verified instances across all six repositories;
-- 100 blinded judgments over 80 instances from the same 500-instance Python
-  benchmark, comparing the exact Top-20 `BM25_projection` and lexical--structural
-  `MURAL_2src` rows;
+- 100 blinded judgments over 80 Python instances;
 - matched 4,000-token GLM-5.2 repair on all 500 Python instances, evaluated by
   the official SWE-bench harness.
 

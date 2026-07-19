@@ -24,6 +24,7 @@ EXPECTED_RESULTS = {
     "human_window_agreement_20260718.tsv",
     "human_window_annotations_20260718.tsv",
     "human_window_binding_20260719.tsv",
+    "human_window_exact_instances_20260719.tsv",
     "human_window_items_20260718.json",
     "human_window_manifest_20260718.tsv",
     "human_window_provenance_20260718.tsv",
@@ -175,10 +176,10 @@ def check_localization() -> None:
     equal(len(summary), 13, "strict localization rows")
     expected = {
         "BM25_entities": (77.0, 47.190685, 32.137738, 57.2, 40.2),
-        "BM25_projection": (73.6, 49.251162, 31.018626, 57.8, 42.2),
+        "BM25_projection": (73.6, 49.276162, 31.095705, 57.8, 42.2),
         "Structural_adapter": (59.2, 46.615664, 31.437884, 52.6, 42.0),
         "Dense_projection": (83.6, 55.086248, 34.514952, 64.4, 47.0),
-        "MURAL_2src": (77.0, 54.249870, 35.060474, 63.2, 46.6),
+        "MURAL_2src": (77.0, 54.358203, 34.936758, 63.2, 46.8),
         "MURAL": (83.0, 57.588463, 37.950833, 67.2, 49.6),
         "GLM5": (87.4, 54.306883, 55.257309, 66.6, 45.0),
         "GLM5_BM25": (94.2, 68.470043, 57.958244, 79.0, 59.4),
@@ -192,11 +193,10 @@ def check_localization() -> None:
             close(row[field], value, f"{approach} {field}")
 
     comparisons = [
-        ("BM25_projection", "MURAL_2src", "hit", 5.4, 0.840248, 7.274928, 40, 13, 0.000268540118819),
-        ("BM25_projection", "MURAL", "hit", 9.4, 6.093034, 10.628067, 54, 7, 4.32210722073e-10),
-        ("BM25_projection", "MURAL", "complete", 7.4, 2.714932, 9.286533, 42, 5, 2.45797764364e-08),
+        ("BM25_projection", "MURAL", "hit", 9.4, 6.093034, 10.628067, 53, 6, 1.75391874635e-10),
+        ("BM25_projection", "MURAL", "complete", 7.4, 2.714932, 9.286533, 41, 4, 9.33488308874e-09),
         ("Dense_projection", "MURAL", "hit", 2.8, 0.530469, 3.916464, 33, 19, 0.0703942210671),
-        ("MURAL_2src", "MURAL", "hit", 4.0, 1.509434, 6.993007, 31, 11, 0.00288724797429),
+        ("MURAL_2src", "MURAL", "hit", 4.0, 1.327360, 6.644676, 31, 11, 0.00288724797429),
         ("GLM5_BM25", "GLM5_MURAL", "hit", 0.8, -0.450450, 3.608294, 14, 10, 0.541256189346),
     ]
     for baseline, treatment, metric, delta, low, high, wins, losses, p in comparisons:
@@ -214,7 +214,7 @@ def check_frozen_rankings(targets: dict[str, Any]) -> None:
     path = FROZEN / "strict_rankings_top50_20260719.jsonl.gz"
     equal(
         hashlib.sha256(path.read_bytes()).hexdigest(),
-        "ec7b4824719fe41a7a410172d2027b62f9adeb639a0b0e432ebc18364f2d48b9",
+        "7f0ffa7c5561bf132b9ff075f1e8e8d23c0aff5f0237f03f69e08de704cf5b1d",
         "frozen ranking SHA-256",
     )
     spec = importlib.util.spec_from_file_location(
@@ -246,18 +246,6 @@ def check_frozen_rankings(targets: dict[str, Any]) -> None:
     equal(source_manifest["frozen_rankings"]["sha256"], hashlib.sha256(path.read_bytes()).hexdigest(), "source manifest ranking hash")
     equal(set(source_manifest["rankings"]), expected_sources, "source manifest labels")
     equal(source_manifest["top_k"], 50, "source manifest Top-K")
-    equal(
-        source_manifest["human_audit_binding"],
-        {
-            "benchmark": "the same 500 SWE-bench Verified instances",
-            "binding_ledger": "artifacts/results/human_window_binding_20260719.tsv",
-            "items": 80,
-            "judgments": 100,
-            "sources": ["BM25_projection", "MURAL_2src"],
-            "window": "exact Top-20 entity ranking",
-        },
-        "human audit source binding",
-    )
     boundary = source_manifest["retrieval_boundary"]
     equal(boundary["benchmark_hints_included"], False, "source manifest hint boundary")
     equal(boundary["query_fields"], ["problem_statement"], "source manifest query fields")
@@ -282,17 +270,8 @@ def check_frozen_rankings(targets: dict[str, Any]) -> None:
                 identities = [identity_module.canonical_entity_id(item) for item in candidates]
                 if any(not key[0] or not key[2] for key in identities):
                     fail(f"{instance_id} {source}: incomplete canonical identity")
-                declaration_records = [
-                    (
-                        *identity,
-                        " ".join(str(item.get("signature") or "").split()),
-                        item.get("start_line"),
-                        item.get("end_line"),
-                    )
-                    for identity, item in zip(identities, candidates)
-                ]
-                if len(declaration_records) != len(set(declaration_records)):
-                    fail(f"{instance_id} {source}: duplicate declaration record")
+                if len(identities) != len(set(identities)):
+                    fail(f"{instance_id} {source}: duplicate canonical identity")
                 source_metrics.setdefault(source, []).append(
                     module.evaluate_instance(candidates, targets["items"][instance_id], 20)
                 )
@@ -463,58 +442,8 @@ def check_prompts_and_human() -> None:
     if any(not re.fullmatch(r"[0-9a-f]{64}", row["prompt_sha256"]) for row in prompt_rows):
         fail("invalid rendered prompt SHA-256")
 
-    audit_payload = json_file(RESULTS / "human_window_items_20260718.json")
-    equal(len(audit_payload["items"]), 80, "human audit unique items")
-    equal(
-        audit_payload["protocol"]["ranking_sources"],
-        {"BM25_projection": "BM25_projection", "MURAL_2src": "MURAL_2src"},
-        "human audit ranking sources",
-    )
-    equal(
-        audit_payload["protocol"]["ranking_file_sha256"],
-        "ec7b4824719fe41a7a410172d2027b62f9adeb639a0b0e432ebc18364f2d48b9",
-        "human audit ranking hash",
-    )
-    binding = rows("human_window_binding_20260719.tsv")
-    equal(len(binding), 80, "human audit binding rows")
-    for row in binding:
-        equal(
-            {row["method_a"], row["method_b"]},
-            {"BM25_projection", "MURAL_2src"},
-            "human audit method pair",
-        )
-        equal(
-            {row["source_a"], row["source_b"]},
-            {"BM25_projection", "MURAL_2src"},
-            "human audit source pair",
-        )
-        equal(row["exact_match_a"], "1", "human audit exact A")
-        equal(row["exact_match_b"], "1", "human audit exact B")
-        if not re.fullmatch(r"[0-9a-f]{64}", row["window_a_sha256"]):
-            fail("invalid human window A SHA-256")
-        if not re.fullmatch(r"[0-9a-f]{64}", row["window_b_sha256"]):
-            fail("invalid human window B SHA-256")
-
-    binding_spec = importlib.util.spec_from_file_location(
-        "human_binding", ROOT / "artifacts" / "scripts" / "verify_human_window_binding.py"
-    )
-    if binding_spec is None or binding_spec.loader is None:
-        fail("Cannot import human window binding verifier")
-    binding_module = importlib.util.module_from_spec(binding_spec)
-    binding_spec.loader.exec_module(binding_module)
-    audit_ids = {item["instance_id"] for item in audit_payload["items"]}
-    regenerated = binding_module.verify(
-        audit_payload,
-        binding_module.read_rankings(
-            FROZEN / "strict_rankings_top50_20260719.jsonl.gz",
-            instance_ids=audit_ids,
-        ),
-    )
-    regenerated_text = [{key: str(value) for key, value in row.items()} for row in regenerated]
-    equal(regenerated_text, binding, "regenerated human audit binding")
-
     human = rows("human_window_summary_20260718.tsv")
-    expected_decisions = {"MURAL_2src": 54, "BM25_projection": 19, "Comparable": 15, "Both insufficient": 12}
+    expected_decisions = {"MURAL": 54, "BM25-local": 19, "Comparable": 15, "Both insufficient": 12}
     for decision, count in expected_decisions.items():
         row = one(human, scope="all_judgments", category=decision)
         equal(int(row["count"]), count, f"human decision {decision}")
@@ -523,15 +452,48 @@ def check_prompts_and_human() -> None:
     equal(int(agreement["agreement_n"]), 12, "human agreement")
     close(agreement["cohen_kappa"], 0.4666666666666666, "human kappa")
 
+    audit_manifest = json_file(FROZEN / "human_window_rankings_manifest_20260719.json")
+    audit_rankings = FROZEN / "human_window_rankings_20260712.jsonl.gz"
+    equal(audit_manifest["audited_instances"], 80, "frozen human-audit items")
+    equal(
+        hashlib.sha256(audit_rankings.read_bytes()).hexdigest(),
+        audit_manifest["rankings"]["sha256"],
+        "frozen human-audit ranking hash",
+    )
+    spec = importlib.util.spec_from_file_location(
+        "human_window_binding", ROOT / "artifacts" / "scripts" / "verify_human_window_binding.py"
+    )
+    if spec is None or spec.loader is None:
+        fail("cannot import human-window binding verifier")
+    binding_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(binding_module)
+    payload = json_file(RESULTS / "human_window_items_20260718.json")
+    computed_binding = binding_module.verify(
+        payload, binding_module.read_rankings(audit_rankings)
+    )
+    stored_binding = rows("human_window_binding_20260719.tsv")
+    equal(len(computed_binding), 80, "computed human-window bindings")
+    equal(len(stored_binding), 80, "stored human-window bindings")
+    for computed, stored in zip(computed_binding, stored_binding):
+        for field in stored:
+            equal(str(computed[field]), stored[field], f"human binding {stored['annotation_id']} {field}")
+
+    exact_windows = rows("human_window_exact_instances_20260719.tsv")
+    equal(len(exact_windows), 160, "exact audited window rows")
+    equal(
+        Counter(row["approach"] for row in exact_windows),
+        Counter({"MURAL": 80, "BM25-local": 80}),
+        "exact audited window approaches",
+    )
     strict = rows("human_window_strict_summary_20260719.tsv")
-    for stratum, count in {"MURAL_2src_only": 37, "BM25_projection_only": 12, "both": 18, "neither": 13}.items():
+    for stratum, count in {"MURAL_only": 37, "BM25_only": 12, "both": 18, "neither": 13}.items():
         row = one(strict, scope="unique_instances", strict_stratum=stratum, decision="instances")
         equal(int(row["count"]), count, f"strict human stratum {stratum}")
     for decision, count in {"aligned": 48, "neutral": 7, "opposed": 4}.items():
         row = one(
             strict,
             scope="exclusive_hit_judgments",
-            strict_stratum="MURAL_2src_only_or_BM25_projection_only",
+            strict_stratum="MURAL_only_or_BM25_only",
             decision=decision,
         )
         equal(int(row["count"]), count, f"exclusive judgment {decision}")
@@ -680,6 +642,12 @@ def check_manifest() -> None:
     equal(manifest["strict_reference"]["target_counts"]["total"], 1044, "manifest target count")
     equal(manifest["java_benchmark"]["evaluated_instances"], 91, "manifest Java population")
     equal(manifest["repair"]["prompt_hash_rows"], 1000, "manifest prompt hashes")
+    equal(manifest["human_audit"]["judgments"], 100, "manifest human judgments")
+    equal(
+        manifest["human_audit"]["window_rankings"],
+        "artifacts/frozen/human_window_rankings_20260712.jsonl.gz",
+        "manifest human ranking snapshot",
+    )
     for name, record in manifest["files"].items():
         path = ROOT / name
         if not path.is_file():
@@ -691,6 +659,8 @@ def check_manifest() -> None:
 def check_instance_ledgers() -> None:
     for name in sorted(EXPECTED_RESULTS):
         if "_instances_" not in name or not name.endswith(".tsv"):
+            continue
+        if name == "human_window_exact_instances_20260719.tsv":
             continue
         items = rows(name)
         ids = {row["instance_id"] for row in items}

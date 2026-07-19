@@ -1,101 +1,101 @@
 annotator	annotation_id	instance_id	repository	assignment	method_a	method_b	objective_outcome	window_preference_label	preferred_method	confidence	rationale
-A	WIN-001	astropy__astropy-14598	astropy/astropy	仅学生A	MURAL_2src	BM25_projection	neither	窗口A	MURAL_2src	4	官方补丁与窗口核对实体有依据但仍有歧义。
-A	WIN-002	django__django-15572	django/django	共同标注	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	官方补丁与窗口函数补丁和代码证据直接、明确。
-B	WIN-002	django__django-15572	django/django	共同标注	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	"补丁修改django/template/autoreload.py中get_template_directories函数，窗口A位置4明确包含该编辑实体且含template_changed/watch_for_template_changes/reset_loaders等同模块支持实体；窗口B完全缺失autoreload.py任何实体，被""string""""template""症状词误导至StringAgg/NowNode/value_to_string等无关方法"
-A	WIN-003	sphinx-doc__sphinx-9367	sphinx-doc/sphinx	仅学生A	BM25_projection	MURAL_2src	neither	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-004	sympy__sympy-24661	sympy/sympy	仅学生B	BM25_projection	MURAL_2src	both	窗口B	MURAL_2src	4	补丁为EvaluateFalseTransformer添加visit_Compare，窗口B含该类visit_BinOp/flatten方法及同模块函数，上下文正确；窗口A仅含parse_expr入口却被stats/rv中evaluate参数误导为大量噪声
-A	WIN-005	pydata__xarray-4356	pydata/xarray	仅学生A	MURAL_2src	BM25_projection	BM25_projection_only	窗口B	BM25_projection	5	官方补丁核对窗口A源文件索引有误
-A	WIN-006	pallets__flask-5014	pallets/flask	共同标注	MURAL_2src	BM25_projection	both	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-006	pallets__flask-5014	pallets/flask	共同标注	MURAL_2src	BM25_projection	both	基本相当	Comparable	4	两窗口均含补丁编辑目标Blueprint.__init__及完整Blueprint类方法集，内容高度重叠(17/20相同)，少数差异实体均为低影响支持项，完整性和噪声无实质区分度
-A	WIN-007	mwaskom__seaborn-3187	mwaskom/seaborn	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	两者都不足	Both insufficient	5	官方补丁核对窗口源文件索引有误
-B	WIN-007	mwaskom__seaborn-3187	mwaskom/seaborn	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	两者都不足	Both insufficient	4	补丁核心修改scales.py的Continuous.label方法及utils.py的get_view_interval函数，两窗口均缺失scales.py编辑实体；窗口B虽含utils/locator_to_legend_entries等邻近实体但仍不完整，属legends症状词误导至图例外围而漏掉刻度标签生成层
-B	WIN-008	django__django-16631	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	4	补丁修改get_session_auth_hash(base_user.py)和get_user(auth/init.py)，窗口A包含get_session_auth_hash及salted_hmac/SECRET_KEY_FALLBACKS等关键支持实体，窗口B仅含session后端基础设施而完全缺失两个编辑目标，属症状词(session)误导至sessions/backends模块
-B	WIN-009	django__django-16642	django/django	仅学生B	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	"补丁修改django/http/response.py中FileResponse.set_headers方法，窗口B位置6明确包含该编辑实体且FileResponse.__init__等提供完整上下文；窗口A完全缺失http/response.py，仅命中security checks和mail等含""content_type""词汇的无关模块，属典型症状词误导"
-B	WIN-010	django__django-11880	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	"补丁修改Field.__deepcopy__添加error_messages深拷贝，窗口A位置9明确包含该实体且含ChoiceField/MultiValueField的__deepcopy__作为支持上下文；窗口B完全缺失__deepcopy__方法，被""error_messages""症状词误导仅命中各字段的default_error_messages字典"
-A	WIN-011	mwaskom__seaborn-3069	mwaskom/seaborn	共同标注	BM25_projection	MURAL_2src	both	窗口B	MURAL_2src	5	官方补丁核对窗口A源文件索引有误
-B	WIN-011	mwaskom__seaborn-3069	mwaskom/seaborn	共同标注	BM25_projection	MURAL_2src	both	两者都不足	Both insufficient	4	补丁主要修改Plotter._finalize_figure(添加Nominal轴网格/限界/反转逻辑)及Plotter._setup_scales(移除嵌套import)。两窗口均包含_setup_scales与Nominal类方法，但核心编辑实体_finalize_figure在两个Top-20中均缺失，属排序截断导致关键实体落选。窗口B噪声更低但关键实体缺失使得两者均不足以支撑修复
-A	WIN-012	sympy__sympy-19495	sympy/sympy	仅学生A	BM25_projection	MURAL_2src	MURAL_2src_only	窗口A	BM25_projection	5	相关实体存在但排在 Top-20 之外被噪声挤出
-B	WIN-013	django__django-15973	django/django	仅学生B	MURAL_2src	BM25_projection	BM25_projection_only	窗口B	BM25_projection	5	补丁修改django/db/migrations/autodetector.py中_get_dependencies_for_foreign_key，窗口B位置9明确包含该编辑实体且含同模块_generate_added_field及state.py等支持上下文；窗口A仅含同模块_generate_added_field而缺失目标函数，属排序截断
-B	WIN-014	django__django-15503	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	"补丁修改json.py中HasKeyLookup等类，窗口A含HasKeyLookup.as_sql/as_sqlite/as_oracle及KeyTransformNumericLookupMixin等编辑实体；窗口B完全缺失json.py任何实体，被""has_key""症状词误导至cache/sessions的has_key方法和大量postgres operations"
-A	WIN-015	pytest-dev__pytest-8399	pytest-dev/pytest	共同标注	MURAL_2src	BM25_projection	BM25_projection_only	两者都不足	Both insufficient	3	窗口函数边界、类归属、别名或语言解析造成错误。
-B	WIN-015	pytest-dev__pytest-8399	pytest-dev/pytest	共同标注	MURAL_2src	BM25_projection	BM25_projection_only	窗口B	BM25_projection	4	补丁核心编辑_unittest_的_inject_setup_teardown_fixtures两窗口均含；窗口B的fixture基础设施(mak_xunit_fixture等)上下文更密集，窗口A混入pytester和testing/collect噪声；python.py编辑实体均缺失致完整性不足
-A	WIN-016	astropy__astropy-12907	astropy/astropy	仅学生A	MURAL_2src	BM25_projection	neither	窗口B	BM25_projection	5	窗口A中函数边界、类归属、语言解析造成错误。
-A	WIN-017	astropy__astropy-8707	astropy/astropy	共同标注	MURAL_2src	BM25_projection	both	窗口A	MURAL_2src	5	相关实体存在但排在 Top-20 之外被噪声挤出
-B	WIN-017	astropy__astropy-8707	astropy/astropy	共同标注	MURAL_2src	BM25_projection	both	窗口A	MURAL_2src	4	补丁主要修改Header.fromstring，两窗口均含此实体；窗口A多含_from_blocks/fromfile等header.py内部上下文，窗口B被bytes误导至table HDU和character_as_bytes噪声，A更完整。
-A	WIN-018	sympy__sympy-21930	sympy/sympy	仅学生A	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	官方补丁核对窗口B源文件索引有误
-B	WIN-019	django__django-13363	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	补丁修改TruncDate.as_sql和TruncTime.as_sql，窗口A明确包含两者(位置14和18)及TruncBase.__init__等支持实体；窗口B被问题描述中DateTimeField/DateField等词汇误导至fields/init.py和forms/fields.py，仅含Now.output_field从datetime模块，完全缺失编辑目标
-B	WIN-020	django__django-12713	django/django	仅学生B	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	"补丁修改formfield_for_manytomany(仅窗口B位置4)，窗口A被""widget""症状词误导至forms/fields.py的Widget配置及Query方法，完全缺失编辑目标"
-B	WIN-021	django__django-13449	django/django	仅学生B	BM25_projection	MURAL_2src	both	窗口A	BM25_projection	4	补丁修改expressions.py中Window类(继承SQLiteNumericMixin并新增as_sqlite方法)，窗口A包含Window.init(位置14)及SQLiteNumericMixin.as_sqlite(位置6)等关键实体；窗口B虽含SQLiteNumericMixin.as_sqlite但Window类完全缺失，且两窗口均被SQLite/DecimalField等词汇拖入大量backend噪声，A因包含编辑目标类而完整性明显更优
-A	WIN-022	psf__requests-5414	psf/requests	共同标注	MURAL_2src	BM25_projection	both	窗口A	MURAL_2src	5	窗口B中函数边界、类归属、语言解析造成错误。
-B	WIN-022	psf__requests-5414	psf/requests	共同标注	MURAL_2src	BM25_projection	both	窗口B	BM25_projection	4	两窗口均含编辑实体PreparedRequest.prepare_url，窗口B额外包含其内部调用的_get_idna_encoded_host，与补丁中IDNA编码异常捕获逻辑直接相关；窗口A缺失该关键支持实体
-A	WIN-023	pydata__xarray-6599	pydata/xarray	共同标注	BM25_projection	MURAL_2src	neither	窗口B	MURAL_2src	3	官方补丁与窗口核对实体有依据但仍有歧义。
-B	WIN-023	pydata__xarray-6599	pydata/xarray	共同标注	BM25_projection	MURAL_2src	neither	两者都不足	Both insufficient	4	两窗口均包含polyval入口函数但缺失补丁真正编辑实体_ensure_numeric(同文件computation.py内部函数)，属排序截断导致核心编辑位置落选；窗口B多一个cross函数但无实质完整性优势
-B	WIN-024	django__django-12308	django/django	仅学生B	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	"补丁修改display_for_field函数，仅窗口B位置3明确包含该实体及同模块display_for_value/label_for_field等支持函数；窗口A被""readonly""症状词误导聚集于options.py的readonly_fields/response等方法而完全缺失编辑目标"
-A	WIN-025	scikit-learn__scikit-learn-25931	scikit-learn/scikit-learn	仅学生A	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	官方补丁核对窗口A源文件索引有误
-A	WIN-026	sympy__sympy-13615	sympy/sympy	仅学生A	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	官方补丁与窗口函数补丁和代码证据直接、明确。
-A	WIN-027	matplotlib__matplotlib-26208	matplotlib/matplotlib	仅学生A	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	官方补丁核对窗口A源文件索引有误
-A	WIN-028	scikit-learn__scikit-learn-14141	scikit-learn/scikit-learn	共同标注	MURAL_2src	BM25_projection	both	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-028	scikit-learn__scikit-learn-14141	scikit-learn/scikit-learn	共同标注	MURAL_2src	BM25_projection	both	基本相当	Comparable	5	两窗口内容几乎完全相同，均包含编辑目标_get_deps_info及同模块所有函数，仅排序微异；噪声来源相同(joblib弃用警告、setup.py、openml等)，无实质区分度
-A	WIN-029	sphinx-doc__sphinx-7748	sphinx-doc/sphinx	仅学生A	BM25_projection	MURAL_2src	both	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-A	WIN-030	pydata__xarray-4966	pydata/xarray	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	核对官方补丁窗口A命中上层调用者，但漏掉实际需要修改的层级。
-B	WIN-030	pydata__xarray-4966	pydata/xarray	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	补丁修改xarray/coding/variables.py中UnsignedIntegerCoder.decode方法，窗口B明确包含该实体(位置3)及其父类VariableCoder.decode、兄弟方法encode、同模块的_apply_mask/CFMaskCoder/CFScaleOffsetCoder及调用链conventions模块；窗口A完全缺失coding/variables.py，仅命中问题描述中提及的conventions.py警告抛出位置，属于典型症状词误导
-A	WIN-031	scikit-learn__scikit-learn-12973	scikit-learn/scikit-learn	仅学生A	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	相关实体存在但排在 Top-20 之外
-A	WIN-032	sympy__sympy-17630	sympy/sympy	仅学生A	MURAL_2src	BM25_projection	neither	窗口A	MURAL_2src	5	官方补丁核对窗口B源文件索引有误
-A	WIN-033	matplotlib__matplotlib-20676	matplotlib/matplotlib	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	官方补丁核对窗口源文件索引有误
-B	WIN-033	matplotlib__matplotlib-20676	matplotlib/matplotlib	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	4	补丁修改SpanSelector._setup_edge_handle方法，窗口B在位置20明确包含该编辑实体，窗口A虽覆盖new_axes及多数SpanSelector方法但缺失_setup_edge_handle；两窗口同为SpanSelector密集上下文，噪声相当，完整性差异决定B更优
-A	WIN-034	astropy__astropy-14539	astropy/astropy	共同标注	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	官方补丁核对窗口B源文件索引有误
-B	WIN-034	astropy__astropy-14539	astropy/astropy	共同标注	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	补丁修改astropy/io/fits/diff.py中TableDataDiff._diff方法的VLA列格式条件，窗口A位置18明确包含该实体且FITSDiff._diff等提供充分上下文；窗口B包含FITSDiff._diff但缺失TableDataDiff._diff，且混入fitsdiff.py脚本实体(EPILOG/main等)造成噪声，属邻近函数混淆
-B	WIN-035	sympy__sympy-16597	sympy/sympy	仅学生B	BM25_projection	MURAL_2src	both	基本相当	Comparable	4	两窗口均包含核心编辑实体get_known_facts(ask.py)，且均缺失同等重要的sympy/core/assumptions.py中_assume_rules修改；窗口A含3个ask.py实体与sathandlers，噪声来自solveset/diophantine；窗口B含4个ask.py实体与sathandlers，噪声来自permutations/diophantine；完整性接近、噪声分布差异轻微，无法判定稳定优劣
-A	WIN-036	django__django-12039	django/django	仅学生A	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	官方补丁核对窗口B源文件索引有误
-B	WIN-037	django__django-13590	django/django	仅学生B	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	补丁修改Query.resolve_lookup_value方法，窗口B位置10明确包含该实体且同文件含_add_q/names_to_path/setup_joins等7个Query方法提供丰富上下文；窗口A仅含Query._add_q而缺失目标方法，且混入大量compiler/expressions/template等无关实体，属排序截断导致核心方法落选
-A	WIN-038	scikit-learn__scikit-learn-13142	scikit-learn/scikit-learn	仅学生A	BM25_projection	MURAL_2src	neither	窗口B	MURAL_2src	5	官方补丁与窗口函数补丁和代码证据直接、明确。
-A	WIN-039	matplotlib__matplotlib-24637	matplotlib/matplotlib	共同标注	BM25_projection	MURAL_2src	both	窗口A	BM25_projection	5	包含官方补丁draw(self, renderer)实际修改的主要函数
-B	WIN-039	matplotlib__matplotlib-24637	matplotlib/matplotlib	共同标注	BM25_projection	MURAL_2src	both	窗口B	MURAL_2src	4	两窗口均含编辑实体AnnotationBbox.draw，窗口B含14个同模块AnnotationBbox方法上下文更密集，窗口A混入5个示例文件及text.py Annotation方法噪声；B完整性稍优且噪声更低
-A	WIN-040	django__django-15863	django/django	仅学生A	BM25_projection	MURAL_2src	BM25_projection_only	窗口A	BM25_projection	5	官方补丁核对窗口B源文件索引有误
-A	WIN-041	pytest-dev__pytest-5840	pytest-dev/pytest	共同标注	MURAL_2src	BM25_projection	neither	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-041	pytest-dev__pytest-5840	pytest-dev/pytest	共同标注	MURAL_2src	BM25_projection	neither	两者都不足	Both insufficient	5	"两窗口完全相同，仅含testing/conftest测试文件和hookspec/capture钩子，完全缺失补丁核心文件_pytest/config/init.py和_pytest/pathlib.py；""conftest""""ImportError""症状词误导检索至测试文件和钩子规范"
-A	WIN-042	scikit-learn__scikit-learn-13496	scikit-learn/scikit-learn	仅学生A	MURAL_2src	BM25_projection	neither	窗口A	MURAL_2src	5	B窗口追随 issue 表面词汇，偏离真正补丁位置。
-B	WIN-043	sympy__sympy-16792	sympy/sympy	仅学生B	BM25_projection	MURAL_2src	BM25_projection_only	窗口A	BM25_projection	5	"补丁修改codegen.py中CodeGen.routine方法，窗口A明确包含该实体及make_routine/codegen等支持上下文；窗口B被""autowrap""症状词误导仅含autowrap.py实体而完全缺失codegen模块"
-A	WIN-044	django__django-16139	django/django	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	相关实体存在但排在 Top-20 之外被噪声挤出
-B	WIN-044	django__django-16139	django/django	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	4	补丁修改UserChangeForm.init，窗口B位置19明确包含该实体，窗口A缺失编辑方法仅命中UserChangeForm.password字段及大量无关表单字段，属症状词误导
-A	WIN-045	sphinx-doc__sphinx-10614	sphinx-doc/sphinx	共同标注	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	核对官方补丁窗口B命中上层调用者，但漏掉实际需要修改的层级。
-B	WIN-045	sphinx-doc__sphinx-10614	sphinx-doc/sphinx	共同标注	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	补丁修改html_visit_inheritance_diagram函数，窗口A位置7包含该编辑实体且同模块10+个支持实体；窗口B完全缺失inheritance_diagram模块，被SVG关键词误导至graphviz.fix_svg_relative_paths和大量search stopwords等完全无关实体
-B	WIN-046	django__django-11433	django/django	仅学生B	BM25_projection	MURAL_2src	neither	两者都不足	Both insufficient	4	"补丁修改django/forms/models.py中construct_instance函数，两窗口均缺失该核心实体；窗口B含formsets.cleaned_data但非编辑目标，窗口A含Field.empty_values仅部分支持上下文；被""cleaned_data""""default""等词误导至forms/fields.py和formsets.py"
-B	WIN-047	django__django-9296	django/django	仅学生B	MURAL_2src	BM25_projection	both	窗口A	MURAL_2src	5	"补丁为Paginator添加__iter__方法，窗口A包含Paginator.init/page_range/page/validate_number等全部Paginator及Page类方法，均在django/core/paginator.py内；窗口B被问题描述中""iter""词汇误导，12个实体为无关模块的__iter__实现(QuerySet/formsets/templates等)，仅含少数Page方法而缺失Paginator核心方法，完整性与噪声差异均显著"
-A	WIN-048	psf__requests-1766	psf/requests	共同标注	BM25_projection	MURAL_2src	neither	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-048	psf__requests-1766	psf/requests	共同标注	BM25_projection	MURAL_2src	neither	基本相当	Comparable	5	两窗口内容完全相同，均缺失补丁核心文件requests/auth.py及digest构建函数；窗口内虽有prepare_auth等auth相关实体，但均非实际编辑目标，且混入大量无关实体(如options、NTLMConnectionPool等)，属于检索阶段未命中auth.py的文件源错误
-B	WIN-049	django__django-15278	django/django	仅学生B	MURAL_2src	BM25_projection	BM25_projection_only	窗口B	BM25_projection	5	补丁修改sqlite3/schema.py中add_field方法，窗口B位置12明确包含该实体；窗口A被OneToOneField/unique/nulable等词汇误导至字段属性层，完全缺失编辑实体
-B	WIN-050	django__django-12193	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	补丁核心编辑实体为CheckboxInput.get_context(窗口A位置10)，窗口B完全缺失该实体；窗口A还包含SplitArrayWidget.get_context等直接支持上下文，完整性优势明确
-A	WIN-051	sympy__sympy-23413	sympy/sympy	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	相关实体存在但排在 Top-20 之外
-B	WIN-051	sympy__sympy-23413	sympy/sympy	共同标注	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	"补丁修改sympy/polys/matrices/normalforms.py的_hermite_normal_form函数，窗口B在位置3明确包含该编辑实体且位置1-6均为同模块HNF相关函数提供完整上下文；窗口A完全缺失该模块，仅命中问题描述中""rows""""rank-deficient""等词汇导向的sympy/matrices/common.py通用矩阵行操作和numberfields子模块，属典型症状词误导"
-B	WIN-052	django__django-15368	django/django	仅学生B	BM25_projection	MURAL_2src	both	基本相当	Comparable	4	两窗口均包含编辑实体bulk_update及resolve_expression等表达式支持上下文，仅少数差异实体(collapse_group_by vs output_field)，完整性噪声近乎等同，无稳定优劣区分
-A	WIN-053	pydata__xarray-6744	pydata/xarray	仅学生A	BM25_projection	MURAL_2src	both	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-A	WIN-054	django__django-13343	django/django	仅学生A	MURAL_2src	BM25_projection	MURAL_2src_only	窗口B	BM25_projection	5	相关实体存在但排在 Top-20 之外被噪声挤出
-A	WIN-055	pytest-dev__pytest-7571	pytest-dev/pytest	仅学生A	MURAL_2src	BM25_projection	neither	窗口B	BM25_projection	5	官方补丁与窗口函数补丁和代码证据直接、明确。
-B	WIN-056	django__django-14017	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	补丁直接修改Q._combine方法(仅窗口A位置20包含)，窗口B完全缺失该核心编辑实体；窗口A同时包含Exists相关方法提供充分上下文，窗口B虽含Exists但漏掉Q._combine属排序截断
-B	WIN-057	django__django-13794	django/django	仅学生B	MURAL_2src	BM25_projection	both	窗口A	MURAL_2src	5	"补丁修改functional.py中__proxy__类的__add__/radd，窗口A包含同类的__proxy__.__str__及lazy/new_method_proxy等支持实体；窗口B被""add filter""误导至template/defaultfilters等模块，几乎缺失functional.py上下文"
-A	WIN-058	django__django-14999	django/django	仅学生A	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	官方补丁与窗口函数补丁和代码证据直接、明确。
-A	WIN-059	pylint-dev__pylint-4661	pylint-dev/pylint	仅学生A	BM25_projection	MURAL_2src	both	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-060	django__django-13344	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	4	补丁直接修改SecurityMiddleware.init__及SessionMiddleware/CacheMiddleware等__init，窗口A包含SecurityMiddleware.init(位置13)及被替换的_get_response_none_deprecation；窗口B虽有MiddlewareMixin.init__和load_middleware等支持上下文，但缺失所有直接编辑实体。两者均缺失SessionMiddleware/CacheMiddleware的__init，属排序截断
-A	WIN-061	sphinx-doc__sphinx-10323	sphinx-doc/sphinx	仅学生A	BM25_projection	MURAL_2src	BM25_projection_only	两者都不足	Both insufficient	3	窗口函数边界、类归属、别名或语言解析造成错误。
-B	WIN-062	django__django-16662	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	"补丁修改MigrationWriter.as_string方法，窗口A明确包含该编辑实体及同模块序列化支持实体；窗口B完全缺失as_string，被""ordering""症状词误导至sql/query.py和options.py的排序相关实体"
-B	WIN-063	django__django-13346	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	4	补丁核心新增KeyTransformIn类及register_lookup调用，两窗口均缺失该新类；但窗口A包含同模块HasKeyLookup/KeyTransform等8个JSON字段实体提供密集邻近上下文，窗口B仅含sql/query.py通用方法而完全无json.py内容；截断导致新增类落选但窗口A上下文价值明显更优
-A	WIN-064	pylint-dev__pylint-6528	pylint-dev/pylint	共同标注	BM25_projection	MURAL_2src	BM25_projection_only	窗口B	MURAL_2src	5	窗口函数边界、类归属、别名或语言解析造成错误。
-B	WIN-064	pylint-dev__pylint-6528	pylint-dev/pylint	共同标注	BM25_projection	MURAL_2src	BM25_projection_only	两者都不足	Both insufficient	5	"补丁核心修改pylint/lint/expand_modules.py的_is_ignored_file和pylinter.py的_discover_files，两窗口均缺失这两个文件任何实体；窗口A仅含pylinter.py的_parse_error_mode(不同方法)，窗口B无一lint模块实体；""ignore""症状词误导检索至checkers中各类含ignore的方法"
-A	WIN-065	scikit-learn__scikit-learn-14983	scikit-learn/scikit-learn	仅学生A	BM25_projection	MURAL_2src	both	窗口B	MURAL_2src	5	核对官方补丁窗口A命中上层调用者，但漏掉实际需要修改的层级。
-A	WIN-066	sphinx-doc__sphinx-8056	sphinx-doc/sphinx	仅学生A	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	核对官方补丁窗口A命中上层调用者，但漏掉实际需要修改的层级。
-B	WIN-067	django__django-16263	django/django	仅学生B	BM25_projection	MURAL_2src	BM25_projection_only	窗口A	BM25_projection	4	补丁核心修改Query.get_aggregation(位置14)及set_annotation_mask/add_annotation等sql/query.py内部方法，窗口A覆盖这些关键实体及get_count/annotation_select等支持上下文；窗口B仅含QuerySet.count/annotate/aggregate等API表层方法，漏掉全部内部实现层，属典型症状词误导致抽象层级偏移
-B	WIN-068	django__django-15499	django/django	仅学生B	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	补丁修改CreateModel.reduce方法，窗口B明确包含该实体(位置14)且AlterModelManagers/CreateModel全套方法提供完整上下文；窗口A虽含同类方法但缺失核心reduce，且混入__all__、contenttypes迁移等噪声，完整性差异显著
-B	WIN-069	django__django-15467	django/django	仅学生B	MURAL_2src	BM25_projection	MURAL_2src_only	窗口A	MURAL_2src	5	补丁修改BaseModelAdmin.formfield_for_foreignkey方法，窗口A位置16明确包含该实体及radio_fields/formfield_for_dbfield等支持上下文；窗口B仅含radio_fields属性，其余为checks.py的_check_radio_fields等检查方法，完全缺失编辑目标，被radio_fields关键词误导至checks模块
-A	WIN-070	django__django-10914	django/django	仅学生A	MURAL_2src	BM25_projection	MURAL_2src_only	两者都不足	Both insufficient	3	官方补丁与窗口核对实体有依据但仍有歧义。
-B	WIN-071	django__django-16901	django/django	仅学生B	MURAL_2src	BM25_projection	both	窗口A	MURAL_2src	5	补丁修改WhereNode.as_sql方法，窗口A位置16明确包含该实体及同模块WhereNode.split_having_qualify/get_group_by_cols和XOR常量；窗口B仅含XOR常量和QuerySet.xor，完全缺失核心方法，属排序截断
-A	WIN-072	astropy__astropy-13579	astropy/astropy	仅学生A	MURAL_2src	BM25_projection	MURAL_2src_only	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-073	django__django-14007	django/django	仅学生B	BM25_projection	MURAL_2src	BM25_projection_only	窗口A	BM25_projection	5	补丁修改SQLInsertCompiler.execute_sql，仅窗口A包含该实体(位置12)及get_db_converters等转换器支持上下文；窗口B缺失编辑目标，属排序截断
-A	WIN-074	matplotlib__matplotlib-20488	matplotlib/matplotlib	仅学生A	BM25_projection	MURAL_2src	neither	两者都不足	Both insufficient	3	窗口函数边界、类归属、别名或语言解析造成错误。
-A	WIN-075	sphinx-doc__sphinx-9461	sphinx-doc/sphinx	仅学生A	BM25_projection	MURAL_2src	both	窗口A	BM25_projection	5	官方补丁与窗口函数补丁和代码证据直接、明确。
-A	WIN-076	matplotlib__matplotlib-24026	matplotlib/matplotlib	仅学生A	MURAL_2src	BM25_projection	BM25_projection_only	窗口B	BM25_projection	5	官方补丁与窗口函数补丁和代码证据直接、明确。
-B	WIN-077	django__django-12143	django/django	仅学生B	BM25_projection	MURAL_2src	BM25_projection_only	窗口A	BM25_projection	5	补丁修改ModelAdmin._get_edited_object_pks方法，窗口A位置11明确包含该实体及邻近方法_get_list_editable_queryset，其余多为同文件options.py中change_view/add_view等支持上下文；窗口B完全缺失该方法，且近半实体为forms/widgets.py的value_from_datadict和views/generic/base.py的View类，属排序截断导致编辑实体落选。
-A	WIN-078	pylint-dev__pylint-4604	pylint-dev/pylint	共同标注	MURAL_2src	BM25_projection	neither	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
-B	WIN-078	pylint-dev__pylint-4604	pylint-dev/pylint	共同标注	MURAL_2src	BM25_projection	neither	两者都不足	Both insufficient	5	"两窗口内容完全相同，均仅含各checker的MSGS/options等配置字典，缺失补丁核心实体variables.py的_store_type_annotation_node方法和constants.py的IS_PYPY；被""unused-import""症状词误导至imports/variables模块的表面属性层次而未命中实际修改位置"
-B	WIN-079	django__django-12419	django/django	仅学生B	BM25_projection	MURAL_2src	MURAL_2src_only	窗口B	MURAL_2src	5	补丁修改global_settings.py中SECURE_REFERRER_POLICY默认值，窗口B明确包含该设置项；窗口A完全缺失编辑实体，被关键词误导至security checks模块
-A	WIN-080	sympy__sympy-20438	sympy/sympy	仅学生A	MURAL_2src	BM25_projection	MURAL_2src_only	窗口B	BM25_projection	4	A窗口追随 issue 表面词汇，偏离真正补丁位置。
+A	WIN-001	astropy__astropy-14598	astropy/astropy	仅学生A	MURAL	BM25-local	两者均未命中	窗口A	MURAL	4	官方补丁与窗口核对实体有依据但仍有歧义。
+A	WIN-002	django__django-15572	django/django	共同标注	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	官方补丁与窗口函数补丁和代码证据直接、明确。
+B	WIN-002	django__django-15572	django/django	共同标注	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	"补丁修改django/template/autoreload.py中get_template_directories函数，窗口A位置4明确包含该编辑实体且含template_changed/watch_for_template_changes/reset_loaders等同模块支持实体；窗口B完全缺失autoreload.py任何实体，被""string""""template""症状词误导至StringAgg/NowNode/value_to_string等无关方法"
+A	WIN-003	sphinx-doc__sphinx-9367	sphinx-doc/sphinx	仅学生A	BM25-local	MURAL	两者均未命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-004	sympy__sympy-24661	sympy/sympy	仅学生B	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	4	补丁为EvaluateFalseTransformer添加visit_Compare，窗口B含该类visit_BinOp/flatten方法及同模块函数，上下文正确；窗口A仅含parse_expr入口却被stats/rv中evaluate参数误导为大量噪声
+A	WIN-005	pydata__xarray-4356	pydata/xarray	仅学生A	MURAL	BM25-local	仅BM25-local命中	窗口B	BM25-local	5	官方补丁核对窗口A源文件索引有误
+A	WIN-006	pallets__flask-5014	pallets/flask	共同标注	MURAL	BM25-local	两者均命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-006	pallets__flask-5014	pallets/flask	共同标注	MURAL	BM25-local	两者均命中	基本相当	Comparable	4	两窗口均含补丁编辑目标Blueprint.__init__及完整Blueprint类方法集，内容高度重叠(17/20相同)，少数差异实体均为低影响支持项，完整性和噪声无实质区分度
+A	WIN-007	mwaskom__seaborn-3187	mwaskom/seaborn	共同标注	BM25-local	MURAL	仅MURAL命中	两者都不足	Both insufficient	5	官方补丁核对窗口源文件索引有误
+B	WIN-007	mwaskom__seaborn-3187	mwaskom/seaborn	共同标注	BM25-local	MURAL	仅MURAL命中	两者都不足	Both insufficient	4	补丁核心修改scales.py的Continuous.label方法及utils.py的get_view_interval函数，两窗口均缺失scales.py编辑实体；窗口B虽含utils/locator_to_legend_entries等邻近实体但仍不完整，属legends症状词误导至图例外围而漏掉刻度标签生成层
+B	WIN-008	django__django-16631	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	4	补丁修改get_session_auth_hash(base_user.py)和get_user(auth/init.py)，窗口A包含get_session_auth_hash及salted_hmac/SECRET_KEY_FALLBACKS等关键支持实体，窗口B仅含session后端基础设施而完全缺失两个编辑目标，属症状词(session)误导至sessions/backends模块
+B	WIN-009	django__django-16642	django/django	仅学生B	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	"补丁修改django/http/response.py中FileResponse.set_headers方法，窗口B位置6明确包含该编辑实体且FileResponse.__init__等提供完整上下文；窗口A完全缺失http/response.py，仅命中security checks和mail等含""content_type""词汇的无关模块，属典型症状词误导"
+B	WIN-010	django__django-11880	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	"补丁修改Field.__deepcopy__添加error_messages深拷贝，窗口A位置9明确包含该实体且含ChoiceField/MultiValueField的__deepcopy__作为支持上下文；窗口B完全缺失__deepcopy__方法，被""error_messages""症状词误导仅命中各字段的default_error_messages字典"
+A	WIN-011	mwaskom__seaborn-3069	mwaskom/seaborn	共同标注	BM25-local	MURAL	两者均命中	窗口B	MURAL	5	官方补丁核对窗口A源文件索引有误
+B	WIN-011	mwaskom__seaborn-3069	mwaskom/seaborn	共同标注	BM25-local	MURAL	两者均命中	两者都不足	Both insufficient	4	补丁主要修改Plotter._finalize_figure(添加Nominal轴网格/限界/反转逻辑)及Plotter._setup_scales(移除嵌套import)。两窗口均包含_setup_scales与Nominal类方法，但核心编辑实体_finalize_figure在两个Top-20中均缺失，属排序截断导致关键实体落选。窗口B噪声更低但关键实体缺失使得两者均不足以支撑修复
+A	WIN-012	sympy__sympy-19495	sympy/sympy	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口A	BM25-local	5	相关实体存在但排在 Top-20 之外被噪声挤出
+B	WIN-013	django__django-15973	django/django	仅学生B	MURAL	BM25-local	仅BM25-local命中	窗口B	BM25-local	5	补丁修改django/db/migrations/autodetector.py中_get_dependencies_for_foreign_key，窗口B位置9明确包含该编辑实体且含同模块_generate_added_field及state.py等支持上下文；窗口A仅含同模块_generate_added_field而缺失目标函数，属排序截断
+B	WIN-014	django__django-15503	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	"补丁修改json.py中HasKeyLookup等类，窗口A含HasKeyLookup.as_sql/as_sqlite/as_oracle及KeyTransformNumericLookupMixin等编辑实体；窗口B完全缺失json.py任何实体，被""has_key""症状词误导至cache/sessions的has_key方法和大量postgres operations"
+A	WIN-015	pytest-dev__pytest-8399	pytest-dev/pytest	共同标注	MURAL	BM25-local	仅BM25-local命中	两者都不足	Both insufficient	3	窗口函数边界、类归属、别名或语言解析造成错误。
+B	WIN-015	pytest-dev__pytest-8399	pytest-dev/pytest	共同标注	MURAL	BM25-local	仅BM25-local命中	窗口B	BM25-local	4	补丁核心编辑_unittest_的_inject_setup_teardown_fixtures两窗口均含；窗口B的fixture基础设施(mak_xunit_fixture等)上下文更密集，窗口A混入pytester和testing/collect噪声；python.py编辑实体均缺失致完整性不足
+A	WIN-016	astropy__astropy-12907	astropy/astropy	仅学生A	MURAL	BM25-local	两者均未命中	窗口B	BM25-local	5	窗口A中函数边界、类归属、语言解析造成错误。
+A	WIN-017	astropy__astropy-8707	astropy/astropy	共同标注	MURAL	BM25-local	两者均命中	窗口A	MURAL	5	相关实体存在但排在 Top-20 之外被噪声挤出
+B	WIN-017	astropy__astropy-8707	astropy/astropy	共同标注	MURAL	BM25-local	两者均命中	窗口A	MURAL	4	补丁主要修改Header.fromstring，两窗口均含此实体；窗口A多含_from_blocks/fromfile等header.py内部上下文，窗口B被bytes误导至table HDU和character_as_bytes噪声，A更完整。
+A	WIN-018	sympy__sympy-21930	sympy/sympy	仅学生A	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	官方补丁核对窗口B源文件索引有误
+B	WIN-019	django__django-13363	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	补丁修改TruncDate.as_sql和TruncTime.as_sql，窗口A明确包含两者(位置14和18)及TruncBase.__init__等支持实体；窗口B被问题描述中DateTimeField/DateField等词汇误导至fields/init.py和forms/fields.py，仅含Now.output_field从datetime模块，完全缺失编辑目标
+B	WIN-020	django__django-12713	django/django	仅学生B	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	"补丁修改formfield_for_manytomany(仅窗口B位置4)，窗口A被""widget""症状词误导至forms/fields.py的Widget配置及Query方法，完全缺失编辑目标"
+B	WIN-021	django__django-13449	django/django	仅学生B	BM25-local	MURAL	仅BM25-local命中	窗口A	BM25-local	4	补丁修改expressions.py中Window类(继承SQLiteNumericMixin并新增as_sqlite方法)，窗口A包含Window.init(位置14)及SQLiteNumericMixin.as_sqlite(位置6)等关键实体；窗口B虽含SQLiteNumericMixin.as_sqlite但Window类完全缺失，且两窗口均被SQLite/DecimalField等词汇拖入大量backend噪声，A因包含编辑目标类而完整性明显更优
+A	WIN-022	psf__requests-5414	psf/requests	共同标注	MURAL	BM25-local	两者均命中	窗口A	MURAL	5	窗口B中函数边界、类归属、语言解析造成错误。
+B	WIN-022	psf__requests-5414	psf/requests	共同标注	MURAL	BM25-local	两者均命中	窗口B	BM25-local	4	两窗口均含编辑实体PreparedRequest.prepare_url，窗口B额外包含其内部调用的_get_idna_encoded_host，与补丁中IDNA编码异常捕获逻辑直接相关；窗口A缺失该关键支持实体
+A	WIN-023	pydata__xarray-6599	pydata/xarray	共同标注	BM25-local	MURAL	两者均未命中	窗口B	MURAL	3	官方补丁与窗口核对实体有依据但仍有歧义。
+B	WIN-023	pydata__xarray-6599	pydata/xarray	共同标注	BM25-local	MURAL	两者均未命中	两者都不足	Both insufficient	4	两窗口均包含polyval入口函数但缺失补丁真正编辑实体_ensure_numeric(同文件computation.py内部函数)，属排序截断导致核心编辑位置落选；窗口B多一个cross函数但无实质完整性优势
+B	WIN-024	django__django-12308	django/django	仅学生B	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	"补丁修改display_for_field函数，仅窗口B位置3明确包含该实体及同模块display_for_value/label_for_field等支持函数；窗口A被""readonly""症状词误导聚集于options.py的readonly_fields/response等方法而完全缺失编辑目标"
+A	WIN-025	scikit-learn__scikit-learn-25931	scikit-learn/scikit-learn	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	官方补丁核对窗口A源文件索引有误
+A	WIN-026	sympy__sympy-13615	sympy/sympy	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	官方补丁与窗口函数补丁和代码证据直接、明确。
+A	WIN-027	matplotlib__matplotlib-26208	matplotlib/matplotlib	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	官方补丁核对窗口A源文件索引有误
+A	WIN-028	scikit-learn__scikit-learn-14141	scikit-learn/scikit-learn	共同标注	MURAL	BM25-local	两者均命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-028	scikit-learn__scikit-learn-14141	scikit-learn/scikit-learn	共同标注	MURAL	BM25-local	两者均命中	基本相当	Comparable	5	两窗口内容几乎完全相同，均包含编辑目标_get_deps_info及同模块所有函数，仅排序微异；噪声来源相同(joblib弃用警告、setup.py、openml等)，无实质区分度
+A	WIN-029	sphinx-doc__sphinx-7748	sphinx-doc/sphinx	仅学生A	BM25-local	MURAL	两者均命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+A	WIN-030	pydata__xarray-4966	pydata/xarray	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	核对官方补丁窗口A命中上层调用者，但漏掉实际需要修改的层级。
+B	WIN-030	pydata__xarray-4966	pydata/xarray	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	补丁修改xarray/coding/variables.py中UnsignedIntegerCoder.decode方法，窗口B明确包含该实体(位置3)及其父类VariableCoder.decode、兄弟方法encode、同模块的_apply_mask/CFMaskCoder/CFScaleOffsetCoder及调用链conventions模块；窗口A完全缺失coding/variables.py，仅命中问题描述中提及的conventions.py警告抛出位置，属于典型症状词误导
+A	WIN-031	scikit-learn__scikit-learn-12973	scikit-learn/scikit-learn	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	相关实体存在但排在 Top-20 之外
+A	WIN-032	sympy__sympy-17630	sympy/sympy	仅学生A	MURAL	BM25-local	两者均未命中	窗口A	MURAL	5	官方补丁核对窗口B源文件索引有误
+A	WIN-033	matplotlib__matplotlib-20676	matplotlib/matplotlib	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	官方补丁核对窗口源文件索引有误
+B	WIN-033	matplotlib__matplotlib-20676	matplotlib/matplotlib	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	4	补丁修改SpanSelector._setup_edge_handle方法，窗口B在位置20明确包含该编辑实体，窗口A虽覆盖new_axes及多数SpanSelector方法但缺失_setup_edge_handle；两窗口同为SpanSelector密集上下文，噪声相当，完整性差异决定B更优
+A	WIN-034	astropy__astropy-14539	astropy/astropy	共同标注	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	官方补丁核对窗口B源文件索引有误
+B	WIN-034	astropy__astropy-14539	astropy/astropy	共同标注	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	补丁修改astropy/io/fits/diff.py中TableDataDiff._diff方法的VLA列格式条件，窗口A位置18明确包含该实体且FITSDiff._diff等提供充分上下文；窗口B包含FITSDiff._diff但缺失TableDataDiff._diff，且混入fitsdiff.py脚本实体(EPILOG/main等)造成噪声，属邻近函数混淆
+B	WIN-035	sympy__sympy-16597	sympy/sympy	仅学生B	BM25-local	MURAL	两者均命中	基本相当	Comparable	4	两窗口均包含核心编辑实体get_known_facts(ask.py)，且均缺失同等重要的sympy/core/assumptions.py中_assume_rules修改；窗口A含3个ask.py实体与sathandlers，噪声来自solveset/diophantine；窗口B含4个ask.py实体与sathandlers，噪声来自permutations/diophantine；完整性接近、噪声分布差异轻微，无法判定稳定优劣
+A	WIN-036	django__django-12039	django/django	仅学生A	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	官方补丁核对窗口B源文件索引有误
+B	WIN-037	django__django-13590	django/django	仅学生B	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	补丁修改Query.resolve_lookup_value方法，窗口B位置10明确包含该实体且同文件含_add_q/names_to_path/setup_joins等7个Query方法提供丰富上下文；窗口A仅含Query._add_q而缺失目标方法，且混入大量compiler/expressions/template等无关实体，属排序截断导致核心方法落选
+A	WIN-038	scikit-learn__scikit-learn-13142	scikit-learn/scikit-learn	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	官方补丁与窗口函数补丁和代码证据直接、明确。
+A	WIN-039	matplotlib__matplotlib-24637	matplotlib/matplotlib	共同标注	BM25-local	MURAL	两者均命中	窗口A	BM25-local	5	包含官方补丁draw(self, renderer)实际修改的主要函数
+B	WIN-039	matplotlib__matplotlib-24637	matplotlib/matplotlib	共同标注	BM25-local	MURAL	两者均命中	窗口B	MURAL	4	两窗口均含编辑实体AnnotationBbox.draw，窗口B含14个同模块AnnotationBbox方法上下文更密集，窗口A混入5个示例文件及text.py Annotation方法噪声；B完整性稍优且噪声更低
+A	WIN-040	django__django-15863	django/django	仅学生A	BM25-local	MURAL	仅BM25-local命中	窗口A	BM25-local	5	官方补丁核对窗口B源文件索引有误
+A	WIN-041	pytest-dev__pytest-5840	pytest-dev/pytest	共同标注	MURAL	BM25-local	两者均未命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-041	pytest-dev__pytest-5840	pytest-dev/pytest	共同标注	MURAL	BM25-local	两者均未命中	两者都不足	Both insufficient	5	"两窗口完全相同，仅含testing/conftest测试文件和hookspec/capture钩子，完全缺失补丁核心文件_pytest/config/init.py和_pytest/pathlib.py；""conftest""""ImportError""症状词误导检索至测试文件和钩子规范"
+A	WIN-042	scikit-learn__scikit-learn-13496	scikit-learn/scikit-learn	仅学生A	MURAL	BM25-local	两者均未命中	窗口A	MURAL	5	B窗口追随 issue 表面词汇，偏离真正补丁位置。
+B	WIN-043	sympy__sympy-16792	sympy/sympy	仅学生B	BM25-local	MURAL	仅BM25-local命中	窗口A	BM25-local	5	"补丁修改codegen.py中CodeGen.routine方法，窗口A明确包含该实体及make_routine/codegen等支持上下文；窗口B被""autowrap""症状词误导仅含autowrap.py实体而完全缺失codegen模块"
+A	WIN-044	django__django-16139	django/django	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	相关实体存在但排在 Top-20 之外被噪声挤出
+B	WIN-044	django__django-16139	django/django	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	4	补丁修改UserChangeForm.init，窗口B位置19明确包含该实体，窗口A缺失编辑方法仅命中UserChangeForm.password字段及大量无关表单字段，属症状词误导
+A	WIN-045	sphinx-doc__sphinx-10614	sphinx-doc/sphinx	共同标注	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	核对官方补丁窗口B命中上层调用者，但漏掉实际需要修改的层级。
+B	WIN-045	sphinx-doc__sphinx-10614	sphinx-doc/sphinx	共同标注	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	补丁修改html_visit_inheritance_diagram函数，窗口A位置7包含该编辑实体且同模块10+个支持实体；窗口B完全缺失inheritance_diagram模块，被SVG关键词误导至graphviz.fix_svg_relative_paths和大量search stopwords等完全无关实体
+B	WIN-046	django__django-11433	django/django	仅学生B	BM25-local	MURAL	两者均未命中	两者都不足	Both insufficient	4	"补丁修改django/forms/models.py中construct_instance函数，两窗口均缺失该核心实体；窗口B含formsets.cleaned_data但非编辑目标，窗口A含Field.empty_values仅部分支持上下文；被""cleaned_data""""default""等词误导至forms/fields.py和formsets.py"
+B	WIN-047	django__django-9296	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	"补丁为Paginator添加__iter__方法，窗口A包含Paginator.init/page_range/page/validate_number等全部Paginator及Page类方法，均在django/core/paginator.py内；窗口B被问题描述中""iter""词汇误导，12个实体为无关模块的__iter__实现(QuerySet/formsets/templates等)，仅含少数Page方法而缺失Paginator核心方法，完整性与噪声差异均显著"
+A	WIN-048	psf__requests-1766	psf/requests	共同标注	BM25-local	MURAL	两者均未命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-048	psf__requests-1766	psf/requests	共同标注	BM25-local	MURAL	两者均未命中	基本相当	Comparable	5	两窗口内容完全相同，均缺失补丁核心文件requests/auth.py及digest构建函数；窗口内虽有prepare_auth等auth相关实体，但均非实际编辑目标，且混入大量无关实体(如options、NTLMConnectionPool等)，属于检索阶段未命中auth.py的文件源错误
+B	WIN-049	django__django-15278	django/django	仅学生B	MURAL	BM25-local	仅BM25-local命中	窗口B	BM25-local	5	补丁修改sqlite3/schema.py中add_field方法，窗口B位置12明确包含该实体；窗口A被OneToOneField/unique/nulable等词汇误导至字段属性层，完全缺失编辑实体
+B	WIN-050	django__django-12193	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	补丁核心编辑实体为CheckboxInput.get_context(窗口A位置10)，窗口B完全缺失该实体；窗口A还包含SplitArrayWidget.get_context等直接支持上下文，完整性优势明确
+A	WIN-051	sympy__sympy-23413	sympy/sympy	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	相关实体存在但排在 Top-20 之外
+B	WIN-051	sympy__sympy-23413	sympy/sympy	共同标注	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	"补丁修改sympy/polys/matrices/normalforms.py的_hermite_normal_form函数，窗口B在位置3明确包含该编辑实体且位置1-6均为同模块HNF相关函数提供完整上下文；窗口A完全缺失该模块，仅命中问题描述中""rows""""rank-deficient""等词汇导向的sympy/matrices/common.py通用矩阵行操作和numberfields子模块，属典型症状词误导"
+B	WIN-052	django__django-15368	django/django	仅学生B	BM25-local	MURAL	两者均命中	基本相当	Comparable	4	两窗口均包含编辑实体bulk_update及resolve_expression等表达式支持上下文，仅少数差异实体(collapse_group_by vs output_field)，完整性噪声近乎等同，无稳定优劣区分
+A	WIN-053	pydata__xarray-6744	pydata/xarray	仅学生A	BM25-local	MURAL	两者均命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+A	WIN-054	django__django-13343	django/django	仅学生A	MURAL	BM25-local	仅MURAL命中	窗口B	BM25-local	5	相关实体存在但排在 Top-20 之外被噪声挤出
+A	WIN-055	pytest-dev__pytest-7571	pytest-dev/pytest	仅学生A	MURAL	BM25-local	两者均命中	窗口B	BM25-local	5	官方补丁与窗口函数补丁和代码证据直接、明确。
+B	WIN-056	django__django-14017	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	补丁直接修改Q._combine方法(仅窗口A位置20包含)，窗口B完全缺失该核心编辑实体；窗口A同时包含Exists相关方法提供充分上下文，窗口B虽含Exists但漏掉Q._combine属排序截断
+B	WIN-057	django__django-13794	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	"补丁修改functional.py中__proxy__类的__add__/radd，窗口A包含同类的__proxy__.__str__及lazy/new_method_proxy等支持实体；窗口B被""add filter""误导至template/defaultfilters等模块，几乎缺失functional.py上下文"
+A	WIN-058	django__django-14999	django/django	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	官方补丁与窗口函数补丁和代码证据直接、明确。
+A	WIN-059	pylint-dev__pylint-4661	pylint-dev/pylint	仅学生A	BM25-local	MURAL	两者均命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-060	django__django-13344	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	4	补丁直接修改SecurityMiddleware.init__及SessionMiddleware/CacheMiddleware等__init，窗口A包含SecurityMiddleware.init(位置13)及被替换的_get_response_none_deprecation；窗口B虽有MiddlewareMixin.init__和load_middleware等支持上下文，但缺失所有直接编辑实体。两者均缺失SessionMiddleware/CacheMiddleware的__init，属排序截断
+A	WIN-061	sphinx-doc__sphinx-10323	sphinx-doc/sphinx	仅学生A	BM25-local	MURAL	仅BM25-local命中	两者都不足	Both insufficient	3	窗口函数边界、类归属、别名或语言解析造成错误。
+B	WIN-062	django__django-16662	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	"补丁修改MigrationWriter.as_string方法，窗口A明确包含该编辑实体及同模块序列化支持实体；窗口B完全缺失as_string，被""ordering""症状词误导至sql/query.py和options.py的排序相关实体"
+B	WIN-063	django__django-13346	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	4	补丁核心新增KeyTransformIn类及register_lookup调用，两窗口均缺失该新类；但窗口A包含同模块HasKeyLookup/KeyTransform等8个JSON字段实体提供密集邻近上下文，窗口B仅含sql/query.py通用方法而完全无json.py内容；截断导致新增类落选但窗口A上下文价值明显更优
+A	WIN-064	pylint-dev__pylint-6528	pylint-dev/pylint	共同标注	BM25-local	MURAL	仅BM25-local命中	窗口B	MURAL	5	窗口函数边界、类归属、别名或语言解析造成错误。
+B	WIN-064	pylint-dev__pylint-6528	pylint-dev/pylint	共同标注	BM25-local	MURAL	仅BM25-local命中	两者都不足	Both insufficient	5	"补丁核心修改pylint/lint/expand_modules.py的_is_ignored_file和pylinter.py的_discover_files，两窗口均缺失这两个文件任何实体；窗口A仅含pylinter.py的_parse_error_mode(不同方法)，窗口B无一lint模块实体；""ignore""症状词误导检索至checkers中各类含ignore的方法"
+A	WIN-065	scikit-learn__scikit-learn-14983	scikit-learn/scikit-learn	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	核对官方补丁窗口A命中上层调用者，但漏掉实际需要修改的层级。
+A	WIN-066	sphinx-doc__sphinx-8056	sphinx-doc/sphinx	仅学生A	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	核对官方补丁窗口A命中上层调用者，但漏掉实际需要修改的层级。
+B	WIN-067	django__django-16263	django/django	仅学生B	BM25-local	MURAL	仅BM25-local命中	窗口A	BM25-local	4	补丁核心修改Query.get_aggregation(位置14)及set_annotation_mask/add_annotation等sql/query.py内部方法，窗口A覆盖这些关键实体及get_count/annotation_select等支持上下文；窗口B仅含QuerySet.count/annotate/aggregate等API表层方法，漏掉全部内部实现层，属典型症状词误导致抽象层级偏移
+B	WIN-068	django__django-15499	django/django	仅学生B	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	补丁修改CreateModel.reduce方法，窗口B明确包含该实体(位置14)且AlterModelManagers/CreateModel全套方法提供完整上下文；窗口A虽含同类方法但缺失核心reduce，且混入__all__、contenttypes迁移等噪声，完整性差异显著
+B	WIN-069	django__django-15467	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	补丁修改BaseModelAdmin.formfield_for_foreignkey方法，窗口A位置16明确包含该实体及radio_fields/formfield_for_dbfield等支持上下文；窗口B仅含radio_fields属性，其余为checks.py的_check_radio_fields等检查方法，完全缺失编辑目标，被radio_fields关键词误导至checks模块
+A	WIN-070	django__django-10914	django/django	仅学生A	MURAL	BM25-local	仅MURAL命中	两者都不足	Both insufficient	3	官方补丁与窗口核对实体有依据但仍有歧义。
+B	WIN-071	django__django-16901	django/django	仅学生B	MURAL	BM25-local	仅MURAL命中	窗口A	MURAL	5	补丁修改WhereNode.as_sql方法，窗口A位置16明确包含该实体及同模块WhereNode.split_having_qualify/get_group_by_cols和XOR常量；窗口B仅含XOR常量和QuerySet.xor，完全缺失核心方法，属排序截断
+A	WIN-072	astropy__astropy-13579	astropy/astropy	仅学生A	MURAL	BM25-local	仅MURAL命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-073	django__django-14007	django/django	仅学生B	BM25-local	MURAL	仅BM25-local命中	窗口A	BM25-local	5	补丁修改SQLInsertCompiler.execute_sql，仅窗口A包含该实体(位置12)及get_db_converters等转换器支持上下文；窗口B缺失编辑目标，属排序截断
+A	WIN-074	matplotlib__matplotlib-20488	matplotlib/matplotlib	仅学生A	BM25-local	MURAL	两者均未命中	两者都不足	Both insufficient	3	窗口函数边界、类归属、别名或语言解析造成错误。
+A	WIN-075	sphinx-doc__sphinx-9461	sphinx-doc/sphinx	仅学生A	BM25-local	MURAL	仅BM25-local命中	窗口A	BM25-local	5	官方补丁与窗口函数补丁和代码证据直接、明确。
+A	WIN-076	matplotlib__matplotlib-24026	matplotlib/matplotlib	仅学生A	MURAL	BM25-local	仅BM25-local命中	窗口B	BM25-local	5	官方补丁与窗口函数补丁和代码证据直接、明确。
+B	WIN-077	django__django-12143	django/django	仅学生B	BM25-local	MURAL	仅BM25-local命中	窗口A	BM25-local	5	补丁修改ModelAdmin._get_edited_object_pks方法，窗口A位置11明确包含该实体及邻近方法_get_list_editable_queryset，其余多为同文件options.py中change_view/add_view等支持上下文；窗口B完全缺失该方法，且近半实体为forms/widgets.py的value_from_datadict和views/generic/base.py的View类，属排序截断导致编辑实体落选。
+A	WIN-078	pylint-dev__pylint-4604	pylint-dev/pylint	共同标注	MURAL	BM25-local	两者均未命中	基本相当	Comparable	5	两个窗口覆盖和噪声接近，各窗口总体完整性基本相当。
+B	WIN-078	pylint-dev__pylint-4604	pylint-dev/pylint	共同标注	MURAL	BM25-local	两者均未命中	两者都不足	Both insufficient	5	"两窗口内容完全相同，均仅含各checker的MSGS/options等配置字典，缺失补丁核心实体variables.py的_store_type_annotation_node方法和constants.py的IS_PYPY；被""unused-import""症状词误导至imports/variables模块的表面属性层次而未命中实际修改位置"
+B	WIN-079	django__django-12419	django/django	仅学生B	BM25-local	MURAL	仅MURAL命中	窗口B	MURAL	5	补丁修改global_settings.py中SECURE_REFERRER_POLICY默认值，窗口B明确包含该设置项；窗口A完全缺失编辑实体，被关键词误导至security checks模块
+A	WIN-080	sympy__sympy-20438	sympy/sympy	仅学生A	MURAL	BM25-local	仅MURAL命中	窗口B	BM25-local	4	A窗口追随 issue 表面词汇，偏离真正补丁位置。

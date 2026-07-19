@@ -1,0 +1,22 @@
+{
+  "audited_instances": 80,
+  "benchmark": "SWE-bench Verified",
+  "benchmark_instances": 500,
+  "binding_rule": "verbatim rendered Top-20 window",
+  "method_mapping": {
+    "BM25-local": "ranked BM25 files projected to repository entities",
+    "MURAL": "equal-weight fusion of BM25 projection and structural retrieval"
+  },
+  "packet_created_date": "2026-07-12",
+  "random_seed": 20260712,
+  "rankings": {
+    "path": "artifacts/frozen/human_window_rankings_20260712.jsonl.gz",
+    "sha256": "88cf644885265ac98862ffdd01b980621311f790e00cc2876388b5d136b64a2a"
+  },
+  "schema_version": 1,
+  "source_directories": {
+    "BM25-local": "../../temp_run/private_bm25_filelocal_20260704/bm25_top20_files_filelocal",
+    "MURAL": "../../temp_run/private_bm25_filelocal_20260704/hybrid_rrf/BM25_KG_deterministic_rrf"
+  },
+  "top_k": 20
+}

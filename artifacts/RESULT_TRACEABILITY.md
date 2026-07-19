@@ -32,7 +32,9 @@ All paths below are relative to `artifacts/`.
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
 | Blinded judgments and agreement | `results/human_window_*_20260718.*` |
-| Exact audit-window/configuration binding | `results/human_window_binding_20260719.tsv` |
+| Exact student-visible audit rankings | `frozen/human_window_rankings_20260712.jsonl.gz` |
+| Audit window-to-source binding | `results/human_window_binding_20260719.tsv` |
+| Exact-window strict evaluation | `results/human_window_exact_instances_20260719.tsv` |
 | Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
 | Complete Java evaluation | `results/java_cross_language_*_20260714.*` |
 | Context-construction time | `results/context_construction_cost_20260716.tsv` |
@@ -58,7 +60,6 @@ python3 scripts/evaluate_strict_reference_context.py \
   --row Dense_projection=../temp_run/mural_strict_rankings/Dense_projection \
   --row MURAL_2src=../temp_run/mural_strict_rankings/MURAL_2src \
   --row MURAL=../temp_run/mural_strict_rankings/MURAL \
-  --compare BM25_projection=MURAL_2src \
   --compare BM25_projection=MURAL \
   --compare Dense_projection=MURAL \
   --compare MURAL_2src=MURAL \
@@ -163,30 +164,29 @@ stored in the artifact.
 
 ## Human audit
 
-The 80 audit items are drawn from the same SWE-bench Verified population and
-strict target mapping as the localization experiment. The blinded windows are
-the exact Top-20 `BM25_projection` and `MURAL_2src` rankings; A/B order is
-randomized per item. Verify this binding before recomputing the summaries:
-
 ```bash
 python3 scripts/verify_human_window_binding.py \
   --items results/human_window_items_20260718.json \
-  --rankings frozen/strict_rankings_top50_20260719.jsonl.gz \
+  --rankings frozen/human_window_rankings_20260712.jsonl.gz \
   --output-binding ../temp_run/human_window_binding.tsv
-```
 
-```bash
-python3 scripts/analyze_human_window_audit.py \
-  --annotations results/human_window_annotations_20260718.tsv \
-  --summary-output ../temp_run/human_window_summary.tsv \
-  --agreement-output ../temp_run/human_window_agreement.tsv
+python3 scripts/evaluate_human_window_exact_hits.py \
+  --items results/human_window_items_20260718.json \
+  --rankings frozen/human_window_rankings_20260712.jsonl.gz \
+  --targets results/strict_reference_targets_20260719.json \
+  --output ../temp_run/human_window_exact_instances.tsv
 
 python3 scripts/analyze_human_strict_alignment.py \
   --annotations results/human_window_annotations_20260718.tsv \
-  --strict-instances results/strict_localization_instances_20260719.tsv \
+  --strict-instances ../temp_run/human_window_exact_instances.tsv \
   --output-judgments ../temp_run/human_strict_judgments.tsv \
   --output-summary ../temp_run/human_strict_summary.tsv
 ```
+
+The raw annotations and randomized A/B assignment remain exactly as supplied
+to the students. Strict alignment is computed from the frozen windows they
+actually inspected, while the final 500-instance localization ledger remains
+unchanged.
 
 ## Final integrity gate
 

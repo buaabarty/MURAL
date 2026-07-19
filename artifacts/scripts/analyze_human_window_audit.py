@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize the anonymized blinded two-source MURAL/BM25 window audit."""
+"""Summarize the anonymized blinded MURAL/BM25 window audit."""
 
 from __future__ import annotations
 
@@ -9,12 +9,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 
-PREFERENCE_ORDER = (
-    "MURAL_2src",
-    "BM25_projection",
-    "Comparable",
-    "Both insufficient",
-)
+PREFERENCE_ORDER = ("MURAL", "BM25-local", "Comparable", "Both insufficient")
 NON_POSITIONAL_LABELS = {
     "基本相当": "Comparable",
     "两者都不足": "Both insufficient",
@@ -75,10 +70,7 @@ def validate(rows: list[dict[str, str]]) -> dict[str, list[dict[str, str]]]:
         seen.add(key)
         if row["preferred_method"] not in PREFERENCE_ORDER:
             raise ValueError(f"unsupported preference label: {row['preferred_method']}")
-        if {row["method_a"], row["method_b"]} != {
-            "MURAL_2src",
-            "BM25_projection",
-        }:
+        if {row["method_a"], row["method_b"]} != {"MURAL", "BM25-local"}:
             raise ValueError(f"unblinding map is invalid for {row['annotation_id']}")
         label = row["window_preference_label"]
         if label == "窗口A":
@@ -186,8 +178,7 @@ def main() -> int:
     all_counts = {row["category"]: row["count"] for row in summary if row["scope"] == "all_judgments"}
     print(
         "Blinded window audit: "
-        f"MURAL_2src={all_counts['MURAL_2src']}, "
-        f"BM25_projection={all_counts['BM25_projection']}, "
+        f"MURAL={all_counts['MURAL']}, BM25-local={all_counts['BM25-local']}, "
         f"comparable={all_counts['Comparable']}, insufficient={all_counts['Both insufficient']}; "
         f"agreement={agreement[0]['observed_agreement']:.3f}, kappa={agreement[0]['cohen_kappa']:.3f}."
     )

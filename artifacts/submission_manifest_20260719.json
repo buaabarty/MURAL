@@ -1,28 +1,36 @@
 {
   "files": {
     "README.md": {
-      "bytes": 3031,
-      "sha256": "c8207da380edb0b505feb682f28a388d34dc8ec0bd14d9cbae63927341de8f88"
+      "bytes": 2889,
+      "sha256": "5ebc60b5a35e61da84b2f8127f8b8bb3a58ccc3075c50811a77f0937bbdc58de"
     },
     "artifacts/README.md": {
-      "bytes": 6001,
-      "sha256": "06262e1f59d73d1563d67d5d001f5bc23575ae6a0d2d402755add3b9520e612e"
+      "bytes": 6304,
+      "sha256": "8674b77dbdc2856ce244718bc0c621f55c5f8145919633e78dbaf3fa672dce70"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 8541,
-      "sha256": "51c27a350cb05efcbf1e2f97b780141e831d65d8251beb8a418eb535bb8f5b82"
+      "bytes": 8644,
+      "sha256": "c0f911bb75c9543c014016fb3e07d0589657de567f9de216de7680c04ee8e3a8"
     },
     "artifacts/frozen/external_localizers_manifest.json": {
       "bytes": 815,
       "sha256": "720cc98d41ffcf5de3d9666a7471dd1306319789af6c0ca91e7600edfb002599"
     },
+    "artifacts/frozen/human_window_rankings_20260712.jsonl.gz": {
+      "bytes": 1670074,
+      "sha256": "88cf644885265ac98862ffdd01b980621311f790e00cc2876388b5d136b64a2a"
+    },
+    "artifacts/frozen/human_window_rankings_manifest_20260719.json": {
+      "bytes": 831,
+      "sha256": "7776c1ab5432ed30dac36a635c97144dc0a78f6dfbfc27c0321fd5aa3f1d21a7"
+    },
     "artifacts/frozen/source_rankings_manifest_20260719.json": {
-      "bytes": 3077,
-      "sha256": "76f66ad61077e6bfa5062919a6c484bbfa9fce3d8d7ec93daa0a4cc83ebf4492"
+      "bytes": 2755,
+      "sha256": "00e6d57a0cf2b85f64a2a7314dbe614fe0d8beceaf8b0030625d8bac48c1ea63"
     },
     "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz": {
-      "bytes": 38875921,
-      "sha256": "ec7b4824719fe41a7a410172d2027b62f9adeb639a0b0e432ebc18364f2d48b9"
+      "bytes": 38681790,
+      "sha256": "7f0ffa7c5561bf132b9ff075f1e8e8d23c0aff5f0237f03f69e08de704cf5b1d"
     },
     "artifacts/frozen/swebench_verified_ids_20260719.txt": {
       "bytes": 11234,
@@ -57,36 +65,40 @@
       "sha256": "d35cc8010dc4192809997872f95aae92b80703f4192e8d84b6087f34a3725d36"
     },
     "artifacts/results/human_window_annotations_20260718.tsv": {
-      "bytes": 29513,
-      "sha256": "e2129063258497bb7234706e2dff2afa9d764bea89cdac7a55053e3c7cf6f018"
+      "bytes": 28536,
+      "sha256": "39de6906e09bd182bd867307fcabf998cca857640e8dd647c6dd4f1a14bf5c2b"
     },
     "artifacts/results/human_window_binding_20260719.tsv": {
-      "bytes": 18546,
-      "sha256": "02e7eccc62c7375d6c0c975ca3178cb1461a0c5eaa3fcc24635fd58aba808948"
+      "bytes": 18640,
+      "sha256": "5e0455ba82842990c26680d61e7a36dfecb9da95e8dcf930f1ba25db7e30b124"
+    },
+    "artifacts/results/human_window_exact_instances_20260719.tsv": {
+      "bytes": 12281,
+      "sha256": "627bd619fc35dbcf56d3a8e912638cdd2d747644d79071b2f2bc2e815e27d327"
     },
     "artifacts/results/human_window_items_20260718.json": {
-      "bytes": 731941,
-      "sha256": "f03f3d20078c8555c3ffd2d85349d6986839688a5367a2baa89efbef45a9c8bf"
+      "bytes": 731007,
+      "sha256": "b791a124471791f5d35c226036abb179830d32b49ced3135707ae6b3a50d65c8"
     },
     "artifacts/results/human_window_manifest_20260718.tsv": {
-      "bytes": 7929,
-      "sha256": "5c2abf692b1eb4070837ea56cc25824e0d97d83b9cdc1aa237ea1284b6d8ad7c"
+      "bytes": 7417,
+      "sha256": "dc7656484fdcf59904912808fef7c2a7e8e5a6df38d0e64e7d97681af5eb27ed"
     },
     "artifacts/results/human_window_provenance_20260718.tsv": {
       "bytes": 191,
       "sha256": "0da57b3118ed3a2a671add8ba501d341efff7696defc1bfa727b7bd170b53474"
     },
     "artifacts/results/human_window_strict_judgments_20260719.tsv": {
-      "bytes": 6958,
-      "sha256": "4d78a55d02a4fd8db8315930e23998c745a64170892056831ff14c5d7d42b34d"
+      "bytes": 6214,
+      "sha256": "34922ee5e27f28e2d037d4a0957348f9b7e42010b47503a26d453fb9204d6447"
     },
     "artifacts/results/human_window_strict_summary_20260719.tsv": {
-      "bytes": 1004,
-      "sha256": "cb74de099d28db71da221b81b75fea108c32c456127fc9d6ea58ef632c2dc81e"
+      "bytes": 847,
+      "sha256": "e9ab9e00e40950982ae601e29af9b8ad1d13f5a2d653ce3bb024d906030dd76c"
     },
     "artifacts/results/human_window_summary_20260718.tsv": {
-      "bytes": 696,
-      "sha256": "160c304cacf133fd8fd7ddf9d4fc873cb0bf5bce24a3432f640f9f950156416c"
+      "bytes": 656,
+      "sha256": "034c2a4cabb4f219cc499d252e079312300c0e34c8c38b136c40913c8986ab14"
     },
     "artifacts/results/java_cross_language_instances_20260714.jsonl": {
       "bytes": 1203742,
@@ -217,16 +229,16 @@
       "sha256": "a248523545dd8525a58ba1ec473033b4f146ce694474584b139f720334ed8bb4"
     },
     "artifacts/results/strict_localization_instances_20260719.tsv": {
-      "bytes": 504723,
-      "sha256": "e660540c602217b5b6fc3bb8317aade99a1a1d0dc3bec128ebe0624ea6664751"
+      "bytes": 504744,
+      "sha256": "b996c64f63179b9f58fc7f028be987e416ec6e521383925b44e4879bb0760080"
     },
     "artifacts/results/strict_localization_paired_20260719.tsv": {
-      "bytes": 2741,
-      "sha256": "4bcc5c23fa277d9fafdb4a910e36a2fed45b1e6d415e4196e98ee5329ea507b1"
+      "bytes": 2355,
+      "sha256": "c88217e7b40ae8cfa1002c337145497a94a99f4655a0b5007f6c79897b8a5e12"
     },
     "artifacts/results/strict_localization_summary_20260719.tsv": {
       "bytes": 1107,
-      "sha256": "150909544e48b0b74e639ffeca8832d69b17382154dec57cc2f5258d9b1567e5"
+      "sha256": "9bc09c168504d7a4a70bbb1884dc6ef0047aa7618820f8279f071f89f8acb9f9"
     },
     "artifacts/results/strict_prefix_tail_instances_20260719.tsv": {
       "bytes": 357582,
@@ -293,12 +305,8 @@
       "sha256": "c6b29b8e4365f2afa9c5bc7bf19df27b48ee253702ff2751a0a324f414ef7902"
     },
     "artifacts/scripts/analyze_human_strict_alignment.py": {
-      "bytes": 4451,
-      "sha256": "93cda4e40bc99764b040e55d685447315426b5385bb4c08b68ebd09363e9f802"
-    },
-    "artifacts/scripts/analyze_human_window_audit.py": {
-      "bytes": 7458,
-      "sha256": "ca2d85679b7b8080153ec1474e5f911cb2bf4ad26653e79d87706affcfb3d4c3"
+      "bytes": 4319,
+      "sha256": "3407b93b2046acb4a0faa1b27eeab492d2c2a77bb2420a67a8d4148618316433"
     },
     "artifacts/scripts/analyze_repair_outcomes.py": {
       "bytes": 10622,
@@ -317,8 +325,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 8808,
-      "sha256": "69fd978949ab5c8fe02f09af08b2c6b0f302433394e6024cccd6ebf388d8e90a"
+      "bytes": 8660,
+      "sha256": "1e786ffe54bbfd1dc8a1c9c1ad789929c71676956c29da667b3cb7ef7cdf9f03"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -327,6 +335,10 @@
     "artifacts/scripts/entity_identity.py": {
       "bytes": 1844,
       "sha256": "89022e1fe52863a3202b8c4980c2940ab6f1eaadefad3374572621a8382ff35b"
+    },
+    "artifacts/scripts/evaluate_human_window_exact_hits.py": {
+      "bytes": 2981,
+      "sha256": "91cf3f45434a62ba780a88c4e40dc4a6b585530b0e56a619d17216bc2f661a94"
     },
     "artifacts/scripts/evaluate_java_retrieve_localize.py": {
       "bytes": 36225,
@@ -380,9 +392,9 @@
       "bytes": 24692,
       "sha256": "1c1b6a94cba660705425ea011b29920044ad14c67962a3ae7a5b676a9fecf9f3"
     },
-    "artifacts/scripts/finalize_human_window_audit.py": {
-      "bytes": 5425,
-      "sha256": "be37805edc6854c31e5db5da29426e9ddfc7bef95b400afe5f6748b23a696b28"
+    "artifacts/scripts/freeze_human_window_rankings.py": {
+      "bytes": 5707,
+      "sha256": "6215c31427637479bb19f0d96209fd27e18dadd2ba617bd8d3c39263d251dfe0"
     },
     "artifacts/scripts/fuse_path_mined_with_kg.py": {
       "bytes": 4921,
@@ -395,10 +407,6 @@
     "artifacts/scripts/materialize_repair_variant_reports.py": {
       "bytes": 3500,
       "sha256": "fc4041d71d0a67d0f5855c2832b34c43dc18f8e79da4507106492adfb9958532"
-    },
-    "artifacts/scripts/merge_audited_localization_rows.py": {
-      "bytes": 4645,
-      "sha256": "c99d00adc262e3c1d951000c0ab9250340bd7726bbffaa61ff11bd23f92942d3"
     },
     "artifacts/scripts/merge_repair_official_updates.py": {
       "bytes": 7173,
@@ -425,12 +433,12 @@
       "sha256": "11fa4108f6743e7211fa4821ce707bea191913b917f00a04b2ef1bb7a1307796"
     },
     "artifacts/scripts/verify_human_window_binding.py": {
-      "bytes": 5004,
-      "sha256": "e406bb381cdc3d7d15e4c2871251cd125c2c1fa5f5e1654619f1dbc5a61e9c6c"
+      "bytes": 3567,
+      "sha256": "9eb986627a92d638f7ddee9557ad3c3173712266d80c7ecd7c7a422f61a9683a"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 33595,
-      "sha256": "45aa17f097f3aa52af89c9c456987f57a99a2b8f39af83eb35737baf419dac8b"
+      "bytes": 32469,
+      "sha256": "b85c54bed672479700aa629652af1c9dec1f39690611aa03c8da535a0fd72285"
     },
     "test_entity_projection_ranking.py": {
       "bytes": 2935,
@@ -441,8 +449,8 @@
       "sha256": "97c66fca5b94d4e31e7212eb4842383f9ca48db2831a6c09c34e374fe8d390fa"
     },
     "test_human_window_binding.py": {
-      "bytes": 2142,
-      "sha256": "f6dd9057969a46aba993f41a9212756472041569dda9e825889c7f4cecd7c99f"
+      "bytes": 1082,
+      "sha256": "1b7fcb0ad2dcf5afbd6c47d152a4cf0f6a8199e99bbbddf9896ab5a6b966347c"
     },
     "test_strict_external_localizers.py": {
       "bytes": 1379,
@@ -459,24 +467,22 @@
   },
   "frozen_date": "2026-07-19",
   "human_audit": {
-    "audited_sources": [
-      "BM25_projection",
-      "MURAL_2src"
-    ],
-    "benchmark": "the same 500 SWE-bench Verified instances as the main localization experiment",
-    "binding_ledger": "artifacts/results/human_window_binding_20260719.tsv",
+    "configurations": {
+      "BM25-local": "BM25-ranked files through entity projection",
+      "MURAL": "equal-weight BM25 projection plus structural retrieval"
+    },
     "decision_labels": [
-      "MURAL_2src",
-      "BM25_projection",
+      "MURAL",
+      "BM25-local",
       "Comparable",
       "Both insufficient"
     ],
     "double_coded_instances": 20,
     "judgments": 100,
-    "ranking_file": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
-    "strict_target_file": "artifacts/results/strict_reference_targets_20260719.json",
+    "strict_window_evaluation": "artifacts/results/human_window_exact_instances_20260719.tsv",
     "unique_instances": 80,
-    "window": "exact Top-20 entity ranking"
+    "window_binding": "artifacts/results/human_window_binding_20260719.tsv",
+    "window_rankings": "artifacts/frozen/human_window_rankings_20260712.jsonl.gz"
   },
   "java_benchmark": {
     "evaluated_instances": 91,
