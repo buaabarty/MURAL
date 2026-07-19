@@ -1,0 +1,19 @@
+{
+  "audit": "target_issue_creation_cutoff",
+  "comparison": "run_meta.active_root.created_at == epoch(dataset.created_at)",
+  "cutoff_mismatches": [],
+  "dataset": "deliverables/claude4_sonnet_generate_only/swe-bench_verified-test.arrow",
+  "missing_cutoff_instances": [],
+  "missing_run_instances": [],
+  "run_dir": "runs/kg_verified_evidence_graph/tse_timesafe_main_20260529_v6",
+  "summary": {
+    "archived_runs": 500,
+    "dataset_instances": 500,
+    "matching_target_issue_cutoffs": 500,
+    "mismatched_cutoffs": 0,
+    "missing_cutoffs": 0,
+    "missing_runs": 0,
+    "unexpected_runs": 0
+  },
+  "unexpected_run_instances": []
+}
