@@ -31,6 +31,9 @@ All paths below are relative to `artifacts/`.
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
+| Blinded judgments and agreement | `results/human_window_*_20260718.*` |
+| Exact audit-window/configuration binding | `results/human_window_binding_20260719.tsv` |
+| Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
 | Complete Java evaluation | `results/java_cross_language_*_20260714.*` |
 | Context-construction time | `results/context_construction_cost_20260716.tsv` |
 
@@ -55,6 +58,7 @@ python3 scripts/evaluate_strict_reference_context.py \
   --row Dense_projection=../temp_run/mural_strict_rankings/Dense_projection \
   --row MURAL_2src=../temp_run/mural_strict_rankings/MURAL_2src \
   --row MURAL=../temp_run/mural_strict_rankings/MURAL \
+  --compare BM25_projection=MURAL_2src \
   --compare BM25_projection=MURAL \
   --compare Dense_projection=MURAL \
   --compare MURAL_2src=MURAL \
@@ -157,17 +161,32 @@ python3 scripts/analyze_clustered_repair_stats.py \
 Hosted generation reads `AUTODL_API_KEY` from the environment. No credential is
 stored in the artifact.
 
-## Blinded re-audit alignment
+## Human audit
+
+The 80 audit items are drawn from the same SWE-bench Verified population and
+strict target mapping as the localization experiment. The blinded windows are
+the exact Top-20 `BM25_projection` and `MURAL_2src` rankings; A/B order is
+randomized per item. Verify this binding before recomputing the summaries:
 
 ```bash
-python3 scripts/prepare_human_window_reaudit.py \
-  --old-items inputs/human_window_items_legacy_20260718.json \
+python3 scripts/verify_human_window_binding.py \
+  --items results/human_window_items_20260718.json \
   --rankings frozen/strict_rankings_top50_20260719.jsonl.gz \
-  --output-items inputs/human_window_items_current_20260719.json \
-  --output-alignment inputs/human_window_alignment_20260719.tsv \
-  --version-date 2026-07-19
+  --output-binding ../temp_run/human_window_binding.tsv
 ```
 
+```bash
+python3 scripts/analyze_human_window_audit.py \
+  --annotations results/human_window_annotations_20260718.tsv \
+  --summary-output ../temp_run/human_window_summary.tsv \
+  --agreement-output ../temp_run/human_window_agreement.tsv
+
+python3 scripts/analyze_human_strict_alignment.py \
+  --annotations results/human_window_annotations_20260718.tsv \
+  --strict-instances results/strict_localization_instances_20260719.tsv \
+  --output-judgments ../temp_run/human_strict_judgments.tsv \
+  --output-summary ../temp_run/human_strict_summary.tsv
+```
 
 ## Final integrity gate
 
