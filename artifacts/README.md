@@ -46,6 +46,7 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `verify_human_window_binding.py`: verifies each rendered A/B window byte-for-byte.
 - `evaluate_human_window_exact_hits.py`: evaluates those exact windows against strict targets.
 - `analyze_human_strict_alignment.py`: re-stratifies judgments from exact-window hits.
+- `analyze_stratified_context_findings.py`: opportunity-matched, multiplicity, rank-shift, repository, and instance-level audit statistics.
 - `analyze_clustered_repair_stats.py`: clustered repair statistics.
 - `evaluate_java_retrieve_localize.py`: complete Java evaluator.
 - `build_submission_manifest.py`: protocol and digest manifest.
@@ -64,6 +65,9 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv`
 - `results/strict_external_localizer_{summary,instances,paired}_20260719.tsv`
 - `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv`
+- `results/strict_mechanism_analysis_20260719.tsv`
+- `results/strict_target_multiplicity_20260719.tsv`
+- `results/strict_repository_robustness_20260719.tsv`
 - `results/context_construction_cost_20260716.tsv`
 
 ### Repair prompts and official outcomes
@@ -86,6 +90,7 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 - `results/human_window_binding_20260719.tsv`
 - `results/human_window_exact_instances_20260719.tsv`
 - `results/human_window_strict_{judgments,summary}_20260719.tsv`
+- `results/human_window_unique_strict_summary_20260719.tsv`
 - `frozen/human_window_rankings_20260712.jsonl.gz`
 - `frozen/human_window_rankings_manifest_20260719.json`
 - `results/java_cross_language_{summary,paired}_20260714.tsv`

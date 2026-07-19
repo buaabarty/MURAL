@@ -30,6 +30,7 @@ EXPECTED_RESULTS = {
     "human_window_provenance_20260718.tsv",
     "human_window_strict_judgments_20260719.tsv",
     "human_window_strict_summary_20260719.tsv",
+    "human_window_unique_strict_summary_20260719.tsv",
     "human_window_summary_20260718.tsv",
     "java_cross_language_instances_20260714.jsonl",
     "java_cross_language_paired_20260714.tsv",
@@ -54,6 +55,7 @@ EXPECTED_RESULTS = {
     "strict_localization_instances_20260719.tsv",
     "strict_localization_paired_20260719.tsv",
     "strict_localization_summary_20260719.tsv",
+    "strict_mechanism_analysis_20260719.tsv",
     "strict_prefix_tail_instances_20260719.tsv",
     "strict_prefix_tail_paired_20260719.tsv",
     "strict_prefix_tail_summary_20260719.tsv",
@@ -61,9 +63,11 @@ EXPECTED_RESULTS = {
     "strict_rrf_sensitivity_instances_20260719.tsv",
     "strict_rrf_sensitivity_paired_20260719.tsv",
     "strict_rrf_sensitivity_summary_20260719.tsv",
+    "strict_repository_robustness_20260719.tsv",
     "strict_selector_instances_20260719.tsv",
     "strict_selector_paired_20260719.tsv",
     "strict_selector_summary_20260719.tsv",
+    "strict_target_multiplicity_20260719.tsv",
     "strict_token_context_instances_20260719.tsv",
     "strict_token_context_paired_20260719.tsv",
     "strict_token_context_summary_20260719.tsv",
@@ -207,6 +211,88 @@ def check_localization() -> None:
         equal(int(row["wins"]), wins, f"{baseline}->{treatment} {metric} wins")
         equal(int(row["losses"]), losses, f"{baseline}->{treatment} {metric} losses")
         close(row["mcnemar_p"], p, f"{baseline}->{treatment} {metric} p", 1e-12)
+
+
+def check_stratified_findings() -> None:
+    mechanisms = rows("strict_mechanism_analysis_20260719.tsv")
+    equal(len(mechanisms), 4, "mechanism-analysis rows")
+    expected_opportunity = {
+        "target_coverage": (69.978632, 74.928775, 4.950142, 1.231061, 6.269592, None),
+        "hit": (72.222222, 76.923077, 4.700855, 1.234568, 6.140473, (12, 1, 0.00341796875)),
+        "complete": (67.948718, 73.076923, 5.128205, 1.030665, 6.756757, (13, 1, 0.0018310546875)),
+    }
+    for metric, values in expected_opportunity.items():
+        row = one(
+            mechanisms,
+            analysis="opportunity_matched",
+            stratum="single_file_entity_only_both_file_hit",
+            metric=metric,
+        )
+        equal(int(row["N"]), 234, f"opportunity {metric} N")
+        for field, value in zip(
+            ("baseline", "treatment", "delta", "clustered_ci_low", "clustered_ci_high"),
+            values[:5],
+        ):
+            close(row[field], value, f"opportunity {metric} {field}")
+        binary = values[5]
+        if binary is not None:
+            wins, losses, p = binary
+            equal(int(row["wins"]), wins, f"opportunity {metric} wins")
+            equal(int(row["losses"]), losses, f"opportunity {metric} losses")
+            close(row["exact_p"], p, f"opportunity {metric} p", 1e-12)
+
+    rank = one(mechanisms, analysis="shared_hit_rank_shift", stratum="both_hit", metric="first_rank")
+    equal(int(rank["N"]), 283, "shared-hit rank N")
+    for field, value in {
+        "baseline": 4.346290,
+        "treatment": 3.593640,
+        "delta": -0.752650,
+        "clustered_ci_low": -1.170910,
+        "clustered_ci_high": -0.053186,
+    }.items():
+        close(rank[field], value, f"shared-hit rank {field}")
+    for field, value in {"wins": 102, "ties": 151, "losses": 30}.items():
+        equal(int(rank[field]), value, f"shared-hit rank {field}")
+    close(rank["exact_p"], 2.25726725605e-10, "shared-hit rank p", 1e-16)
+
+    multiplicity = rows("strict_target_multiplicity_20260719.tsv")
+    equal(len(multiplicity), 4, "target-multiplicity rows")
+    expected_multiplicity = {
+        "1": (319, 61.128527, 61.128527, 0, 100.0),
+        "2": (86, 76.744186, 51.162791, 22, 66.666667),
+        "3+": (95, 78.947368, 9.473684, 66, 12.0),
+        "2+": (181, 77.900552, 29.281768, 88, 37.588652),
+    }
+    for group, (n, hit, complete, partial, conditional) in expected_multiplicity.items():
+        row = one(multiplicity, target_count=group)
+        equal(int(row["N"]), n, f"multiplicity {group} N")
+        close(row["hit"], hit, f"multiplicity {group} Hit")
+        close(row["complete"], complete, f"multiplicity {group} Complete")
+        equal(int(row["partial_hits"]), partial, f"multiplicity {group} partial hits")
+        close(row["complete_given_hit"], conditional, f"multiplicity {group} conditional complete")
+
+    repositories = rows("strict_repository_robustness_20260719.tsv")
+    equal(len(repositories), 24, "repository-robustness rows")
+    direct = [row for row in repositories if row["analysis"] == "repository"]
+    leave_one_out = [row for row in repositories if row["analysis"] == "leave_one_repository_out"]
+    equal(len(direct), 12, "repository direct rows")
+    equal(len(leave_one_out), 12, "leave-one-repository-out rows")
+    equal(sum(float(row["delta_hit"]) > 0 for row in direct), 8, "positive repository Hit deltas")
+    equal(sum(float(row["delta_hit"]) < 0 for row in direct), 0, "negative repository Hit deltas")
+    close(min(float(row["delta_hit"]) for row in leave_one_out), 8.550186, "minimum leave-one-out Hit delta")
+    close(max(float(row["delta_hit"]) for row in leave_one_out), 9.771310, "maximum leave-one-out Hit delta")
+
+    human = rows("human_window_unique_strict_summary_20260719.tsv")
+    expected_human = {"aligned": 40, "neutral": 4, "opposed": 3, "no_consensus": 2}
+    for decision, count in expected_human.items():
+        row = one(human, scope="unique_exclusive_hit_instances", decision=decision)
+        equal(int(row["count"]), count, f"unique strict human {decision}")
+        equal(int(row["denominator"]), 49, f"unique strict human {decision} denominator")
+    directional = one(human, scope="directional_unique_instances", decision="aligned")
+    equal(int(directional["count"]), 40, "directional strict alignment")
+    equal(int(directional["denominator"]), 43, "directional strict denominator")
+    close(directional["share"], 0.930233, "directional strict share")
+    close(directional["exact_p"], 3.02134139929e-09, "directional strict p", 1e-15)
 
 
 
@@ -704,6 +790,7 @@ def main() -> None:
     check_instance_ledgers()
     targets = check_targets()
     check_localization()
+    check_stratified_findings()
     check_frozen_rankings(targets)
     check_token_budgets()
     check_controls_and_budgets()

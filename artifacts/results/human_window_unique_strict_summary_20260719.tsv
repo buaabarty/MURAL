@@ -1,0 +1,6 @@
+scope	decision	count	denominator	share	exact_p
+unique_exclusive_hit_instances	aligned	40	49	0.816327	
+unique_exclusive_hit_instances	neutral	4	49	0.081633	
+unique_exclusive_hit_instances	opposed	3	49	0.061224	
+unique_exclusive_hit_instances	no_consensus	2	49	0.040816	
+directional_unique_instances	aligned	40	43	0.930233	3.02134139929e-09

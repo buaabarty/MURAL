@@ -28,6 +28,9 @@ All paths below are relative to `artifacts/`.
 | Released localizer completion | `results/strict_external_localizer_{summary,instances,paired}_20260719.tsv` |
 | Entity budgets 5, 10, 20, and 40 | `results/strict_budget_b*_{summary,instances,paired}_20260719.tsv` |
 | RRF sensitivity | `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv` |
+| Opportunity-matched entity selection and shared-hit rank shifts | `results/strict_mechanism_analysis_20260719.tsv` |
+| Target-multiplicity coverage analysis | `results/strict_target_multiplicity_20260719.tsv` |
+| Repository and leave-one-repository-out effects | `results/strict_repository_robustness_20260719.tsv` |
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
@@ -36,6 +39,7 @@ All paths below are relative to `artifacts/`.
 | Audit window-to-source binding | `results/human_window_binding_20260719.tsv` |
 | Exact-window strict evaluation | `results/human_window_exact_instances_20260719.tsv` |
 | Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
+| Unique-instance strict judgment alignment | `results/human_window_unique_strict_summary_20260719.tsv` |
 | Complete Java evaluation | `results/java_cross_language_*_20260714.*` |
 | Context-construction time | `results/context_construction_cost_20260716.tsv` |
 
@@ -187,6 +191,20 @@ The raw annotations and randomized A/B assignment remain exactly as supplied
 to the students. They audit the main RQ-1 `BM25_projection` versus
 `MURAL_2src` comparison. Strict alignment is computed from the exact windows
 the students inspected.
+
+## Regenerate the stratified analyses
+
+```bash
+python3 scripts/analyze_stratified_context_findings.py \
+  --targets results/strict_reference_targets_20260719.json \
+  --localization-instances results/strict_localization_instances_20260719.tsv \
+  --human-judgments results/human_window_strict_judgments_20260719.tsv \
+  --bootstrap 10000 --seed 7 \
+  --output-mechanisms results/strict_mechanism_analysis_20260719.tsv \
+  --output-multiplicity results/strict_target_multiplicity_20260719.tsv \
+  --output-repositories results/strict_repository_robustness_20260719.tsv \
+  --output-human results/human_window_unique_strict_summary_20260719.tsv
+```
 
 ## Final integrity gate
 

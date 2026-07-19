@@ -1,0 +1,5 @@
+analysis	stratum	metric	N	baseline	treatment	delta	clustered_ci_low	clustered_ci_high	wins	ties	losses	exact_p
+opportunity_matched	single_file_entity_only_both_file_hit	target_coverage	234	69.978632	74.928775	4.950142	1.231061	6.269592				
+opportunity_matched	single_file_entity_only_both_file_hit	hit	234	72.222222	76.923077	4.700855	1.234568	6.140473	12	221	1	0.00341796875
+opportunity_matched	single_file_entity_only_both_file_hit	complete	234	67.948718	73.076923	5.128205	1.030665	6.756757	13	220	1	0.0018310546875
+shared_hit_rank_shift	both_hit	first_rank	283	4.346290	3.593640	-0.752650	-1.170910	-0.053186	102	151	30	2.25726725605e-10
