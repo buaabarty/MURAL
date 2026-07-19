@@ -184,9 +184,9 @@ python3 scripts/analyze_human_strict_alignment.py \
 ```
 
 The raw annotations and randomized A/B assignment remain exactly as supplied
-to the students. Strict alignment is computed from the frozen windows they
-actually inspected, while the final 500-instance localization ledger remains
-unchanged.
+to the students. They audit the main RQ-1 `BM25_projection` versus
+`MURAL_2src` comparison. Strict alignment is computed from the exact windows
+the students inspected.
 
 ## Final integrity gate
 

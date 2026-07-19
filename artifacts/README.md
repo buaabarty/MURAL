@@ -94,10 +94,10 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 
 The audit has 100 judgments over 80 instances, including 20 double-coded items.
 The packet is preserved without relabeling or replacing any student-visible
-window. Its `MURAL` label denotes the lexical--structural two-source
-configuration used when the packet was frozen; `BM25-local` denotes BM25-ranked
-files passed through the same entity projection. The audit-specific ranking
-ledger does not overwrite the final benchmark ranking ledger.
+window. It audits the main RQ-1 source-composition comparison: `MURAL` maps to
+`MURAL_2src` (the `MURAL w/o Dense` row), and `BM25-local` maps to
+`BM25_projection`. The exact 80-instance ranking snapshot is the sample-level
+record for that main experiment.
 
 The Java evaluation retains all 91 instances pinned by
 `inputs/java_cross_language_manifest_20260714.json`.

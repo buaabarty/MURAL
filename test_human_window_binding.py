@@ -35,5 +35,5 @@ def test_render_window_matches_annotation_packet_format():
 def test_method_mapping_keeps_raw_annotation_labels():
     assert binding.METHOD_TO_CONFIGURATION == {
         "BM25-local": "BM25_projection",
-        "MURAL": "MURAL_BM25_structural",
+        "MURAL": "MURAL_2src",
     }

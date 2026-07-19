@@ -127,9 +127,13 @@ def main() -> int:
         "benchmark_instances": payload["protocol"]["benchmark_instances"],
         "audited_instances": len(records),
         "top_k": payload["protocol"]["window_size_entities"],
+        "main_experiment": {
+            "paper_table": "RQ-1 source-composition comparison",
+            "configurations": ["BM25_projection", "MURAL_2src"],
+        },
         "method_mapping": {
-            "BM25-local": "ranked BM25 files projected to repository entities",
-            "MURAL": "equal-weight fusion of BM25 projection and structural retrieval",
+            "BM25-local": "BM25_projection",
+            "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
         },
         "source_directories": {method: str(path) for method, path in sources.items()},
         "rankings": {

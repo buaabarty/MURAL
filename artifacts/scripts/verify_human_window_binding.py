@@ -14,7 +14,7 @@ from typing import Any
 
 METHOD_TO_CONFIGURATION = {
     "BM25-local": "BM25_projection",
-    "MURAL": "MURAL_BM25_structural",
+    "MURAL": "MURAL_2src",
 }
 DISPLAY_WIDTH = 360
 

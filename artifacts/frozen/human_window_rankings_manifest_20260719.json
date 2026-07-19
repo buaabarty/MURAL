@@ -3,9 +3,16 @@
   "benchmark": "SWE-bench Verified",
   "benchmark_instances": 500,
   "binding_rule": "verbatim rendered Top-20 window",
+  "main_experiment": {
+    "configurations": [
+      "BM25_projection",
+      "MURAL_2src"
+    ],
+    "paper_table": "RQ-1 source-composition comparison"
+  },
   "method_mapping": {
-    "BM25-local": "ranked BM25 files projected to repository entities",
-    "MURAL": "equal-weight fusion of BM25 projection and structural retrieval"
+    "BM25-local": "BM25_projection",
+    "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)"
   },
   "packet_created_date": "2026-07-12",
   "random_seed": 20260712,

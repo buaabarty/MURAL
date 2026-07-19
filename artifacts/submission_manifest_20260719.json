@@ -5,12 +5,12 @@
       "sha256": "5ebc60b5a35e61da84b2f8127f8b8bb3a58ccc3075c50811a77f0937bbdc58de"
     },
     "artifacts/README.md": {
-      "bytes": 6304,
-      "sha256": "8674b77dbdc2856ce244718bc0c621f55c5f8145919633e78dbaf3fa672dce70"
+      "bytes": 6274,
+      "sha256": "7fbcb66cce9c13d22fed97594c8601b59bf1eefe770e655b10eb56768b9e5bce"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 8644,
-      "sha256": "c0f911bb75c9543c014016fb3e07d0589657de567f9de216de7680c04ee8e3a8"
+      "bytes": 8649,
+      "sha256": "59fb9a7259d9c26e0f299587af30f1265121ceea5599cb761cb38638fb41512c"
     },
     "artifacts/frozen/external_localizers_manifest.json": {
       "bytes": 815,
@@ -21,8 +21,8 @@
       "sha256": "88cf644885265ac98862ffdd01b980621311f790e00cc2876388b5d136b64a2a"
     },
     "artifacts/frozen/human_window_rankings_manifest_20260719.json": {
-      "bytes": 831,
-      "sha256": "7776c1ab5432ed30dac36a635c97144dc0a78f6dfbfc27c0321fd5aa3f1d21a7"
+      "bytes": 933,
+      "sha256": "c43c7c70610f3a85b62883e2139ffed22e355ab57515a76da84ec907ff3bceff"
     },
     "artifacts/frozen/source_rankings_manifest_20260719.json": {
       "bytes": 2755,
@@ -69,8 +69,8 @@
       "sha256": "39de6906e09bd182bd867307fcabf998cca857640e8dd647c6dd4f1a14bf5c2b"
     },
     "artifacts/results/human_window_binding_20260719.tsv": {
-      "bytes": 18640,
-      "sha256": "5e0455ba82842990c26680d61e7a36dfecb9da95e8dcf930f1ba25db7e30b124"
+      "bytes": 17760,
+      "sha256": "a61f6cf0d5f1fe4b160342570223673f052f34cc7ce700f5d8b4fa7750270c62"
     },
     "artifacts/results/human_window_exact_instances_20260719.tsv": {
       "bytes": 12281,
@@ -325,8 +325,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 8660,
-      "sha256": "1e786ffe54bbfd1dc8a1c9c1ad789929c71676956c29da667b3cb7ef7cdf9f03"
+      "bytes": 8689,
+      "sha256": "f981da9b1efceac7984d3d01d9a3b426d28ee8076efa35ce1b4e495a9861e55d"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -393,8 +393,8 @@
       "sha256": "1c1b6a94cba660705425ea011b29920044ad14c67962a3ae7a5b676a9fecf9f3"
     },
     "artifacts/scripts/freeze_human_window_rankings.py": {
-      "bytes": 5707,
-      "sha256": "6215c31427637479bb19f0d96209fd27e18dadd2ba617bd8d3c39263d251dfe0"
+      "bytes": 5820,
+      "sha256": "a7bf11bcc716140ecd5385d2d5021c9c9ea94d3948d32c4bcd38cc83a28fd990"
     },
     "artifacts/scripts/fuse_path_mined_with_kg.py": {
       "bytes": 4921,
@@ -433,12 +433,12 @@
       "sha256": "11fa4108f6743e7211fa4821ce707bea191913b917f00a04b2ef1bb7a1307796"
     },
     "artifacts/scripts/verify_human_window_binding.py": {
-      "bytes": 3567,
-      "sha256": "9eb986627a92d638f7ddee9557ad3c3173712266d80c7ecd7c7a422f61a9683a"
+      "bytes": 3556,
+      "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 32469,
-      "sha256": "b85c54bed672479700aa629652af1c9dec1f39690611aa03c8da535a0fd72285"
+      "bytes": 33028,
+      "sha256": "e9fac57cf64c4b96493145840b6e3524db6af5cfa545fabe474fc98ced74c318"
     },
     "test_entity_projection_ranking.py": {
       "bytes": 2935,
@@ -449,8 +449,8 @@
       "sha256": "97c66fca5b94d4e31e7212eb4842383f9ca48db2831a6c09c34e374fe8d390fa"
     },
     "test_human_window_binding.py": {
-      "bytes": 1082,
-      "sha256": "1b7fcb0ad2dcf5afbd6c47d152a4cf0f6a8199e99bbbddf9896ab5a6b966347c"
+      "bytes": 1071,
+      "sha256": "7454d18f062d80b94805a41f3ee5a4132fc37de61dcb732dd2650b7163a8eecd"
     },
     "test_strict_external_localizers.py": {
       "bytes": 1379,
@@ -468,8 +468,8 @@
   "frozen_date": "2026-07-19",
   "human_audit": {
     "configurations": {
-      "BM25-local": "BM25-ranked files through entity projection",
-      "MURAL": "equal-weight BM25 projection plus structural retrieval"
+      "BM25-local": "BM25_projection",
+      "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)"
     },
     "decision_labels": [
       "MURAL",
@@ -479,6 +479,7 @@
     ],
     "double_coded_instances": 20,
     "judgments": 100,
+    "paper_comparison": "RQ-1 source-composition comparison",
     "strict_window_evaluation": "artifacts/results/human_window_exact_instances_20260719.tsv",
     "unique_instances": 80,
     "window_binding": "artifacts/results/human_window_binding_20260719.tsv",

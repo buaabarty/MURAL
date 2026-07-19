@@ -456,6 +456,19 @@ def check_prompts_and_human() -> None:
     audit_rankings = FROZEN / "human_window_rankings_20260712.jsonl.gz"
     equal(audit_manifest["audited_instances"], 80, "frozen human-audit items")
     equal(
+        audit_manifest["main_experiment"]["configurations"],
+        ["BM25_projection", "MURAL_2src"],
+        "human-audit main comparison",
+    )
+    equal(
+        audit_manifest["method_mapping"],
+        {
+            "BM25-local": "BM25_projection",
+            "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
+        },
+        "human-audit method mapping",
+    )
+    equal(
         hashlib.sha256(audit_rankings.read_bytes()).hexdigest(),
         audit_manifest["rankings"]["sha256"],
         "frozen human-audit ranking hash",
@@ -647,6 +660,11 @@ def check_manifest() -> None:
         manifest["human_audit"]["window_rankings"],
         "artifacts/frozen/human_window_rankings_20260712.jsonl.gz",
         "manifest human ranking snapshot",
+    )
+    equal(
+        manifest["human_audit"]["configurations"]["MURAL"],
+        "MURAL_2src (paper label: MURAL w/o Dense)",
+        "manifest human MURAL mapping",
     )
     for name, record in manifest["files"].items():
         path = ROOT / name

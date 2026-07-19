@@ -169,9 +169,10 @@ def main() -> None:
             "window_rankings": "artifacts/frozen/human_window_rankings_20260712.jsonl.gz",
             "window_binding": "artifacts/results/human_window_binding_20260719.tsv",
             "strict_window_evaluation": "artifacts/results/human_window_exact_instances_20260719.tsv",
+            "paper_comparison": "RQ-1 source-composition comparison",
             "configurations": {
-                "MURAL": "equal-weight BM25 projection plus structural retrieval",
-                "BM25-local": "BM25-ranked files through entity projection",
+                "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
+                "BM25-local": "BM25_projection",
             },
         },
         "java_benchmark": {
