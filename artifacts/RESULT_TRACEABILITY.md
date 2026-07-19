@@ -206,6 +206,17 @@ python3 scripts/analyze_stratified_context_findings.py \
   --output-human results/human_window_unique_strict_summary_20260719.tsv
 ```
 
+## Regenerate the article figures
+
+```bash
+python3 scripts/plot_paper_findings.py \
+  --token-summary results/strict_token_context_summary_20260719.tsv \
+  --multiplicity results/strict_target_multiplicity_20260719.tsv \
+  --output-dir ../temp_run/paper_figures
+```
+
+The command emits vector PDF and 300-dpi PNG versions of both figures.
+
 ## Final integrity gate
 
 ```bash

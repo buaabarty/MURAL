@@ -5,12 +5,12 @@
       "sha256": "5ebc60b5a35e61da84b2f8127f8b8bb3a58ccc3075c50811a77f0937bbdc58de"
     },
     "artifacts/README.md": {
-      "bytes": 6631,
-      "sha256": "b7c893eaeef629982142a76e1389f0cf9bf600852086d6dce351d09bc85b6afc"
+      "bytes": 6734,
+      "sha256": "d41ea95c30eeb2e1645df308c3215e81fcf68a8def3d721f2a35335715c0e39f"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 9722,
-      "sha256": "17a19d8caf16037c43e3772ea2da23153eccee45d8672623f9c0b39bea815e2e"
+      "bytes": 10061,
+      "sha256": "df3ba47fd97c0af7c96c8004df6639f272dc6fa966db213af399b5bbb4c5d607"
     },
     "artifacts/frozen/external_localizers_manifest.json": {
       "bytes": 815,
@@ -345,8 +345,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 8753,
-      "sha256": "2556778ebab50047a524da0e60b4d5bdc976f1eb38d490b4f917231d7d39445e"
+      "bytes": 8801,
+      "sha256": "d604c64a733479077cc103f06306ea98790a2bda5ab61c04f1463aac6b73a8d6"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -435,6 +435,10 @@
     "artifacts/scripts/merge_repair_prediction_updates.py": {
       "bytes": 5603,
       "sha256": "c0a901fa521d44edf8f930794865784287412ab78e0882efc1bc2e5ee651a795"
+    },
+    "artifacts/scripts/plot_paper_findings.py": {
+      "bytes": 8020,
+      "sha256": "21f889c99a734f6ec38e8bb9b1397294e331d49237182f7316c694845cf594d4"
     },
     "artifacts/scripts/reanalyze_java_clustered_stats.py": {
       "bytes": 3366,

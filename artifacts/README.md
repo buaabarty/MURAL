@@ -47,6 +47,7 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `evaluate_human_window_exact_hits.py`: evaluates those exact windows against strict targets.
 - `analyze_human_strict_alignment.py`: re-stratifies judgments from exact-window hits.
 - `analyze_stratified_context_findings.py`: opportunity-matched, multiplicity, rank-shift, repository, and instance-level audit statistics.
+- `plot_paper_findings.py`: publication figures for token-budget robustness and target-scope coverage.
 - `analyze_clustered_repair_stats.py`: clustered repair statistics.
 - `evaluate_java_retrieve_localize.py`: complete Java evaluator.
 - `build_submission_manifest.py`: protocol and digest manifest.

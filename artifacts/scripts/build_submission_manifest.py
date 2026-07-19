@@ -19,6 +19,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_human_strict_alignment.py",
     "artifacts/scripts/analyze_source_bearing_prompt_coverage.py",
     "artifacts/scripts/analyze_stratified_context_findings.py",
+    "artifacts/scripts/plot_paper_findings.py",
     "artifacts/scripts/build_strict_reference_targets.py",
     "artifacts/scripts/build_submission_manifest.py",
     "artifacts/scripts/collect_swebench_reports.py",
