@@ -1,134 +1,105 @@
 # MURAL paper artifact
 
-This directory contains the frozen inputs, prompts, evaluators, and retained
-result ledgers used by the MURAL manuscript and separately compiled supplement.
-Results not cited by either document are excluded.
+This directory contains the prompts, strict evaluators, frozen rankings,
+article-facing result ledgers, and protocol manifest used by the manuscript and
+its independently compiled supplement.
 
-## Evaluation boundary
+## Evaluation contract
 
-For all localization runs, the query is the original issue title and body and
-the code snapshot is the official base commit. Official patches are loaded only
-by the evaluator to derive file and entity targets. The ranking pipeline does
-not read patch text, repair commits, benchmark hints, or future artifacts.
+Localization reads the original issue and official base commit. Official
+patches are evaluator-only. Retrieval never reads the target repair record,
+patch, linked repair commit, comments, benchmark hints, test outcomes, or later
+repository artifacts.
 
-Paired intervals use 10,000 bootstrap resamples with seed 7. Binary paired
-contrasts use the two-sided exact McNemar test.
+The Python candidate unit is a synchronous module function, direct synchronous
+class method, or simple module/class assignment. The independent target builder
+maps changed regions to the same base-snapshot unit. A changed path containing a
+region outside this contract receives an exact-file fallback, retained alongside
+entity targets from other regions. Matching requires exact normalized path,
+entity kind, and qualified symbol. The final mapping contains 1,044 targets:
+836 functions or class methods, 32 assignments, and 176 file fallbacks. The Java
+evaluation maps changed lines to declarations present in the official base commit;
+its complete benchmark includes all 91 instances and six repositories.
 
-## Main scripts
+Every Python comparison retains all 500 SWE-bench Verified instances. Confidence
+intervals use 10,000 repository-clustered bootstrap resamples with seed 7;
+binary paired contrasts use the two-sided exact McNemar test.
 
-- `export_ranked_file_seeds.py`: adapts ranked retrieval output to ranked files.
-- `export_entity_projection.py`: shared Entity Projection implementation.
-- `export_multi_source_rrf_fusion.py`: equal-weight multi-source entity fusion.
-- `export_fixed_prefix_fusion.py`: prefix-preserving context completion.
-- `export_same_file_neighbor_tail.py`: same-file complete-tail control.
-- `export_selector_simple_baselines.py`: source-order, name, within-file BM25,
-  round-robin, weighted, and stable-random selector controls.
-- `evaluate_token_budget_context.py`: equal rendered-token packing, changed-line
-  coverage, and paired statistics.
-- `analyze_repair_transitions.py`: direct BM25--MURAL repair transitions.
-- `analyze_human_window_audit.py`: blinded preference counts and Cohen's kappa.
-- `analyze_retrieve_localize_controls.py`: localization metrics, paired
-  intervals, and disagreement ledgers.
-- `evaluate_patch_derived_context.py`: edit-target recall and complete coverage.
-- `evaluate_external_localizer_fusion.py`: released-localizer augmentation.
-- `evaluate_java_retrieve_localize.py`: complete Java adapter evaluation.
-- `run_repair_profile_batch.py`: fixed GLM-5.2 generation protocol.
-- `assemble_repair_profile_predictions.py` and
-  `deduplicate_repair_predictions.py`: prediction audit and exact prompt-and-patch reuse.
-- `select_repair_retry_ids.py`: provider-failure-only batch resumption.
-- `audit_repair_context_rendering.py`: executed candidate and prompt audit.
-- `collect_swebench_reports.py`, `materialize_repair_variant_reports.py`, and
-  `analyze_repair_outcomes.py`: official SWE-bench outcome analysis.
-- `verify_paper_results.py`: exact inventory and value verification.
+## Core scripts
 
-## Retained result inventory
+- `build_strict_reference_targets.py`: independent Python-AST target builder.
+- `evaluate_strict_reference_context.py`: exact localization evaluator.
+- `evaluate_strict_external_localizers.py`: released-prefix completion.
+- `evaluate_token_budget_context.py`: rendered-token packing.
+- `entity_identity.py`: shared canonical entity identity and deduplication.
+- `export_ranked_file_seeds.py`: ranked-file seed materialization.
+- `export_entity_projection.py`: projection entry point.
+- `export_path_mined_filelocal.py`: shared projection implementation.
+- `fuse_path_mined_with_kg.py`: canonical union of native structural and projected entities.
+- `export_multi_source_rrf_fusion.py`: deterministic multi-source RRF.
+- `export_fixed_prefix_fusion.py`: prefix-preserving completion.
+- `export_selector_simple_baselines.py`: selector controls.
+- `export_compact_rankings.py`: compact ranking export.
+- `materialize_compact_rankings.py`: evaluator-compatible reconstruction.
+- `analyze_source_bearing_prompt_coverage.py`: rendered-prompt audit.
+- `analyze_human_strict_alignment.py`: manual-audit re-stratification.
+- `analyze_clustered_repair_stats.py`: clustered repair statistics.
+- `evaluate_java_retrieve_localize.py`: complete Java evaluator.
+- `build_submission_manifest.py`: protocol and digest manifest.
+- `verify_paper_results.py`: end-to-end artifact check.
 
-### Target mapping and information boundary
+## Retained results
 
-- `results/tse_gt_mapping_v6.tsv`
-- `results/patch_derived_context_targets_20260702.json`
-- `results/kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json`
-- `results/time_boundary_external_artifact_sensitivity_20260531.tsv`
+### Strict Python localization
 
-### Python localization and context coverage
-
-- `results/mural_localization_{summary,paired,disagreements}_20260716.tsv`
-- `results/mural_edit_target_summary_20260716.tsv`
-- `results/mural_edit_target_summary_20260716.json`
-- `results/mural_edit_target_paired_20260716.tsv`
-- `results/mural_repository_localization_20260716.tsv`
-
-### Supplementary controls
-
-- `results/mural_budget_{summary,paired,disagreements}_20260716.tsv`
-- `results/mural_rrf_sensitivity_{summary,paired,disagreements}_20260716.tsv`
-- `results/mural_external_localizer_{summary,paired,disagreements}_20260716.tsv`
+- `results/strict_reference_targets_20260719.json`
+- `results/strict_localization_{summary,instances,paired}_20260719.tsv`
+- `results/strict_token_context_{summary,instances,paired}_20260719.tsv`
+- `results/strict_token_packing_{summary,instances}_20260719.tsv`
+- `results/strict_budget_b{5,10,20,40}_{summary,instances,paired}_20260719.tsv`
+- `results/strict_selector_{summary,instances,paired}_20260719.tsv`
+- `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv`
+- `results/strict_external_localizer_{summary,instances,paired}_20260719.tsv`
+- `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv`
 - `results/context_construction_cost_20260716.tsv`
-- `results/token_budget_context_{summary,paired,instances}_20260718.tsv`
-- `results/selector_simple_{summary,paired,disagreements}_20260718.tsv`
-- `results/fixed_prefix_tail_{summary,paired,disagreements,counts}_20260718.tsv`
-- `results/localization_nonfallback_{summary,paired,disagreements}_20260718.tsv`
-- `results/history_ablation_{summary,paired,disagreements}_20260718.tsv`
 
-### Blinded human window audit
+### Repair prompts and official outcomes
 
-- `results/human_window_annotations_20260718.tsv`
+- `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv`
+- `results/repair_equal4000_strict_predictions_{bm25,mural}_20260719.jsonl`
+- `results/repair_equal4000_strict_official_{bm25,mural}_20260719.jsonl`
+- `results/repair_equal4000_strict_{outcomes,summary}_20260719.tsv`
+- `results/repair_equal4000_clustered_paired_20260719.tsv`
+- `results/repair_equal4000_strict_prediction_provenance_20260719.tsv`
+- `results/repair_equal4000_strict_regeneration_{bm25,mural}_20260719.tsv`
+
+Nonempty, applicable, and resolved retain 500 instances per context in the
+denominator. The official rows are keyed by instance and patch SHA-256.
+
+### Human and Java evaluations
+
+- `results/human_window_{annotations,manifest,summary,agreement,provenance}_20260718.tsv`
 - `results/human_window_items_20260718.json`
-- `results/human_window_manifest_20260718.tsv`
-- `results/human_window_summary_20260718.tsv`
-- `results/human_window_agreement_20260718.tsv`
-- `results/human_window_provenance_20260718.tsv`
-
-The audit contains 100 anonymized judgments over 80 unique instances. The JSON
-file preserves the exact issue, official patch, and randomized Window A/B
-contents shown to annotators. Twenty instances are independently double-coded
-for agreement analysis.
-
-### Complete Java benchmark
-
-- `results/java_cross_language_summary_20260714.tsv`
-- `results/java_cross_language_paired_20260714.tsv`
+- `results/human_window_strict_{judgments,summary}_20260719.tsv`
+- `results/java_cross_language_{summary,paired}_20260714.tsv`
 - `results/java_cross_language_instances_20260714.jsonl`
 - `results/java_cross_language_targets_20260714.json`
 
-The Java benchmark contains all 91 official instances. Its available adapters
-are lexical and structural; it tests the shared projection and fusion interface
-without representing the default three-source Python configuration. The
-manifest pins the compact selector version plus evaluator and output hashes.
+The audit has 100 judgments over 80 instances, including 20 double-coded items.
+The Java evaluation retains all 91 instances pinned by
+`inputs/java_cross_language_manifest_20260714.json`.
 
-### Repair rendering protocol
+## Frozen rankings and provenance
 
-- `prompts/glm52_repair_prompt.md`
-- `results/repair_equal4000_context_rendering_20260718.tsv`
-- `results/repair_equal4000_context_summary_20260718.tsv`
-
-### End-to-end repair
-
-- `results/repair_equal4000_assembly_20260718.tsv`
-- `results/repair_equal4000_prediction_mapping_20260718.tsv`
-- `results/repair_equal4000_deduplication_summary_20260718.json`
-- `results/repair_equal4000_outcomes_20260718.tsv`
-- `results/repair_equal4000_summary_20260718.tsv`
-- `results/repair_equal4000_transition_summary_20260718.tsv`
-- `results/repair_equal4000_transitions_20260718.tsv`
-
-The equal-4,000-token ledgers are the primary direct BM25--MURAL repair
-comparison. They contain 1,000 variant outcomes, 938 nonempty predictions,
-932 canonical official evaluations, and all paired transitions. The repair
-summary reports counts and benchmark-level yields for nonempty,
-applicable, and test-resolved patches, plus paired bootstrap intervals and
-exact McNemar tests for all three binary outcomes. Here, applicable means that
-the official harness records `patch_successfully_applied=1`; resolved means
-that the official test oracles accept the prediction. The
-`applicable_given_nonempty_percent` field separately reports application
-success conditional on a nonempty prediction. Every benchmark-level yield
-retains all 500 instances in its denominator.
-
-## Verification
+`frozen/strict_rankings_top50_20260719.jsonl.gz` contains Top-50 candidates for
+BM25 projection, the structural adapter, dense projection, two-source MURAL, and
+three-source MURAL for all 500 Python instances.
+`frozen/source_rankings_manifest_20260719.json` records the construction and
+canonical-identity contract for those five rankings.
+`frozen/external_localizers_manifest.json` records the upstream repository commit
+and SHA-256 values for released localizer files.
 
 ```bash
-python3 artifacts/scripts/verify_paper_results.py --scope all
+python3 artifacts/scripts/build_submission_manifest.py
+python3 artifacts/scripts/verify_paper_results.py
 ```
-
-The verifier fails on a missing, extra, duplicate, incomplete, hash-inconsistent,
-or numerically inconsistent paper-facing ledger.

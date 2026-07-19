@@ -1,3 +1,0 @@
-variant	N	candidate_entities_mean	rendered_entities_mean	source_entities_mean	prompt_tokens_mean	prompt_tokens_median	prompt_tokens_p95	prompt_tokens_max
-bm25	500	17.806	16.758	4.97	3618.348	3740.0	3976	4000
-mural	500	17.822	17.326	5.168	3566.58	3704.5	3967	3997

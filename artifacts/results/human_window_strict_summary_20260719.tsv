@@ -1,0 +1,22 @@
+scope	strict_stratum	decision	count
+unique_instances	BM25_only	instances	6
+unique_instances	MURAL_only	instances	31
+unique_instances	both	instances	24
+unique_instances	neither	instances	19
+judgments	BM25_only	BM25-local	5
+judgments	BM25_only	Comparable	1
+judgments	MURAL_only	BM25-local	3
+judgments	MURAL_only	Both insufficient	3
+judgments	MURAL_only	Comparable	1
+judgments	MURAL_only	MURAL	31
+judgments	both	BM25-local	9
+judgments	both	Both insufficient	4
+judgments	both	Comparable	8
+judgments	both	MURAL	11
+judgments	neither	BM25-local	2
+judgments	neither	Both insufficient	5
+judgments	neither	Comparable	5
+judgments	neither	MURAL	12
+exclusive_hit_judgments	MURAL_only_or_BM25_only	aligned	36
+exclusive_hit_judgments	MURAL_only_or_BM25_only	neutral	5
+exclusive_hit_judgments	MURAL_only_or_BM25_only	opposed	3

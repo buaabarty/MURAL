@@ -1,0 +1,63 @@
+{
+  "benchmark": {
+    "instances": 500,
+    "name": "SWE-bench Verified",
+    "snapshot": "official base commit"
+  },
+  "canonical_identity": {
+    "applied_before_truncation": true,
+    "implementation": "artifacts/scripts/entity_identity.py",
+    "python": "normalized path, inferred entity kind, and qualified symbol base"
+  },
+  "frozen_date": "2026-07-19",
+  "frozen_rankings": {
+    "path": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
+    "sha256": "7f0ffa7c5561bf132b9ff075f1e8e8d23c0aff5f0237f03f69e08de704cf5b1d"
+  },
+  "rankings": {
+    "BM25_projection": {
+      "adapter": "ranked files through shared Entity Projection",
+      "projection": "artifacts/scripts/export_path_mined_filelocal.py"
+    },
+    "Dense_projection": {
+      "adapter": "dense-ranked files through shared Entity Projection",
+      "encoder": "jinaai/jina-embeddings-v2-base-code@516f4baf13dec4ddddda8631e019b5737c8bc250",
+      "projection": "artifacts/scripts/export_path_mined_filelocal.py"
+    },
+    "MURAL": {
+      "fusion": "equal-weight reciprocal-rank fusion",
+      "rrf_k": 60,
+      "sources": [
+        "BM25_projection",
+        "Structural_adapter",
+        "Dense_projection"
+      ]
+    },
+    "MURAL_2src": {
+      "fusion": "equal-weight reciprocal-rank fusion",
+      "rrf_k": 60,
+      "sources": [
+        "BM25_projection",
+        "Structural_adapter"
+      ]
+    },
+    "Structural_adapter": {
+      "adapter": "canonical minimum-rank union of native structural entities and the shared projection of structurally ranked files",
+      "native_branch": "typed issue-PR-code graph ranking",
+      "projected_branch": "artifacts/scripts/export_path_mined_filelocal.py",
+      "union": "artifacts/scripts/fuse_path_mined_with_kg.py"
+    }
+  },
+  "retrieval_boundary": {
+    "benchmark_hints_included": false,
+    "file_seed_command": "python3 artifacts/scripts/export_ranked_file_seeds.py --input-dir RUN_ENTITY_RANKINGS --output-dir FILE_SEEDS --ids-file artifacts/frozen/swebench_verified_ids_20260719.txt --max-files 20 --support-mode count",
+    "projection_command": "python3 artifacts/scripts/export_entity_projection.py --input-dir FILE_SEEDS --output-dir PROJECTED_RANKINGS --ids-file artifacts/frozen/swebench_verified_ids_20260719.txt --playground-root BASE_COMMIT_REPOSITORIES --limit 50",
+    "query_fields": [
+      "problem_statement"
+    ],
+    "repository_snapshot": "official base commit",
+    "source_generation_command": "python3 artifacts/scripts/export_text_baselines.py --instance-ids artifacts/frozen/swebench_verified_ids_20260719.txt --dataset-arrow SWE_BENCH_VERIFIED_ARROW --repos-dir BASE_COMMIT_REPOSITORIES --output SOURCE_RUNS --top-k 50 --fusion-depth 200"
+  },
+  "schema_version": 1,
+  "top_k": 50
+}

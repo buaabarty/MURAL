@@ -9,6 +9,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List
 
+from entity_identity import canonical_entity_id
+
 
 def load_ids(ids_file: Path) -> List[str]:
     ids: List[str] = []
@@ -21,15 +23,15 @@ def load_ids(ids_file: Path) -> List[str]:
     return ids
 
 
-def entity_key(item: dict) -> str:
-    return str(item.get("signature") or item.get("name") or "")
+def entity_key(item: dict) -> tuple[str, str, str]:
+    return canonical_entity_id(item)
 
 
 def fuse_entity_lists(original: List[dict], mined: List[dict]) -> List[dict]:
-    by_key: Dict[str, dict] = {}
+    by_key: Dict[tuple[str, str, str], dict] = {}
     for rank, item in enumerate(original, start=1):
         key = entity_key(item)
-        if not key:
+        if not key[0] or not key[2]:
             continue
         out = deepcopy(item)
         out["_kg_rank"] = rank
@@ -37,7 +39,7 @@ def fuse_entity_lists(original: List[dict], mined: List[dict]) -> List[dict]:
         by_key[key] = out
     for rank, item in enumerate(mined, start=1):
         key = entity_key(item)
-        if not key:
+        if not key[0] or not key[2]:
             continue
         if key in by_key:
             out = by_key[key]

@@ -7,20 +7,26 @@ import argparse
 import json
 from pathlib import Path
 
+from entity_identity import canonical_entity_id
+
 
 def ranked_methods(payload: dict) -> list[dict]:
     methods = (payload.get("related_entities") or {}).get("methods") or []
     return sorted(methods, key=lambda item: float(item.get("similarity") or 0.0), reverse=True)
 
 
+def entity_id(item: dict) -> tuple[str, str, str]:
+    return canonical_entity_id(item)
+
+
 def append_unique(output: list[dict], candidates: list[dict], limit: int) -> None:
-    seen = {item.get("signature") for item in output if item.get("signature")}
+    seen = {entity_id(item) for item in output}
     for candidate in candidates:
-        signature = candidate.get("signature")
-        if not signature or signature in seen:
+        identifier = entity_id(candidate)
+        if not all(identifier) or identifier in seen:
             continue
         output.append(dict(candidate))
-        seen.add(signature)
+        seen.add(identifier)
         if len(output) >= limit:
             return
 

@@ -1,342 +1,177 @@
 # Result traceability
 
-This note maps each retained MURAL result to one ledger and records the
-full-workspace commands used to regenerate it.
+All paths below are relative to `artifacts/`.
 
-## Evaluation scope
+## Frozen scope
 
-### SWE-bench Verified
-
-- Population: all 500 official instances.
-- Query: original issue title and body.
-- Snapshot: official base commit.
-- Ranking inputs: issue text, base-commit source, and source-specific retrieval
-  records.
-- Evaluator-only inputs: official patch and test oracles.
-- Final localization budget: 20 distinct entities unless a budget table states
-  otherwise.
-- Uncertainty: 10,000 paired bootstrap resamples, seed 7.
-- Binary paired tests: two-sided exact McNemar.
-
-`results/tse_gt_mapping_v6.tsv` records the deterministic patch-to-entity
-mapping. The information-boundary audit is
-`results/kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json`.
-
-### SWE-bench-Java Verified
-
-`inputs/java_cross_language_manifest_20260714.json` pins all 91 official
-instances from revision `8bd202138a4ab9987daa77111c76a3e66af9f1c9`.
-`results/java_cross_language_instances_20260714.jsonl` contains exactly one row
-per manifest ID. No instance is excluded.
+- Python: all 500 SWE-bench Verified instances.
+- Java: all 91 SWE-bench-Java Verified instances across six repositories.
+- Input: original issue plus official base commit.
+- Default output: 20 distinct base-snapshot entities.
+- Sources: BM25 and dense ranked-file projections plus the structural adapter, which canonically unifies native structural entities with its projected file branch.
+- Fusion: equal-weight RRF with `k=60`.
+- Statistics: 10,000 repository-clustered bootstrap resamples, seed 7;
+  two-sided exact McNemar for binary paired contrasts.
+- Strict targets: 1,044 total, comprising 836 functions or class methods,
+  32 assignments, and 176 exact-file fallbacks.
 
 ## Claim-to-ledger map
 
-### RQ-1 and RQ-2: bounded localization
-
-| Result | Ledger |
+| Manuscript evidence | Retained ledger |
 | --- | --- |
-| BM25, BLUiR, CodeGraph, structural, dense, source ablation, MURAL, and fixed-prefix GLM-5 rows | `results/mural_localization_summary_20260716.tsv` |
-| Paired intervals and exact tests | `results/mural_localization_paired_20260716.tsv` |
-| Per-instance Hit@20 changes | `results/mural_localization_disagreements_20260716.tsv` |
-| Four released Qwen2.5-32B localizers | `results/mural_external_localizer_summary_20260716.tsv` |
-| Released-localizer paired tests | `results/mural_external_localizer_paired_20260716.tsv` |
-| Per-instance released-localizer changes | `results/mural_external_localizer_disagreements_20260716.tsv` |
-| Repository strata | `results/mural_repository_localization_20260716.tsv` |
-| Equal rendered-token packing and changed-line coverage | `results/token_budget_context_{summary,paired,instances}_20260718.tsv` |
-| Simple selector controls | `results/selector_simple_{summary,paired,disagreements}_20260718.tsv` |
-| Complete fixed-prefix tails | `results/fixed_prefix_tail_{summary,paired,disagreements,counts}_20260718.tsv` |
-| Fallback-excluded localization | `results/localization_nonfallback_{summary,paired,disagreements}_20260718.tsv` |
-| Code-only/history source replacement | `results/history_ablation_{summary,paired,disagreements}_20260718.tsv` |
-| Blinded manual window comparison | `results/human_window_items_20260718.json`, `results/human_window_{annotations,manifest,summary,agreement,provenance}_20260718.tsv` |
+| Strict target policy and population | `results/strict_reference_targets_20260719.json` |
+| Top-20 retrieval, projection, fusion, and GLM-prefix rows | `results/strict_localization_{summary,instances,paired}_20260719.tsv` |
+| Equal rendered-token comparison | `results/strict_token_context_{summary,instances,paired}_20260719.tsv` |
+| Packing, truncation, and changed-line coverage | `results/strict_token_packing_{summary,instances}_20260719.tsv` |
+| Selector controls | `results/strict_selector_{summary,instances,paired}_20260719.tsv` |
+| Complete GLM-prefix tail controls | `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv` |
+| Released localizer completion | `results/strict_external_localizer_{summary,instances,paired}_20260719.tsv` |
+| Entity budgets 5, 10, 20, and 40 | `results/strict_budget_b*_{summary,instances,paired}_20260719.tsv` |
+| RRF sensitivity | `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv` |
+| Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
+| Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
+| Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
+| Blinded judgments and agreement | `results/human_window_*_20260718.*` |
+| Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
+| Complete Java evaluation | `results/java_cross_language_*_20260714.*` |
+| Context-construction time | `results/context_construction_cost_20260716.tsv` |
 
-### RQ-3: complete edit-target coverage
+## Reproduce the frozen source rows
 
-| Result | Ledger |
-| --- | --- |
-| Aggregate edit recall and complete coverage | `results/mural_edit_target_summary_20260716.tsv` and `.json` |
-| Paired intervals and exact tests | `results/mural_edit_target_paired_20260716.tsv` |
-| Per-instance mapped targets | `results/patch_derived_context_targets_20260702.json` |
-
-### RQ-4: end-to-end repair
-
-| Result | Ledger |
-| --- | --- |
-| Executed generation rows and selected attempts | `results/repair_equal4000_assembly_20260718.tsv` |
-| Equal-4,000-token context audit | `results/repair_equal4000_context_{summary,rendering}_20260718.tsv` |
-| Canonical prediction slots and exact reuse audit | `results/repair_equal4000_prediction_mapping_20260718.tsv` and `results/repair_equal4000_deduplication_summary_20260718.json` |
-| Per-instance nonempty, applicable, and resolved outcomes with paired tests | `results/repair_equal4000_outcomes_20260718.tsv` and `results/repair_equal4000_summary_20260718.tsv` |
-| Direct BM25--MURAL repair transitions | `results/repair_equal4000_transition_summary_20260718.tsv` and `results/repair_equal4000_transitions_20260718.tsv` |
-
-### Supplementary analyses
-
-| Analysis | Ledger |
-| --- | --- |
-| Budgets 5, 10, 20, and 40 | `results/mural_budget_{summary,paired,disagreements}_20260716.tsv` |
-| RRF constants and dense-source weights | `results/mural_rrf_sensitivity_{summary,paired,disagreements}_20260716.tsv` |
-| Complete Java benchmark | `results/java_cross_language_*_20260714.*` |
-| Context-construction cost | `results/context_construction_cost_20260716.tsv` |
-| External-artifact time boundary | `results/time_boundary_external_artifact_sensitivity_20260531.tsv` |
-| File-only-fallback exclusion | `results/localization_nonfallback_*_20260718.tsv` |
-| Historical-source replacement | `results/history_ablation_*_20260718.tsv` |
-
-## Reproduction commands
-
-Commands below run from the full experiment workspace containing benchmark
-checkouts and archived upstream localizer outputs.
-
-### Ranked files to entities
+Materialize the retained Top-50 ranking ledger:
 
 ```bash
-python3 artifacts/scripts/export_ranked_file_seeds.py \
-  --input-dir runs/text_baselines_nohints/2000 \
-  --output-dir temp_run/bm25_file_seeds \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
+python3 scripts/materialize_compact_rankings.py \
+  --input frozen/strict_rankings_top50_20260719.jsonl.gz \
+  --output-root ../temp_run/mural_strict_rankings
+```
+
+Recompute the five retained standalone source rows:
+
+```bash
+python3 scripts/evaluate_strict_reference_context.py \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --targets results/strict_reference_targets_20260719.json \
+  --row BM25_projection=../temp_run/mural_strict_rankings/BM25_projection \
+  --row Structural_adapter=../temp_run/mural_strict_rankings/Structural_adapter \
+  --row Dense_projection=../temp_run/mural_strict_rankings/Dense_projection \
+  --row MURAL_2src=../temp_run/mural_strict_rankings/MURAL_2src \
+  --row MURAL=../temp_run/mural_strict_rankings/MURAL \
+  --compare BM25_projection=MURAL \
+  --compare Dense_projection=MURAL \
+  --compare MURAL_2src=MURAL \
+  --top-k 20 --bootstrap 10000 --seed 7 \
+  --output-summary ../temp_run/strict_source_summary.tsv \
+  --output-instances ../temp_run/strict_source_instances.tsv \
+  --output-paired ../temp_run/strict_source_paired.tsv
+```
+
+The verifier compares these frozen-source values with the article-facing
+localization ledger.
+
+## Regenerate source rankings
+
+Generate BM25 and dense entity rankings from the original problem statement and
+official base-commit repositories. Benchmark hints are excluded by default:
+
+```bash
+python3 scripts/export_text_baselines.py \
+  --instance-ids frozen/swebench_verified_ids_20260719.txt \
+  --dataset-arrow SWE_BENCH_VERIFIED_ARROW \
+  --repos-dir BASE_COMMIT_REPOSITORIES \
+  --output SOURCE_RUNS --top-k 50 --fusion-depth 200
+```
+
+Materialize ranked-file seeds from the retained runs, then pass both through the
+shared projection:
+
+```bash
+python3 scripts/export_ranked_file_seeds.py \
+  --input-dir RUN_ENTITY_RANKINGS \
+  --output-dir FILE_SEEDS \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
   --max-files 20 --support-mode count
 
-python3 artifacts/scripts/export_entity_projection.py \
-  --input-dir temp_run/bm25_file_seeds \
-  --output-dir temp_run/bm25_projection \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --playground-root playground --limit 50
+python3 scripts/export_entity_projection.py \
+  --input-dir FILE_SEEDS \
+  --output-dir PROJECTED_RANKINGS \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --playground-root BENCHMARK_CHECKOUTS --limit 50
 ```
 
-The second script retains its historical filename; it implements the shared
-Entity Projection operator. Structural and dense ranked-file records use the
-same command.
-
-### Default MURAL
+The retained source-generation entry points are
+`scripts/export_text_baselines.py`, `scripts/run_text_baselines.py`, and
+`scripts/export_dense_filefirst.py`. The dense encoder revision is pinned in
+the script and submission manifest. Construct the structural adapter by taking
+the canonical minimum-rank union of its native entity ranking and projected
+file branch:
 
 ```bash
-python3 artifacts/scripts/export_multi_source_rrf_fusion.py \
-  --source BM25=temp_run/bm25_projection \
-  --source Structural=temp_run/structural_projection \
-  --source Dense=temp_run/dense_projection \
-  --output-dir temp_run/mural \
-  --top-k 50 --rrf-k 60 --force
+python3 scripts/fuse_path_mined_with_kg.py   --kg-dir STRUCTURAL_NATIVE   --path-mined-dir STRUCTURAL_PROJECTED   --output-dir STRUCTURAL_ADAPTER   --ids-file frozen/swebench_verified_ids_20260719.txt --limit 50
 ```
 
-### Localization metrics
+Fuse the canonical adapter rankings:
 
 ```bash
-python3 artifacts/scripts/analyze_retrieve_localize_controls.py \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
-  --group BM25_projection=temp_run/bm25_projection \
-  --group Structural_projection=temp_run/structural_projection \
-  --group Dense_projection=temp_run/dense_projection \
-  --group MURAL=temp_run/mural \
-  --compare BM25_projection=MURAL \
-  --compare Dense_projection=MURAL \
-  --output-summary temp_run/mural_localization_summary.tsv \
-  --output-paired temp_run/mural_localization_paired.tsv \
-  --output-disagreements temp_run/mural_localization_disagreements.tsv
+python3 scripts/export_multi_source_rrf_fusion.py   --source BM25=BM25_PROJECTED   --source Structural=STRUCTURAL_ADAPTER   --source Dense=DENSE_PROJECTED   --output-dir MURAL_PROJECTED   --top-k 50 --rrf-k 60 --force
 ```
 
-### Equal rendered-token control
+The exact source definitions and frozen-ranking digest are recorded in
+`frozen/source_rankings_manifest_20260719.json`.
+
+## Released localizers
+
+External source identity is frozen in
+`frozen/external_localizers_manifest.json`.
 
 ```bash
-python3 artifacts/scripts/evaluate_token_budget_context.py \
-  --source BM25_projection=temp_run/bm25_projection \
-  --source Structural_projection=temp_run/structural_projection \
-  --source Dense_projection=temp_run/dense_projection \
-  --source MURAL=temp_run/mural \
-  --compare BM25_projection=MURAL \
-  --compare Structural_projection=MURAL \
-  --compare Dense_projection=MURAL \
-  --budget 2000 --budget 4000 --budget 8000 \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --dataset-file temp_run/generated/SWE-bench_Verified.jsonl \
-  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
-  --output-root temp_run/token_packed \
-  --output-summary temp_run/token_budget_summary.tsv \
-  --output-paired temp_run/token_budget_paired.tsv \
-  --output-instances temp_run/token_budget_instances.tsv
+python3 scripts/evaluate_strict_external_localizers.py \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --targets results/strict_reference_targets_20260719.json \
+  --external-root RELEASED_LOCALIZER_FILES \
+  --mural-dir MURAL_PROJECTED \
+  --workspace-root BENCHMARK_CHECKOUTS \
+  --top-k 20 --primary-prefix 10 --secondary-pool 20 \
+  --bootstrap 10000 --seed 7 \
+  --output-summary strict_external_summary.tsv \
+  --output-instances strict_external_instances.tsv \
+  --output-paired strict_external_paired.tsv
 ```
 
-### Simple selector controls
+## Prompt and repair provenance
+
+`results/source_bearing_prompt_instances_20260719.tsv` records the
+SHA-256 of every executed prompt and the exact source-bearing entities retained
+by the renderer. Strict predictions and official evaluations are stored
+separately for BM25 and MURAL. The provenance ledger records whether each prompt
+and patch changed during canonical-identity regeneration; an official outcome
+is reused only when instance and patch SHA-256 are identical.
+
+Recompute clustered repair statistics:
 
 ```bash
-python3 artifacts/scripts/export_selector_simple_baselines.py \
-  --input-dir temp_run/bm25_file_seeds \
-  --output-root temp_run/selector_simple \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --playground-root playground --limit 50
+python3 scripts/analyze_clustered_repair_stats.py \
+  --outcomes results/repair_equal4000_strict_outcomes_20260719.tsv \
+  --baseline bm25 --treatment mural --bootstrap 10000 --seed 7 \
+  --output ../temp_run/repair_clustered.tsv
 ```
 
-### Blinded human window audit
+Hosted generation reads `AUTODL_API_KEY` from the environment. No credential is
+stored in the artifact.
 
-The frozen manifest contains all 57 instances on which MURAL and BM25-local
-differ in objective Hit@20, plus 12 both-hit and 11 neither-hit controls.
-Window A/B order is randomized per instance. Two annotators each judge 50
-instances, including 20 shared instances; the public ledger removes annotator
-names and retains the blinded decision, decoded method preference, confidence,
-and rationale.
+## Human audit
 
 ```bash
-python3 artifacts/scripts/analyze_human_window_audit.py \
-  --annotations artifacts/results/human_window_annotations_20260718.tsv \
-  --summary-output artifacts/results/human_window_summary_20260718.tsv \
-  --agreement-output artifacts/results/human_window_agreement_20260718.tsv
+python3 scripts/analyze_human_strict_alignment.py \
+  --annotations results/human_window_annotations_20260718.tsv \
+  --strict-instances results/strict_localization_instances_20260719.tsv \
+  --output-judgments ../temp_run/human_strict_judgments.tsv \
+  --output-summary ../temp_run/human_strict_summary.tsv
 ```
 
-### Fixed-prefix construction
+## Final integrity gate
 
 ```bash
-python3 artifacts/scripts/export_fixed_prefix_fusion.py \
-  --primary-dir temp_run/eval_aliyun_glm5_issueonly \
-  --secondary-dir temp_run/mural \
-  --output-dir temp_run/glm5_mural_b20_p10 \
-  --budget 20 --primary-prefix 10 --secondary-pool 20 --force
-```
-
-### Released localizers
-
-```bash
-python3 artifacts/scripts/evaluate_external_localizer_fusion.py \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --gt-cache temp_run/output/gt_eval_cache_verified_v3_entities.json \
-  --external-root temp_run/CoSIL-release/loc_to_patch_verified \
-  --mural-dir temp_run/mural \
-  --tail-label MURAL \
-  --output-summary temp_run/external_summary.tsv \
-  --output-paired temp_run/external_paired.tsv \
-  --output-disagreements temp_run/external_disagreements.tsv
-```
-
-### Matched 4,000-token GLM-5.2 repair
-
-The primary repair comparison fixes the complete prompt ceiling at 4,000 tokens
-and changes only the projected BM25 or MURAL candidate pool. The hosted key is
-read from the environment and is never written to a configuration or ledger.
-
-```bash
-export AUTODL_API_KEY='set-outside-the-repository'
-python3 artifacts/scripts/run_repair_profile_batch.py \
-  --input-root temp_run/repair_equal4000/inputs \
-  --output-root temp_run/repair_equal4000/runs \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --variants bm25 mural \
-  --preset local_qwen3coder30b --round-tag _base \
-  --playground-dir temp_run/repair_equal4000/playgrounds \
-  --dataset-file temp_run/generated/SWE-bench_Verified.jsonl \
-  --source-root . --model glm-5.2 \
-  --base-url https://www.autodl.art/api/v1 \
-  --api-key-env AUTODL_API_KEY --disable-thinking \
-  --first-prompt-profile compact --prompt-token-limit 4000 \
-  --completion-max-tokens 2048 --response-prefill off \
-  --max-retries 1 --temperature 0 --timeout 600
-```
-
-The executed jobs were split into 21 disjoint ID shards. Retry batches contain
-only attempts rejected for provider or worktree infrastructure failure; the
-assembler requires exactly one infrastructure-clean attempt per variant and
-instance. The rendered prompt audit is reconstructed from the frozen inputs and
-base commits:
-
-```bash
-python3 artifacts/scripts/audit_repair_context_rendering.py \
-  --input-root temp_run/repair_equal4000/inputs \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --dataset-file temp_run/generated/SWE-bench_Verified.jsonl \
-  --playground-root temp_run/repair_equal4000/playgrounds --shared-playground \
-  --variant bm25=bm25 --variant mural=mural \
-  --preset local_qwen3coder30b --round-tag _base \
-  --prompt-token-limit 4000 \
-  --output artifacts/results/repair_equal4000_context_rendering_20260718.tsv
-
-python3 artifacts/scripts/assemble_repair_profile_predictions.py \
-  --run-root temp_run/repair_equal4000/runs \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --output-root temp_run/repair_equal4000/final/predictions \
-  --variant bm25=bm25 --variant mural=mural \
-  --shards shard_00 shard_01 shard_02 shard_03 shard_04 shard_05 \
-    shard_06 shard_07 shard_08 shard_09 shard_10 shard_11 shard_12 \
-    shard_13 shard_14 shard_15 shard_16 shard_17 shard_18 shard_19 \
-    shard_20 retry_bm25 retry_mural retry3_smoke_mural \
-    retry3_mural retry3_bm25 \
-  --shard-first --model-prefix glm52_equal4000 \
-  --expected-dataset-source temp_run/generated/SWE-bench_Verified.jsonl \
-  --dataset-label temp_run/generated/SWE-bench_Verified.jsonl \
-  --expected-context-profile rank_stratified_v3_allfiles \
-  --expected-max-retries 1 --max-prompt-tokens 4000 \
-  --require-no-prefill --require-thinking-disabled
-
-python3 artifacts/scripts/deduplicate_repair_predictions.py \
-  --predictions-root temp_run/repair_equal4000/final/predictions \
-  --output-root temp_run/repair_equal4000/final/canonical \
-  --variants bm25 mural --model-prefix glm52_equal4000 \
-  --prompt-audit artifacts/results/repair_equal4000_context_rendering_20260718.tsv
-```
-
-Reuse requires the same instance, rendered-prompt SHA-256, and patch SHA-256.
-The executed run maps 938 nonempty variant predictions to 932 canonical official
-evaluations. Both canonical slots use the official SWE-bench harness; the mirror
-changes image transport only.
-
-```bash
-for slot in 0 1; do
-  python3 -m swebench.harness.run_evaluation \
-    --dataset_name temp_run/generated/SWE-bench_Verified.jsonl \
-    --predictions_path temp_run/repair_equal4000/final/canonical/slot_${slot}/predictions.jsonl \
-    --max_workers 10 --timeout 1800 \
-    --namespace dockerproxy.net/swebench \
-    --run_id mural_glm52_equal4000_slot_${slot}_20260718
-
-  python3 artifacts/scripts/collect_swebench_reports.py \
-    --predictions temp_run/repair_equal4000/final/canonical/slot_${slot}/predictions.jsonl \
-    --run-id mural_glm52_equal4000_slot_${slot}_20260718 \
-    --output temp_run/repair_equal4000/final/canonical/slot_${slot}/official_results.jsonl \
-    --normalize-terminal-errors
-done
-
-python3 artifacts/scripts/materialize_repair_variant_reports.py \
-  --canonical-root temp_run/repair_equal4000/final/canonical \
-  --output-root temp_run/repair_equal4000/final/official \
-  --variants bm25 mural
-
-python3 artifacts/scripts/analyze_repair_outcomes.py \
-  --ids-file temp_run/SWE-bench_Verified_ids.jsonl \
-  --predictions-root temp_run/repair_equal4000/final/predictions \
-  --official-root temp_run/repair_equal4000/final/official \
-  --variants bm25 mural \
-  --output-outcomes artifacts/results/repair_equal4000_outcomes_20260718.tsv \
-  --output-summary artifacts/results/repair_equal4000_summary_20260718.tsv
-
-python3 artifacts/scripts/analyze_repair_transitions.py \
-  --outcomes artifacts/results/repair_equal4000_outcomes_20260718.tsv \
-  --baseline bm25 --treatment mural \
-  --output-summary artifacts/results/repair_equal4000_transition_summary_20260718.tsv \
-  --output-instances artifacts/results/repair_equal4000_transitions_20260718.tsv
-```
-
-### Context-construction cost
-
-```bash
-python3 artifacts/scripts/analyze_context_construction_cost.py \
-  --logs-glob 'logs/kg_verified_evidence_graph/*.log' \
-  --run-dir runs/kg_verified_evidence_graph/tse_timesafe_main_20260529_v6 \
-  --bm25-time temp_run/timing/bm25_projection.time \
-  --dense-time temp_run/timing/dense_projection.time \
-  --rrf-time temp_run/timing/mural_rrf.time \
-  --output temp_run/context_construction_cost.tsv
-```
-
-### Java
-
-```bash
-python3 artifacts/scripts/evaluate_java_retrieve_localize.py \
-  --dataset-dir temp_run/java_verified_dataset \
-  --kg-seeds artifacts/inputs/java_kg_ranked_file_seeds_20260714.jsonl \
-  --repos-dir temp_run/java_repositories \
-  --cache-dir temp_run/java_entity_cache \
-  --output-summary temp_run/java_summary.tsv \
-  --output-paired temp_run/java_paired.tsv \
-  --output-instances temp_run/java_instances.jsonl \
-  --output-targets temp_run/java_targets.json
-```
-
-### Verification
-
-```bash
-python3 artifacts/scripts/verify_paper_results.py --scope all
+python3 scripts/build_submission_manifest.py
+python3 scripts/verify_paper_results.py
 ```

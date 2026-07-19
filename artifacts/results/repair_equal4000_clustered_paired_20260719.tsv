@@ -1,0 +1,4 @@
+baseline	treatment	metric	N	delta	clustered_ci_low	clustered_ci_high	wins	losses	mcnemar_p
+bm25	mural	nonempty	500	0.800000	-1.075298	4.958678	12	8	0.503444671631
+bm25	mural	applied	500	0.400000	-1.670644	4.958678	12	10	0.831811904907
+bm25	mural	resolved	500	1.000000	-1.446672	6.355932	25	20	0.551484329803

@@ -8,9 +8,13 @@ import csv
 import itertools
 import json
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from evaluate_strict_reference_context import cluster_bootstrap_ci, repository_id  # noqa: E402
 
 
 DEFAULT_VARIANTS = ("issue", "bm25", "mural")
@@ -61,15 +65,14 @@ def exact_mcnemar(wins: int, losses: int) -> float:
     return min(1.0, 2.0 * tail / (2**discordant))
 
 
-def paired_bootstrap_ci(baseline: np.ndarray, treatment: np.ndarray) -> tuple[float, float]:
-    rng = np.random.default_rng(7)
-    difference = treatment.astype(float) - baseline.astype(float)
-    means = np.empty(10_000, dtype=float)
-    for start in range(0, 10_000, 500):
-        stop = min(start + 500, 10_000)
-        indexes = rng.integers(0, len(difference), size=(stop - start, len(difference)))
-        means[start:stop] = difference[indexes].mean(axis=1)
-    low, high = np.percentile(means, [2.5, 97.5])
+def paired_bootstrap_ci(
+    instance_ids: list[str], baseline: np.ndarray, treatment: np.ndarray
+) -> tuple[float, float]:
+    triples = [
+        (repository_id(instance_id), float(base), float(treat))
+        for instance_id, base, treat in zip(instance_ids, baseline, treatment)
+    ]
+    low, high = cluster_bootstrap_ci(triples, 10_000, 7)
     return float(low * 100), float(high * 100)
 
 
@@ -205,7 +208,7 @@ def main() -> None:
             treatment = outcomes[treatment_name][metric]
             wins = int(np.sum(treatment & ~baseline))
             losses = int(np.sum(baseline & ~treatment))
-            low, high = paired_bootstrap_ci(baseline, treatment)
+            low, high = paired_bootstrap_ci(ids, baseline, treatment)
             summary_rows.append(
                 {
                     "kind": "contrast",
@@ -214,8 +217,8 @@ def main() -> None:
                     "baseline": baseline_name,
                     "treatment": treatment_name,
                     "delta_pp": f"{(treatment.mean() - baseline.mean()) * 100:.3f}",
-                    "ci95_low": f"{low:.3f}",
-                    "ci95_high": f"{high:.3f}",
+                    "ci95_low": f"{low:.6f}",
+                    "ci95_high": f"{high:.6f}",
                     "wins": wins,
                     "losses": losses,
                     "p_exact": f"{exact_mcnemar(wins, losses):.12g}",

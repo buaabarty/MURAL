@@ -48,7 +48,7 @@
   },
   "evaluation": {
     "script": "artifacts/scripts/evaluate_java_retrieve_localize.py",
-    "script_sha256": "b2526775dc8521a5f89b321c99a9b94bfc8df1a19f88199382c392ad98c0ab96",
+    "script_sha256": "81486d440c1675ad13720a1001e7d2d61861fdda96e63dddf1c79b4417a66212",
     "dataset_schema": "official repo/base_commit/problem_statement/patch",
     "target_source": "official patch, read after rankings are frozen",
     "target_mapping": "Map changed lines to base-commit Java entities. Auxiliary files and newly added entities do not enlarge an otherwise mapped target set; use one file-level fallback only if the entire patch has no mapped base-commit entity.",
@@ -64,7 +64,7 @@
     "failures": 0,
     "output_sha256": {
       "summary": "3aa2dd962bf663d97b898a7faa57b6dba9f2149bc16271e927c7d8e37e28eae5",
-      "paired": "05beb87bc797005d7f69f15853c4706f3735bc896cab59a87de919c59e5c5fd0",
+      "paired": "a175c2ebd42b5ca0d5d49309491f58927c9e6f189dc4b3a663ed82e4363ced5b",
       "targets": "36c9bf6e082ee85bbcab41637d48489a6a326027e8413d0570aae59b2d291147",
       "instances": "1897392ddc1131381fa015c0f3295750fd697798e797a291cfa367ce4b86549d"
     },

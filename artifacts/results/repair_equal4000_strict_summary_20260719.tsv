@@ -1,0 +1,6 @@
+kind	name	metric	nonempty	nonempty_percent	applicable	applicable_percent	applicable_given_nonempty_percent	resolved	resolved_percent	patch_apply_failed	test_timeout	baseline	treatment	delta_pp	ci95_low	ci95_high	wins	losses	p_exact
+variant	bm25	all	468	93.600	466	93.200	99.573	123	24.600	2	3	NA	NA	NA	NA	NA	NA	NA	NA
+variant	mural	all	472	94.400	468	93.600	99.153	128	25.600	4	4	NA	NA	NA	NA	NA	NA	NA	NA
+contrast	mural_vs_bm25	nonempty										bm25	mural	0.800	-1.075298	4.958678	12	8	0.503444671631
+contrast	mural_vs_bm25	applicable										bm25	mural	0.400	-1.670644	4.958678	12	10	0.831811904907
+contrast	mural_vs_bm25	resolved										bm25	mural	1.000	-1.446672	6.355932	25	20	0.551484329803

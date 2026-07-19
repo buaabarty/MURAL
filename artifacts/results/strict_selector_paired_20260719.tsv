@@ -1,0 +1,26 @@
+baseline	treatment	metric	delta	clustered_ci_low	clustered_ci_high	wins	losses	mcnemar_p
+File_source_order	Compact_projection	file_hit	35.200000	31.752248	43.458452	190	14	1.31834990967e-40
+File_source_order	Compact_projection	target_coverage	28.912338	22.280368	31.810540			
+File_source_order	Compact_projection	hit	33.600000	29.197080	36.023100	183	15	6.77818945277e-38
+File_source_order	Compact_projection	mrr	18.796465	11.619972	21.736996			
+File_source_order	Compact_projection	complete	24.800000	16.748710	28.413364	141	17	1.70489087725e-25
+File_name_overlap	Compact_projection	file_hit	35.200000	31.752248	43.458452	190	14	1.31834990967e-40
+File_name_overlap	Compact_projection	target_coverage	19.706147	17.233177	22.849146			
+File_name_overlap	Compact_projection	hit	24.200000	22.666667	28.372093	146	25	5.47176740687e-22
+File_name_overlap	Compact_projection	mrr	11.083964	6.620962	14.591760			
+File_name_overlap	Compact_projection	complete	15.800000	12.772237	19.355123	105	26	1.88191031704e-12
+Within_file_BM25	Compact_projection	file_hit	35.200000	31.752248	43.458452	190	14	1.31834990967e-40
+Within_file_BM25	Compact_projection	target_coverage	16.712814	14.765750	20.470478			
+Within_file_BM25	Compact_projection	hit	21.800000	19.942186	26.907723	140	31	9.57345251278e-18
+Within_file_BM25	Compact_projection	mrr	3.448846	-0.188019	9.873586			
+Within_file_BM25	Compact_projection	complete	12.800000	10.526316	16.730114	100	36	3.72021540025e-08
+Equal_round_robin	Compact_projection	file_hit	-6.800000	-9.265334	-3.430954	0	34	1.16415321827e-10
+Equal_round_robin	Compact_projection	target_coverage	7.960938	4.536806	10.821093			
+Equal_round_robin	Compact_projection	hit	4.800000	1.030840	7.582938	72	48	0.0353236825378
+Equal_round_robin	Compact_projection	mrr	-0.876740	-4.503239	4.684310			
+Equal_round_robin	Compact_projection	complete	8.400000	6.112435	11.557789	84	42	0.000229977645474
+Stable_random	Compact_projection	file_hit	21.200000	14.285714	31.642204	124	18	1.1693737943e-20
+Stable_random	Compact_projection	target_coverage	42.555729	35.009054	46.250762			
+Stable_random	Compact_projection	hit	44.200000	35.714286	48.148148	225	4	2.6337494377e-61
+Stable_random	Compact_projection	mrr	26.687318	18.708944	30.121068			
+Stable_random	Compact_projection	complete	39.400000	31.739130	42.840647	197	0	9.95682444458e-60

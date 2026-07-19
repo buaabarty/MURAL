@@ -1,5 +1,0 @@
-name	N	top_k	file_rate	method_or_entity_rate	mrr	hit_rate	dir
-CodeOnlyStructural	500	20	0.65	0.4990944444444445	0.31245605844104296	0.564	temp_run/mural_reviewer_controls_20260718/codeonly_projection
-HistoricalStructural	500	20	0.592	0.4527596681096681	0.2631367764072873	0.506	temp_run/mural_experiment_additions/selector_compact_main_20260715/kg_local
-MURALCodeOnly	500	20	0.804	0.568143745143745	0.34178973114089195	0.642	temp_run/mural_reviewer_controls_20260718/mural_codeonly_3src
-MURALHistorical	500	20	0.83	0.5961367243867242	0.3448987389201785	0.672	temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src

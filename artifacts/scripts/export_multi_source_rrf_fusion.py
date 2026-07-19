@@ -9,6 +9,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from entity_identity import canonical_entity_key
+
 
 def load(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -32,20 +34,11 @@ def parse_named_weight(raw: str) -> tuple[str, float]:
 
 def ranked_entities(payload: dict[str, Any], key: str) -> list[dict[str, Any]]:
     entities = (payload.get("related_entities") or {}).get(key) or []
-    return sorted(entities, key=lambda item: -float(item.get("similarity") or 0.0))
+    return list(entities)
 
 
 def entity_id(item: dict[str, Any]) -> str:
-    signature = item.get("signature") or item.get("name")
-    if signature:
-        return str(signature)
-    return "|".join(
-        [
-            str(item.get("file_path") or ""),
-            str(item.get("start_line") or ""),
-            str(item.get("entity_type") or ""),
-        ]
-    )
+    return canonical_entity_key(item)
 
 
 def rank_map(entities: list[dict[str, Any]]) -> dict[str, tuple[int, dict[str, Any]]]:

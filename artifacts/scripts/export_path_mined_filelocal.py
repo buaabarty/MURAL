@@ -24,6 +24,8 @@ from typing import Dict, Iterable, List, Tuple
 
 from datasets import Dataset
 
+from entity_identity import canonical_entity_id
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PLAYGROUND_ROOT = REPO_ROOT / "playground"
@@ -600,7 +602,7 @@ def rerank_instance(data: dict, dataset_item: dict) -> dict:
     repo = dataset_item["repo"]
     base_commit = dataset_item["base_commit"]
 
-    candidates: Dict[str, dict] = {}
+    candidates: Dict[tuple[str, str, str], dict] = {}
     for file_path, file_ev in file_map.items():
         classes, methods = parse_file_entities(repo, base_commit, file_path)
         for method in methods:
@@ -611,7 +613,8 @@ def rerank_instance(data: dict, dataset_item: dict) -> dict:
             method["path_details"] = path_for_item(file_ev, method, cls)
             sig = method.get("signature") or method.get("name")
             method = score_item(method, file_ev, sections, rank_map.get(sig))
-            candidates[sig] = merge_item(candidates.get(sig), method)
+            identity = canonical_entity_id(method)
+            candidates[identity] = merge_item(candidates.get(identity), method)
         for cls in classes:
             cls = deepcopy(cls)
             cls["entity_type"] = "class"
@@ -632,7 +635,8 @@ def rerank_instance(data: dict, dataset_item: dict) -> dict:
             ]
             sig = cls.get("signature") or cls.get("name")
             cls = score_item(cls, file_ev, sections, rank_map.get(sig))
-            candidates[sig] = merge_item(candidates.get(sig), cls)
+            identity = canonical_entity_id(cls)
+            candidates[identity] = merge_item(candidates.get(identity), cls)
 
     methods = sorted(
         [item for item in candidates.values() if item.get("entity_type") == "method"],

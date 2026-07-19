@@ -26,6 +26,8 @@ from typing import Any, Iterable
 import numpy as np
 from tree_sitter_language_pack import get_parser
 
+from evaluate_strict_reference_context import cluster_bootstrap_ci
+
 
 CACHE_VERSION = 1
 SELECTOR_VERSION = "compact_title_exact_file_rank_ast_v1"
@@ -914,7 +916,13 @@ def main() -> int:
                 [row["metrics"][treatment][metric] for row in per_instance], dtype=float
             )
             differences = treatment_values - baseline_values
-            low, high = bootstrap_interval(differences, args.seed, args.bootstrap_iters)
+            triples = [
+                (row["repo"], float(base), float(treatment))
+                for row, base, treatment in zip(
+                    per_instance, baseline_values, treatment_values
+                )
+            ]
+            low, high = cluster_bootstrap_ci(triples, args.bootstrap_iters, args.seed)
             wins = int(np.sum(differences > 0))
             losses = int(np.sum(differences < 0))
             paired_rows.append(

@@ -1,89 +1,95 @@
 #!/usr/bin/env python3
-"""Verify the submission-facing MURAL result ledgers."""
+"""Verify the retained MURAL paper ledgers and frozen protocol."""
 
 from __future__ import annotations
 
-import argparse
 import csv
+import gzip
 import hashlib
+import importlib.util
 import json
 import math
-import sys
+import re
 from collections import Counter
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "artifacts" / "results"
-INPUTS = ROOT / "artifacts" / "inputs"
+FROZEN = ROOT / "artifacts" / "frozen"
+MANIFEST = ROOT / "artifacts" / "submission_manifest_20260719.json"
 
-CORE_FILES = {
+EXPECTED_RESULTS = {
     "context_construction_cost_20260716.tsv",
-    "fixed_prefix_tail_counts_20260718.tsv",
-    "fixed_prefix_tail_disagreements_20260718.tsv",
-    "fixed_prefix_tail_paired_20260718.tsv",
-    "fixed_prefix_tail_summary_20260718.tsv",
-    "history_ablation_disagreements_20260718.tsv",
-    "history_ablation_paired_20260718.tsv",
-    "history_ablation_summary_20260718.tsv",
     "human_window_agreement_20260718.tsv",
     "human_window_annotations_20260718.tsv",
     "human_window_items_20260718.json",
     "human_window_manifest_20260718.tsv",
     "human_window_provenance_20260718.tsv",
+    "human_window_strict_judgments_20260719.tsv",
+    "human_window_strict_summary_20260719.tsv",
     "human_window_summary_20260718.tsv",
-    "localization_nonfallback_disagreements_20260718.tsv",
-    "localization_nonfallback_paired_20260718.tsv",
-    "localization_nonfallback_summary_20260718.tsv",
     "java_cross_language_instances_20260714.jsonl",
     "java_cross_language_paired_20260714.tsv",
     "java_cross_language_summary_20260714.tsv",
     "java_cross_language_targets_20260714.json",
-    "kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json",
-    "mural_budget_disagreements_20260716.tsv",
-    "mural_budget_paired_20260716.tsv",
-    "mural_budget_summary_20260716.tsv",
-    "mural_edit_target_paired_20260716.tsv",
-    "mural_edit_target_summary_20260716.json",
-    "mural_edit_target_summary_20260716.tsv",
-    "mural_external_localizer_disagreements_20260716.tsv",
-    "mural_external_localizer_paired_20260716.tsv",
-    "mural_external_localizer_summary_20260716.tsv",
-    "mural_localization_disagreements_20260716.tsv",
-    "mural_localization_paired_20260716.tsv",
-    "mural_localization_summary_20260716.tsv",
-    "mural_repository_localization_20260716.tsv",
-    "mural_rrf_sensitivity_disagreements_20260716.tsv",
-    "mural_rrf_sensitivity_paired_20260716.tsv",
-    "mural_rrf_sensitivity_summary_20260716.tsv",
-    "patch_derived_context_targets_20260702.json",
-    "selector_simple_disagreements_20260718.tsv",
-    "selector_simple_paired_20260718.tsv",
-    "selector_simple_summary_20260718.tsv",
-    "time_boundary_external_artifact_sensitivity_20260531.tsv",
-    "token_budget_context_instances_20260718.tsv",
-    "token_budget_context_paired_20260718.tsv",
-    "token_budget_context_summary_20260718.tsv",
-    "tse_gt_mapping_v6.tsv",
+    "repair_equal4000_clustered_paired_20260719.tsv",
+    "repair_equal4000_strict_official_bm25_20260719.jsonl",
+    "repair_equal4000_strict_official_mural_20260719.jsonl",
+    "repair_equal4000_strict_outcomes_20260719.tsv",
+    "repair_equal4000_strict_prediction_provenance_20260719.tsv",
+    "repair_equal4000_strict_predictions_bm25_20260719.jsonl",
+    "repair_equal4000_strict_predictions_mural_20260719.jsonl",
+    "repair_equal4000_strict_regeneration_bm25_20260719.tsv",
+    "repair_equal4000_strict_regeneration_mural_20260719.tsv",
+    "repair_equal4000_strict_summary_20260719.tsv",
+    "source_bearing_prompt_instances_20260719.tsv",
+    "source_bearing_prompt_paired_20260719.tsv",
+    "source_bearing_prompt_summary_20260719.tsv",
+    "strict_external_localizer_instances_20260719.tsv",
+    "strict_external_localizer_paired_20260719.tsv",
+    "strict_external_localizer_summary_20260719.tsv",
+    "strict_localization_instances_20260719.tsv",
+    "strict_localization_paired_20260719.tsv",
+    "strict_localization_summary_20260719.tsv",
+    "strict_prefix_tail_instances_20260719.tsv",
+    "strict_prefix_tail_paired_20260719.tsv",
+    "strict_prefix_tail_summary_20260719.tsv",
+    "strict_reference_targets_20260719.json",
+    "strict_rrf_sensitivity_instances_20260719.tsv",
+    "strict_rrf_sensitivity_paired_20260719.tsv",
+    "strict_rrf_sensitivity_summary_20260719.tsv",
+    "strict_selector_instances_20260719.tsv",
+    "strict_selector_paired_20260719.tsv",
+    "strict_selector_summary_20260719.tsv",
+    "strict_token_context_instances_20260719.tsv",
+    "strict_token_context_paired_20260719.tsv",
+    "strict_token_context_summary_20260719.tsv",
+    "strict_token_packing_instances_20260719.tsv",
+    "strict_token_packing_summary_20260719.tsv",
 }
-REPAIR_FILES = {
-    "repair_equal4000_context_rendering_20260718.tsv",
-    "repair_equal4000_context_summary_20260718.tsv",
-    "repair_equal4000_assembly_20260718.tsv",
-    "repair_equal4000_deduplication_summary_20260718.json",
-    "repair_equal4000_outcomes_20260718.tsv",
-    "repair_equal4000_prediction_mapping_20260718.tsv",
-    "repair_equal4000_summary_20260718.tsv",
-    "repair_equal4000_transition_summary_20260718.tsv",
-    "repair_equal4000_transitions_20260718.tsv",
-}
-CHECKS: list[dict[str, Any]] = []
+for budget in (5, 10, 20, 40):
+    for suffix in ("summary", "instances", "paired"):
+        EXPECTED_RESULTS.add(f"strict_budget_b{budget}_{suffix}_20260719.tsv")
 
 
-def tsv(name: str) -> list[dict[str, str]]:
-    with (RESULTS / name).open(newline="", encoding="utf-8") as handle:
+def fail(message: str) -> None:
+    raise AssertionError(message)
+
+
+def equal(observed: Any, expected: Any, label: str) -> None:
+    if observed != expected:
+        fail(f"{label}: observed {observed!r}, expected {expected!r}")
+
+
+def close(observed: float | str, expected: float, label: str, tol: float = 1e-6) -> None:
+    value = float(observed)
+    if not math.isclose(value, expected, rel_tol=0.0, abs_tol=tol):
+        fail(f"{label}: observed {value}, expected {expected}")
+
+
+def rows(name: str) -> list[dict[str, str]]:
+    with (RESULTS / name).open(newline="", encoding="utf-8-sig") as handle:
         return list(csv.DictReader(handle, delimiter="\t"))
 
 
@@ -92,761 +98,562 @@ def json_file(path: Path) -> Any:
 
 
 def jsonl(path: Path) -> list[dict[str, Any]]:
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def check(name: str, observed: Any, expected: Any, source: str, ok: bool | None = None) -> None:
-    CHECKS.append({
-        "name": name,
-        "observed": observed,
-        "expected": expected,
-        "source": source,
-        "ok": observed == expected if ok is None else ok,
-    })
-
-
-def close(name: str, observed: float, expected: float, source: str, tol: float = 5e-7) -> None:
-    check(name, observed, expected, source, math.isclose(observed, expected, abs_tol=tol))
-
-
-def one(rows: list[dict[str, str]], key: str, value: str) -> dict[str, str]:
-    found = [item for item in rows if item.get(key) == value]
+def one(items: list[dict[str, str]], **keys: str) -> dict[str, str]:
+    found = [row for row in items if all(row.get(key) == value for key, value in keys.items())]
     if len(found) != 1:
-        raise AssertionError(f"{key}={value}: expected one row, found {len(found)}")
+        fail(f"Expected one row for {keys}, found {len(found)}")
     return found[0]
 
 
-def pair(rows: list[dict[str, str]], baseline: str, treatment: str, metric: str = "hit") -> dict[str, str]:
-    found = [
-        item for item in rows
-        if item["baseline"] == baseline
-        and item["treatment"] == treatment
-        and item.get("metric", "hit") == metric
-    ]
-    if len(found) != 1:
-        raise AssertionError(f"{baseline}->{treatment}/{metric}: found {len(found)} rows")
-    return found[0]
+def pair(name: str, baseline: str, treatment: str, metric: str) -> dict[str, str]:
+    return one(rows(name), baseline=baseline, treatment=treatment, metric=metric)
 
 
-def where_one(rows: list[dict[str, str]], **keys: str) -> dict[str, str]:
-    found = [
-        item for item in rows
-        if all(item.get(key) == value for key, value in keys.items())
-    ]
-    if len(found) != 1:
-        raise AssertionError(f"{keys}: expected one row, found {len(found)}")
-    return found[0]
-
-
-def inventory(scope: str) -> None:
-    expected = CORE_FILES | (REPAIR_FILES if scope == "all" else set())
+def check_inventory() -> None:
     observed = {path.name for path in RESULTS.iterdir() if path.is_file()}
-    if scope == "core":
-        observed -= REPAIR_FILES
-    check("result inventory", sorted(observed), sorted(expected), "artifacts/results")
+    equal(sorted(observed), sorted(EXPECTED_RESULTS), "paper-facing result inventory")
 
 
-def setup() -> None:
-    source = "tse_gt_mapping_v6.tsv"
-    rows = tsv(source)
+def check_targets() -> dict[str, Any]:
+    data = json_file(RESULTS / "strict_reference_targets_20260719.json")
+    meta, items = data["_meta"], data["items"]
+    equal(meta["schema_version"], 1, "target schema")
+    equal(meta["population"], 500, "target population")
+    equal(len(items), 500, "target item count")
+    equal(
+        meta["ranking_unit"],
+        "base-snapshot synchronous module function, direct class method, or simple module/class assignment",
+        "target ranking unit",
+    )
+    equal(
+        meta["file_target_policy"],
+        "one exact patched-file fallback for every changed path containing a region outside the candidate-unit contract; retained with entity targets",
+        "file target policy",
+    )
+    equal(
+        meta["matching"],
+        "exact normalized file path, target kind, and qualified name",
+        "target matching",
+    )
+    counts = Counter(
+        target["target_type"]
+        for item in items.values()
+        for target in item["targets"]
+    )
+    equal(dict(counts), {"function": 836, "file": 176, "assignment": 32}, "target types")
+    equal(sum(item["target_count"] for item in items.values()), 1044, "total targets")
+    equal(sum(item["target_count"] == 1 for item in items.values()), 319, "single-target instances")
+    equal(sum(item["target_count"] > 1 for item in items.values()), 181, "multi-target instances")
+    equal(sum(item["file_target_count"] > 0 for item in items.values()), 151, "file-target instances")
+    equal(
+        sum(item["file_target_count"] > 0 and item["entity_target_count"] > 0 for item in items.values()),
+        121,
+        "mixed-target instances",
+    )
+    equal(sum(len(item["patch_files"]) == 1 for item in items.values()), 429, "single-file instances")
+    equal(
+        meta["diagnostics"],
+        {
+            "python_files": 622,
+            "non_python_files": 1,
+            "missing_base_files": 1,
+            "base_parse_failures": 0,
+            "patched_parse_failures": 5,
+            "patch_apply_failures": 0,
+        },
+        "target diagnostics",
+    )
+    return data
+
+
+def check_localization() -> None:
+    summary = rows("strict_localization_summary_20260719.tsv")
+    equal(len(summary), 13, "strict localization rows")
     expected = {
-        "single_file": (429, 85.8), "multi_file": (71, 14.2),
-        "has_method_target": (473, 94.6), "has_class_target": (66, 13.2),
-        "single_entity": (350, 70.0), "multi_entity": (150, 30.0),
-        "file_only_fallback": (9, 1.8),
+        "BM25_entities": (77.0, 47.190685, 32.137738, 57.2, 40.2),
+        "BM25_projection": (73.6, 49.276162, 31.095705, 57.8, 42.2),
+        "Structural_adapter": (59.2, 46.615664, 31.437884, 52.6, 42.0),
+        "Dense_projection": (83.6, 55.086248, 34.514952, 64.4, 47.0),
+        "MURAL_2src": (77.0, 54.358203, 34.936758, 63.2, 46.8),
+        "MURAL": (83.0, 57.588463, 37.950833, 67.2, 49.6),
+        "GLM5": (87.4, 54.306883, 55.257309, 66.6, 45.0),
+        "GLM5_BM25": (94.2, 68.470043, 57.958244, 79.0, 59.4),
+        "GLM5_MURAL2": (94.6, 69.881840, 58.501354, 79.2, 61.4),
+        "GLM5_MURAL": (95.2, 69.805996, 58.511191, 79.8, 61.2),
     }
-    for category, values in expected.items():
-        item = one(rows, "category", category)
-        check(f"{category} count", int(float(item["count"])), values[0], source)
-        close(f"{category} percent", float(item["percent"]), values[1], source)
+    for approach, values in expected.items():
+        row = one(summary, approach=approach)
+        equal(int(row["N"]), 500, f"{approach} N")
+        for field, value in zip(("file_hit", "target_coverage", "mrr", "hit", "complete"), values):
+            close(row[field], value, f"{approach} {field}")
+
+    comparisons = [
+        ("BM25_projection", "MURAL", "hit", 9.4, 6.093034, 10.628067, 53, 6, 1.75391874635e-10),
+        ("BM25_projection", "MURAL", "complete", 7.4, 2.714932, 9.286533, 41, 4, 9.33488308874e-09),
+        ("Dense_projection", "MURAL", "hit", 2.8, 0.530469, 3.916464, 33, 19, 0.0703942210671),
+        ("MURAL_2src", "MURAL", "hit", 4.0, 1.327360, 6.644676, 31, 11, 0.00288724797429),
+        ("GLM5_BM25", "GLM5_MURAL", "hit", 0.8, -0.450450, 3.608294, 14, 10, 0.541256189346),
+    ]
+    for baseline, treatment, metric, delta, low, high, wins, losses, p in comparisons:
+        row = pair("strict_localization_paired_20260719.tsv", baseline, treatment, metric)
+        close(row["delta"], delta, f"{baseline}->{treatment} {metric} delta")
+        close(row["clustered_ci_low"], low, f"{baseline}->{treatment} {metric} low")
+        close(row["clustered_ci_high"], high, f"{baseline}->{treatment} {metric} high")
+        equal(int(row["wins"]), wins, f"{baseline}->{treatment} {metric} wins")
+        equal(int(row["losses"]), losses, f"{baseline}->{treatment} {metric} losses")
+        close(row["mcnemar_p"], p, f"{baseline}->{treatment} {metric} p", 1e-12)
 
 
-def localization() -> None:
-    source = "mural_localization_summary_20260716.tsv"
-    rows = tsv(source)
+
+def check_frozen_rankings(targets: dict[str, Any]) -> None:
+    path = FROZEN / "strict_rankings_top50_20260719.jsonl.gz"
+    equal(
+        hashlib.sha256(path.read_bytes()).hexdigest(),
+        "7f0ffa7c5561bf132b9ff075f1e8e8d23c0aff5f0237f03f69e08de704cf5b1d",
+        "frozen ranking SHA-256",
+    )
+    spec = importlib.util.spec_from_file_location(
+        "strict_eval", ROOT / "artifacts" / "scripts" / "evaluate_strict_reference_context.py"
+    )
+    if spec is None or spec.loader is None:
+        fail("Cannot import strict evaluator")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    identity_spec = importlib.util.spec_from_file_location(
+        "entity_identity", ROOT / "artifacts" / "scripts" / "entity_identity.py"
+    )
+    if identity_spec is None or identity_spec.loader is None:
+        fail("Cannot import canonical entity identity")
+    identity_module = importlib.util.module_from_spec(identity_spec)
+    identity_spec.loader.exec_module(identity_module)
+
+    source_metrics: dict[str, list[dict[str, float]]] = {}
+    seen: set[str] = set()
+    expected_sources = {
+        "BM25_projection",
+        "Structural_adapter",
+        "Dense_projection",
+        "MURAL_2src",
+        "MURAL",
+    }
+    source_manifest = json_file(FROZEN / "source_rankings_manifest_20260719.json")
+    equal(source_manifest["frozen_rankings"]["sha256"], hashlib.sha256(path.read_bytes()).hexdigest(), "source manifest ranking hash")
+    equal(set(source_manifest["rankings"]), expected_sources, "source manifest labels")
+    equal(source_manifest["top_k"], 50, "source manifest Top-K")
+    boundary = source_manifest["retrieval_boundary"]
+    equal(boundary["benchmark_hints_included"], False, "source manifest hint boundary")
+    equal(boundary["query_fields"], ["problem_statement"], "source manifest query fields")
+    equal(
+        source_manifest["rankings"]["Dense_projection"]["encoder"],
+        "jinaai/jina-embeddings-v2-base-code@516f4baf13dec4ddddda8631e019b5737c8bc250",
+        "dense encoder revision",
+    )
+    if "--include-hints" in boundary["source_generation_command"]:
+        fail("source generation command includes benchmark hints")
+    with gzip.open(path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            row = json.loads(line)
+            instance_id = row["instance_id"]
+            if instance_id in seen:
+                fail(f"duplicate frozen ranking instance {instance_id}")
+            seen.add(instance_id)
+            equal(set(row["sources"]), expected_sources, f"{instance_id} frozen sources")
+            for source, candidates in row["sources"].items():
+                if len(candidates) > 50:
+                    fail(f"{instance_id} {source}: more than Top-50 candidates")
+                identities = [identity_module.canonical_entity_id(item) for item in candidates]
+                if any(not key[0] or not key[2] for key in identities):
+                    fail(f"{instance_id} {source}: incomplete canonical identity")
+                if len(identities) != len(set(identities)):
+                    fail(f"{instance_id} {source}: duplicate canonical identity")
+                source_metrics.setdefault(source, []).append(
+                    module.evaluate_instance(candidates, targets["items"][instance_id], 20)
+                )
+    equal(len(seen), 500, "frozen ranking population")
+    summary = rows("strict_localization_summary_20260719.tsv")
+    for source, metrics in source_metrics.items():
+        ledger = one(summary, approach=source)
+        for field in ("file_hit", "target_coverage", "mrr", "hit", "complete"):
+            observed = 100 * sum(float(item[field]) for item in metrics) / len(metrics)
+            close(observed, float(ledger[field]), f"frozen {source} {field}", 1e-5)
+
+
+def check_token_budgets() -> None:
+    summary = rows("strict_token_context_summary_20260719.tsv")
     expected = {
-        "BM25_entities": (0.770, 0.3920462482, 0.2525878538, 0.460),
-        "Structural_entities": (0.556, 0.3377373737, 0.2224038520, 0.378),
-        "BM25_projection": (0.736, 0.5010113276, 0.2881168371, 0.570),
-        "Structural_projection": (0.592, 0.4527596681, 0.2631367764, 0.506),
-        "Dense_projection": (0.830, 0.5646061688, 0.3205790961, 0.636),
-        "MURAL_without_dense": (0.770, 0.5519722222, 0.3199049014, 0.626),
-        "MURAL": (0.830, 0.5961367244, 0.3448987389, 0.672),
-        "GLM5": (0.874, 0.5298935731, 0.5123071429, 0.624),
-        "GLM5_BM25": (0.942, 0.6916631979, 0.5440595658, 0.780),
-        "GLM5_MURAL_without_dense": (0.946, 0.7112065601, 0.5476293906, 0.792),
-        "GLM5_MURAL": (0.952, 0.7163266900, 0.5495297781, 0.802),
+        2000: (45.2, 55.2, 56.8, 11.6),
+        4000: (56.2, 65.4, 66.6, 10.4),
+        8000: (62.6, 72.4, 74.8, 12.2),
     }
-    check("localization rows", len(rows), 15, source)
-    for name, values in expected.items():
-        item = one(rows, "name", name)
-        check(f"{name} N", int(item["N"]), 500, source)
-        for field, expected_value in zip(
-            ("file_rate", "method_or_entity_rate", "mrr", "hit_rate"), values
+    for budget, (bm25, dense, mural, delta) in expected.items():
+        close(one(summary, approach=f"BM25_t{budget}")["hit"], bm25, f"BM25 T{budget}")
+        close(one(summary, approach=f"Dense_t{budget}")["hit"], dense, f"Dense T{budget}")
+        close(one(summary, approach=f"MURAL_t{budget}")["hit"], mural, f"MURAL T{budget}")
+        paired = pair(
+            "strict_token_context_paired_20260719.tsv",
+            f"BM25_t{budget}",
+            f"MURAL_t{budget}",
+            "hit",
+        )
+        close(paired["delta"], delta, f"T{budget} Hit delta")
+        if float(paired["clustered_ci_low"]) <= 0:
+            fail(f"T{budget}: principal clustered interval includes zero")
+
+    packing = rows("strict_token_packing_summary_20260719.tsv")
+    expected_packing = {
+        2000: (8.948, 1861.310, 0.23983012963790792, 0.25331888377133566, 0.202),
+        4000: (19.574, 3834.142, 0.23050986001839174, 0.31373611487401787, 0.232),
+        8000: (39.306, 7657.458, 0.2355874421207958, 0.3698184773774045, 0.27),
+    }
+    for budget, values in expected_packing.items():
+        row = one(packing, source="MURAL", token_budget=str(budget))
+        for field, value in zip(
+            ("selected_mean", "context_tokens_mean", "truncated_entity_rate", "changed_line_recall", "complete_changed_line_rate"),
+            values,
         ):
-            close(f"{name} {field}", float(item[field]), expected_value, source)
-
-    source = "mural_localization_paired_20260716.tsv"
-    rows = tsv(source)
-    expected_pairs = [
-        ("BM25_entities", "BM25_projection", 0.110, 101, 46, 6.6718656940094816e-06),
-        ("Structural_entities", "Structural_projection", 0.128, 66, 2, 1.5903890617646743e-17),
-        ("MURAL_without_dense", "MURAL", 0.046, 34, 11, 0.0008240823595997426),
-        ("Dense_projection", "MURAL", 0.036, 37, 19, 0.022241389472860112),
-        ("GLM5", "GLM5_MURAL", 0.178, 89, 0, 3.2311742677852644e-27),
-        ("GLM5_BM25", "GLM5_MURAL", 0.022, 21, 10, 0.07075554598122835),
-        ("GLM5_MURAL_without_dense", "GLM5_MURAL", 0.010, 9, 4, 0.266845703125),
-    ]
-    for baseline, treatment, delta, wins, losses, p_value in expected_pairs:
-        item = pair(rows, baseline, treatment)
-        close(f"{baseline}->{treatment} delta", float(item["delta"]), delta, source)
-        check(f"{baseline}->{treatment} wins", int(item["wins"]), wins, source)
-        check(f"{baseline}->{treatment} losses", int(item["losses"]), losses, source)
-        close(f"{baseline}->{treatment} p", float(item["exact_mcnemar_p"]), p_value, source)
+            close(row[field], value, f"MURAL packing T{budget} {field}")
 
 
-def edit_targets() -> None:
-    source = "mural_edit_target_summary_20260716.tsv"
-    rows = tsv(source)
-    expected = {
-        "BM25 + projection": (0.501011, 0.446),
-        "Dense + projection": (0.564606, 0.504),
-        "MURAL w/o Dense": (0.551972, 0.490),
-        "MURAL": (0.596137, 0.534),
-        "GLM-5": (0.529894, 0.462),
-        "GLM-5 + BM25 projection": (0.691663, 0.620),
-        "GLM-5 + MURAL w/o Dense": (0.711207, 0.644),
-        "GLM-5 + MURAL": (0.716327, 0.646),
+def check_controls_and_budgets() -> None:
+    selector = rows("strict_selector_summary_20260719.tsv")
+    equal(len(selector), 6, "retained selector rows")
+    if any("Weighted" in row["approach"] for row in selector):
+        fail("exploratory weighted selector remains in paper-facing results")
+    for approach, values in {
+        "File_source_order": (24.2, 17.4),
+        "File_name_overlap": (33.6, 26.4),
+        "Within_file_BM25": (36.0, 29.4),
+        "Equal_round_robin": (53.0, 33.8),
+        "Stable_random": (13.6, 2.8),
+        "Compact_projection": (57.8, 42.2),
+    }.items():
+        row = one(selector, approach=approach)
+        close(row["hit"], values[0], f"selector {approach} Hit")
+        close(row["complete"], values[1], f"selector {approach} Complete")
+    row = pair("strict_selector_paired_20260719.tsv", "Equal_round_robin", "Compact_projection", "hit")
+    close(row["delta"], 4.8, "compact vs round-robin Hit")
+    close(row["mcnemar_p"], 0.0353236825378, "compact vs round-robin p")
+
+    prefix = rows("strict_prefix_tail_summary_20260719.tsv")
+    equal(len(prefix), 9, "retained prefix rows")
+    if any("Weighted" in row["approach"] for row in prefix):
+        fail("exploratory weighted tail remains in paper-facing results")
+    for approach, values in {
+        "OwnRemaining": (6.054, 66.6, 45.0),
+        "SameFileNeighbors": (16.736, 74.8, 56.6),
+        "EqualRoundRobin": (20.0, 77.6, 54.8),
+        "BM25Projection": (20.0, 79.0, 59.4),
+        "DenseProjection": (20.0, 80.0, 61.6),
+        "MURAL": (20.0, 79.8, 61.2),
+    }.items():
+        row = one(prefix, approach=approach)
+        for field, value in zip(("candidate_count_mean", "hit", "complete"), values):
+            close(row[field], value, f"prefix {approach} {field}")
+
+    expected_budgets = {
+        5: (62.6, 67.8, 68.0),
+        10: (66.4, 72.4, 73.8),
+        20: (66.6, 79.0, 79.8),
+        40: (66.6, 82.0, 86.0),
     }
-    check("edit-target rows", len(rows), 11, source)
+    for budget, values in expected_budgets.items():
+        summary = rows(f"strict_budget_b{budget}_summary_20260719.tsv")
+        for approach, value in zip(("Issue", "BM25", "MURAL"), values):
+            close(one(summary, approach=approach)["hit"], value, f"B{budget} {approach} Hit")
+    row = pair("strict_budget_b40_paired_20260719.tsv", "BM25", "MURAL", "hit")
+    close(row["delta"], 4.0, "B40 Hit delta")
+    close(row["mcnemar_p"], 3.58819961548e-05, "B40 Hit p", 1e-12)
+
+    sensitivity = rows("strict_rrf_sensitivity_summary_20260719.tsv")
+    for approach, hit in {
+        "k10": 69.8,
+        "k30": 68.2,
+        "k60": 67.2,
+        "k100": 67.0,
+        "dense05": 65.4,
+        "dense075": 65.6,
+        "dense125": 66.8,
+        "dense15": 67.2,
+    }.items():
+        close(one(sensitivity, approach=approach)["hit"], hit, f"RRF {approach}")
+
+
+def check_external() -> None:
+    summary = rows("strict_external_localizer_summary_20260719.tsv")
+    expected = {
+        "CoSIL": (4.046, 67.8, 51.0),
+        "CoSIL+MURAL": (20.0, 84.0, 65.2),
+        "Agentless": (2.518, 47.6, 34.6),
+        "Agentless+MURAL": (20.0, 76.4, 58.2),
+        "LocAgent": (3.784, 65.0, 49.0),
+        "LocAgent+MURAL": (20.0, 81.4, 62.4),
+        "OrcaLoca": (0.298, 14.0, 10.8),
+        "OrcaLoca+MURAL": (20.0, 70.0, 52.2),
+    }
+    for approach, values in expected.items():
+        row = one(summary, approach=approach)
+        for field, value in zip(("candidate_count_mean", "hit", "complete"), values):
+            close(row[field], value, f"{approach} {field}")
+    for baseline, delta in {
+        "CoSIL": 16.2,
+        "Agentless": 28.8,
+        "LocAgent": 16.4,
+        "OrcaLoca": 56.0,
+    }.items():
+        row = pair("strict_external_localizer_paired_20260719.tsv", baseline, f"{baseline}+MURAL", "hit")
+        close(row["delta"], delta, f"{baseline} completion delta")
+        equal(int(row["losses"]), 0, f"{baseline} prefix-preserving losses")
+        if float(row["clustered_ci_low"]) <= 0:
+            fail(f"{baseline}: completion interval includes zero")
+
+    provenance = json_file(FROZEN / "external_localizers_manifest.json")
+    equal(provenance["source_commit"], "0568e423735b399d5b089996961fea9ae142e4c7", "external source commit")
+    equal(len(provenance["files"]), 4, "external source file count")
+    if any(not re.fullmatch(r"[0-9a-f]{64}", value) for value in provenance["files"].values()):
+        fail("invalid external source SHA-256")
+
+
+
+def check_prompts_and_human() -> None:
+    summary = rows("source_bearing_prompt_summary_20260719.tsv")
+    expected = {
+        "bm25": (16.744, 4.956, 3613.916, 50.247835, 62.2, 42.0),
+        "mural": (17.302, 5.146, 3565.324, 52.419892, 64.0, 44.0),
+    }
+    for variant, values in expected.items():
+        row = one(summary, variant=variant)
+        equal(int(row["N"]), 500, f"{variant} prompt N")
+        for field, value in zip(
+            ("rendered_entities_mean", "source_entities_mean", "prompt_tokens_mean", "source_target_coverage", "source_hit", "source_complete"),
+            values,
+        ):
+            close(row[field], value, f"{variant} prompt {field}")
+        equal(int(row["verified_prompt_hashes"]), 500, f"{variant} verified prompt hashes")
+
+    prompt_rows = rows("source_bearing_prompt_instances_20260719.tsv")
+    equal(len(prompt_rows), 1000, "prompt instance rows")
+    equal(Counter(row["variant"] for row in prompt_rows), Counter({"bm25": 500, "mural": 500}), "prompt variants")
+    if any(not re.fullmatch(r"[0-9a-f]{64}", row["prompt_sha256"]) for row in prompt_rows):
+        fail("invalid rendered prompt SHA-256")
+
+    human = rows("human_window_summary_20260718.tsv")
+    expected_decisions = {"MURAL": 54, "BM25-local": 19, "Comparable": 15, "Both insufficient": 12}
+    for decision, count in expected_decisions.items():
+        row = one(human, scope="all_judgments", category=decision)
+        equal(int(row["count"]), count, f"human decision {decision}")
+    agreement = rows("human_window_agreement_20260718.tsv")[0]
+    equal(int(agreement["overlap_n"]), 20, "human overlap")
+    equal(int(agreement["agreement_n"]), 12, "human agreement")
+    close(agreement["cohen_kappa"], 0.4666666666666666, "human kappa")
+
+    strict = rows("human_window_strict_summary_20260719.tsv")
+    for stratum, count in {"MURAL_only": 31, "BM25_only": 6, "both": 24, "neither": 19}.items():
+        row = one(strict, scope="unique_instances", strict_stratum=stratum, decision="instances")
+        equal(int(row["count"]), count, f"strict human stratum {stratum}")
+    for decision, count in {"aligned": 36, "neutral": 5, "opposed": 3}.items():
+        row = one(
+            strict,
+            scope="exclusive_hit_judgments",
+            strict_stratum="MURAL_only_or_BM25_only",
+            decision=decision,
+        )
+        equal(int(row["count"]), count, f"exclusive judgment {decision}")
+
+
+def check_repair() -> None:
+    outcomes = rows("repair_equal4000_strict_outcomes_20260719.tsv")
+    equal(len(outcomes), 1000, "strict repair outcome rows")
+    aggregate: dict[str, dict[str, int]] = {}
+    for variant in ("bm25", "mural"):
+        selected = [row for row in outcomes if row["variant"] == variant]
+        equal(len(selected), 500, f"{variant} repair rows")
+        aggregate[variant] = {
+            metric: sum(int(row[metric]) for row in selected)
+            for metric in ("nonempty", "applied", "resolved")
+        }
+    equal(
+        aggregate,
+        {
+            "bm25": {"nonempty": 468, "applied": 466, "resolved": 123},
+            "mural": {"nonempty": 472, "applied": 468, "resolved": 128},
+        },
+        "repair aggregates",
+    )
+
+    summary = rows("repair_equal4000_strict_summary_20260719.tsv")
+    for variant, values in {"bm25": (468, 466, 123), "mural": (472, 468, 128)}.items():
+        row = one(summary, kind="variant", name=variant, metric="all")
+        for field, value in zip(("nonempty", "applicable", "resolved"), values):
+            equal(int(row[field]), value, f"{variant} summary {field}")
+    paired = rows("repair_equal4000_clustered_paired_20260719.tsv")
+    expected = {
+        "nonempty": (0.8, -1.075298, 4.958678, 12, 8, 0.503444671631),
+        "applied": (0.4, -1.670644, 4.958678, 12, 10, 0.831811904907),
+        "resolved": (1.0, -1.446672, 6.355932, 25, 20, 0.551484329803),
+    }
+    for metric, values in expected.items():
+        row = one(paired, baseline="bm25", treatment="mural", metric=metric)
+        for field, value in zip(
+            ("delta", "clustered_ci_low", "clustered_ci_high", "wins", "losses", "mcnemar_p"),
+            values,
+        ):
+            close(row[field], value, f"repair {metric} {field}", 1e-9)
+        summary_metric = "applicable" if metric == "applied" else metric
+        summary_row = one(
+            summary, kind="contrast", name="mural_vs_bm25", metric=summary_metric
+        )
+        for field, value in zip(
+            ("delta_pp", "ci95_low", "ci95_high", "wins", "losses", "p_exact"),
+            values,
+        ):
+            close(summary_row[field], value, f"repair summary {metric} {field}", 1e-9)
+
+    provenance = rows("repair_equal4000_strict_prediction_provenance_20260719.tsv")
+    equal(len(provenance), 1000, "repair provenance rows")
+    provenance_by_key = {
+        (row["instance_id"], row["variant"]): row
+        for row in provenance
+    }
+    equal(len(provenance_by_key), 1000, "unique repair provenance keys")
+
+    for variant in ("bm25", "mural"):
+        predictions = jsonl(RESULTS / f"repair_equal4000_strict_predictions_{variant}_20260719.jsonl")
+        official = jsonl(RESULTS / f"repair_equal4000_strict_official_{variant}_20260719.jsonl")
+        equal(len(predictions), 500, f"{variant} prediction count")
+        expected_official = aggregate[variant]["nonempty"]
+        equal(len(official), expected_official, f"{variant} official count")
+        prediction_by_id = {row["instance_id"]: row for row in predictions}
+        official_by_id = {row["instance_id"]: row for row in official}
+        equal(len(prediction_by_id), 500, f"{variant} prediction IDs")
+        equal(len(official_by_id), expected_official, f"{variant} official IDs")
+
+        for instance_id, prediction in prediction_by_id.items():
+            patch = str(prediction.get("model_patch") or "")
+            digest = hashlib.sha256(patch.encode("utf-8")).hexdigest()
+            provenance_row = provenance_by_key[(instance_id, variant)]
+            equal(
+                provenance_row["new_patch_sha256"],
+                digest,
+                f"{variant} {instance_id} provenance patch hash",
+            )
+            nonempty = int(bool(patch.strip()))
+            equal(int(provenance_row["nonempty"]), nonempty, f"{variant} {instance_id} provenance nonempty")
+            if nonempty:
+                if instance_id not in official_by_id:
+                    fail(f"{variant} {instance_id}: nonempty prediction lacks official outcome")
+                official_row = official_by_id[instance_id]
+                equal(official_row["patch_sha256"], digest, f"{variant} {instance_id} official patch hash")
+                equal(int(official_row["patch_chars"]), len(patch), f"{variant} {instance_id} patch chars")
+            elif instance_id in official_by_id:
+                fail(f"{variant} {instance_id}: empty prediction has official outcome")
+
+
+def check_java_and_cost() -> None:
+    java = rows("java_cross_language_summary_20260714.tsv")
+    expected = {
+        "Raw_BM25_entities": (61.5384615, 19.9258342, 13.4988129, 34.0659341),
+        "BM25_projection": (67.0329670, 31.9343477, 24.1405226, 47.2527473),
+        "Structural_projection": (63.7362637, 34.7318549, 24.3507117, 51.6483516),
+        "Lexical_structural_fusion": (70.3296703, 34.6052152, 25.9345240, 54.9450549),
+    }
     for name, values in expected.items():
-        item = one(rows, "name", name)
-        check(f"{name} N", int(item["N"]), 500, source)
-        close(f"{name} recall", float(item["edit_target_recall"]), values[0], source, 5e-6)
-        close(f"{name} complete", float(item["complete_edit_target_rate"]), values[1], source)
-
-    source = "mural_edit_target_paired_20260716.tsv"
-    rows = tsv(source)
-    expected_pairs = [
-        ("BM25Proj", "MURAL", 0.088, 49, 5, 3.8913883226854296e-10),
-        ("DenseProj", "MURAL", 0.030, 37, 22, 0.06744461190078899),
-        ("MURALwoDense", "MURAL", 0.044, 31, 9, 0.0006795482549932785),
-        ("GLM5", "GLM5MURAL", 0.184, 92, 0, 4.0389678347315804e-28),
-        ("GLM5BM25", "GLM5MURAL", 0.026, 20, 7, 0.0191572904586792),
-    ]
-    for baseline, treatment, delta, wins, losses, p_value in expected_pairs:
-        item = pair(rows, baseline, treatment, "complete_edit")
-        close(f"{baseline}->{treatment} complete delta", float(item["delta"]), delta, source)
-        check(f"{baseline}->{treatment} wins", int(item["wins"]), wins, source)
-        check(f"{baseline}->{treatment} losses", int(item["losses"]), losses, source)
-        close(f"{baseline}->{treatment} p", float(item["exact_mcnemar_p"]), p_value, source)
-
-
-def budget_and_sensitivity() -> None:
-    source = "mural_budget_summary_20260716.tsv"
-    rows = tsv(source)
-    expected = {
-        "Issue_B5": .604, "BM25_B5": .664, "MURAL_B5": .670,
-        "Issue_B10": .624, "BM25_B10": .724, "MURAL_B10": .738,
-        "Issue_B20": .624, "BM25_B20": .780, "MURAL_B20": .802,
-        "Issue_B40": .624, "BM25_B40": .814, "MURAL_B40": .856,
-    }
-    check("budget rows", len(rows), 12, source)
-    for name, value in expected.items():
-        close(f"{name} Hit", float(one(rows, "name", name)["hit_rate"]), value, source)
-    source = "mural_budget_paired_20260716.tsv"
-    item = pair(tsv(source), "BM25_B40", "MURAL_B40")
-    close("B40 Hit delta", float(item["delta"]), .042, source)
-    check("B40 wins/losses", (int(item["wins"]), int(item["losses"])), (23, 2), source)
-    close("B40 p", float(item["exact_mcnemar_p"]), 1.9431114196777344e-05, source)
-
-    source = "mural_rrf_sensitivity_summary_20260716.tsv"
-    rows = tsv(source)
-    expected = {
-        "k10": .682, "k30": .678, "k60": .672, "k100": .670,
-        "dense05": .654, "dense075": .656, "dense125": .672, "dense15": .676,
-    }
-    check("RRF sensitivity rows", len(rows), 8, source)
-    for name, value in expected.items():
-        close(f"{name} Hit", float(one(rows, "name", name)["hit_rate"]), value, source)
-
-
-def external_localizers() -> None:
-    source = "mural_external_localizer_summary_20260716.tsv"
-    rows = tsv(source)
-    expected = {
-        "CoSIL-Qwen2.5-32B": .656, "CoSIL-Qwen2.5-32B+MURAL": .812,
-        "LocAgent-Qwen2.5-32B": .612, "LocAgent-Qwen2.5-32B+MURAL": .782,
-        "Agentless-Qwen2.5-32B": .578, "Agentless-Qwen2.5-32B+MURAL": .766,
-        "OrcaLoca-Qwen2.5-32B": .214, "OrcaLoca-Qwen2.5-32B+MURAL": .514,
-    }
-    check("external-localizer rows", len(rows), 8, source)
-    for name, value in expected.items():
-        item = one(rows, "name", name)
-        check(f"{name} N", int(item["N"]), 500, source)
-        close(f"{name} Hit", float(item["top20_hit_rate"]), value, source)
-    source = "mural_external_localizer_paired_20260716.tsv"
-    rows = tsv(source)
-    expected_pairs = {
-        "CoSIL-Qwen2.5-32B": (.156, 78, 0),
-        "LocAgent-Qwen2.5-32B": (.170, 86, 1),
-        "Agentless-Qwen2.5-32B": (.188, 95, 1),
-        "OrcaLoca-Qwen2.5-32B": (.300, 150, 0),
-    }
-    for baseline, values in expected_pairs.items():
-        item = one(rows, "baseline", baseline)
-        close(f"{baseline} delta", float(item["delta"]), values[0], source)
-        check(f"{baseline} wins/losses", (int(item["wins"]), int(item["losses"])), values[1:], source)
-
-
-def repository_and_java() -> None:
-    source = "mural_repository_localization_20260716.tsv"
-    rows = tsv(source)
-    check("repository rows", len(rows), 26, source)
-    check("repository strata", len({item["repository"] for item in rows if item["repository"] != "ALL"}), 12, source)
-    for approach in ("BM25_projection", "MURAL"):
-        selected = [item for item in rows if item["method"] == approach and item["repository"] != "ALL"]
-        check(f"{approach} repositories", len(selected), 12, source)
-        check(f"{approach} instances", sum(int(item["N"]) for item in selected), 500, source)
-
-    source = "java_cross_language_summary_20260714.tsv"
-    rows = tsv(source)
-    expected = {
-        "Raw_BM25_entities": (.6153846154, .1992583424, .1349881290, .3406593407),
-        "BM25_projection": (.6703296703, .3193434770, .2414052262, .4725274725),
-        "Structural_projection": (.6373626374, .3473185494, .2435071169, .5164835165),
-        "Lexical_structural_fusion": (.7032967033, .3460521520, .2593452402, .5494505495),
-    }
-    check("Java row order", [item["name"] for item in rows], list(expected), source)
-    for name, values in expected.items():
-        item = one(rows, "name", name)
-        check(f"{name} N", int(item["N"]), 91, source)
+        row = one(java, name=name)
+        equal(int(row["N"]), 91, f"Java {name} N")
         for field, value in zip(("file_rate", "method_or_entity_rate", "mrr", "hit_rate"), values):
-            close(f"{name} {field}", float(item[field]), value, source)
+            close(100 * float(row[field]), value, f"Java {name} {field}", 1e-5)
+    instances = jsonl(RESULTS / "java_cross_language_instances_20260714.jsonl")
+    equal(len(instances), 91, "Java instance count")
+    equal(len({row["instance_id"] for row in instances}), 91, "Java unique IDs")
+    equal(len({row["repo"] for row in instances}), 6, "Java repository count")
 
-    source = "java_cross_language_instances_20260714.jsonl"
-    instances = jsonl(RESULTS / source)
-    ids = sorted(item["instance_id"] for item in instances)
-    check("Java instance count", len(instances), 91, source)
-    check("Java unique IDs", len(set(ids)), 91, source)
-    digest = hashlib.sha256("\n".join(ids).encode()).hexdigest()
-    manifest = json_file(INPUTS / "java_cross_language_manifest_20260714.json")
-    benchmark = manifest["benchmark"]
-    check("Java official/evaluated/excluded", (
-        benchmark["official_instances"], benchmark["evaluated_instances"],
-        benchmark["excluded_instances"]
-    ), (91, 91, 0), "java_cross_language_manifest_20260714.json")
-    check("Java instance-ID digest", digest, benchmark["instance_id_set_sha256"],
-          "java_cross_language_manifest_20260714.json")
+    paired = rows("java_cross_language_paired_20260714.tsv")
+    row = one(paired, baseline="Raw_BM25_entities", treatment="BM25_projection", metric="mrr")
+    close(100 * float(row["delta"]), 10.6417097, "Java BM25 projection MRR delta")
+    close(100 * float(row["ci95_low"]), 3.9955544, "Java BM25 projection MRR low")
+    row = one(paired, baseline="Raw_BM25_entities", treatment="BM25_projection", metric="hit")
+    close(row["exact_mcnemar_p"], 0.0576126729138, "Java BM25 projection Hit p")
 
-    evaluation = manifest["evaluation"]
-    manifest_source = "java_cross_language_manifest_20260714.json"
-    check(
-        "Java evaluator hash",
-        hashlib.sha256((ROOT / evaluation["script"]).read_bytes()).hexdigest(),
+    java_manifest = json_file(
+        ROOT / "artifacts" / "inputs" / "java_cross_language_manifest_20260714.json"
+    )
+    evaluation = java_manifest["evaluation"]
+    java_script = ROOT / evaluation["script"]
+    equal(
+        hashlib.sha256(java_script.read_bytes()).hexdigest(),
         evaluation["script_sha256"],
-        manifest_source,
+        "Java evaluator embedded hash",
     )
-    output_files = {
-        "summary": "java_cross_language_summary_20260714.tsv",
-        "paired": "java_cross_language_paired_20260714.tsv",
-        "targets": "java_cross_language_targets_20260714.json",
-        "instances": "java_cross_language_instances_20260714.jsonl",
-    }
-    for label, filename in output_files.items():
-        check(
-            f"Java {label} hash",
-            hashlib.sha256((RESULTS / filename).read_bytes()).hexdigest(),
-            evaluation["output_sha256"][label],
-            manifest_source,
-        )
-    target_meta = json_file(RESULTS / output_files["targets"])["meta"]
-    check("Java selector version", target_meta["selector_version"],
-          evaluation["selector_version"], manifest_source)
+    equal(
+        hashlib.sha256(
+            (RESULTS / "java_cross_language_paired_20260714.tsv").read_bytes()
+        ).hexdigest(),
+        evaluation["output_sha256"]["paired"],
+        "Java paired-ledger embedded hash",
+    )
+
+    cost = rows("context_construction_cost_20260716.tsv")
+    close(one(cost, stage="three_source_equal_weight_rrf")["mean_s"], 0.0091, "RRF mean seconds")
+    close(one(cost, stage="structural_adapter")["median_s"], 66.9057985, "structural median seconds")
 
 
-def costs_and_audits() -> None:
-    source = "context_construction_cost_20260716.tsv"
-    rows = tsv(source)
-    stages = [
-        "structural_adapter", "bm25_entity_projection",
-        "dense_entity_projection", "three_source_equal_weight_rrf",
+def check_manifest() -> None:
+    manifest = json_file(MANIFEST)
+    equal(manifest["schema_version"], 2, "manifest schema")
+    equal(manifest["python_benchmark"]["instances"], 500, "manifest Python population")
+    equal(manifest["strict_reference"]["target_counts"]["total"], 1044, "manifest target count")
+    equal(manifest["java_benchmark"]["evaluated_instances"], 91, "manifest Java population")
+    equal(manifest["repair"]["prompt_hash_rows"], 1000, "manifest prompt hashes")
+    for name, record in manifest["files"].items():
+        path = ROOT / name
+        if not path.is_file():
+            fail(f"manifest file missing: {name}")
+        equal(path.stat().st_size, record["bytes"], f"manifest size {name}")
+        equal(hashlib.sha256(path.read_bytes()).hexdigest(), record["sha256"], f"manifest hash {name}")
+
+
+def check_instance_ledgers() -> None:
+    for name in sorted(EXPECTED_RESULTS):
+        if "_instances_" not in name or not name.endswith(".tsv"):
+            continue
+        items = rows(name)
+        ids = {row["instance_id"] for row in items}
+        equal(len(ids), 500, f"{name} unique instances")
+        if len(items) % 500:
+            fail(f"{name}: row count {len(items)} is not a 500-instance multiple")
+
+
+def check_removed_terms() -> None:
+    paper_facing = [
+        ROOT / "README.md",
+        ROOT / "artifacts" / "README.md",
+        ROOT / "artifacts" / "RESULT_TRACEABILITY.md",
     ]
-    check("cost stage order", [item["stage"] for item in rows], stages, source)
-    for item in rows:
-        check(f"{item['stage']} N", int(item["N"]), 500, source)
-        value = float(item["total_s"])
-        check(f"{item['stage']} nonnegative time", value, ">=0", source, value >= 0)
-    source = "time_boundary_external_artifact_sensitivity_20260531.tsv"
-    check("time-boundary rows", len(tsv(source)), 2, source)
-    for source in (
-        "kg_evidence_graph_tse_timesafe_main_20260529_v6_audit_final.json",
-        "patch_derived_context_targets_20260702.json",
-    ):
-        value = json_file(RESULTS / source)
-        check(f"{source} nonempty", bool(value), True, source)
-
-    rendering_source = "repair_equal4000_context_rendering_20260718.tsv"
-    rendering_path = RESULTS / rendering_source
-    if rendering_path.exists():
-        rendering_rows = tsv(rendering_source)
-        expected_ids = set(
-            json_file(RESULTS / "patch_derived_context_targets_20260702.json")[
-                "items"
-            ]
-        )
-        rendering_keys = {
-            (row["variant"], row["instance_id"]) for row in rendering_rows
-        }
-        check("context rendering rows", len(rendering_rows), 1000, rendering_source)
-        check(
-            "context rendering keys unique",
-            len(rendering_keys),
-            len(rendering_rows),
-            rendering_source,
-        )
-        for variant in ("bm25", "mural"):
-            observed_ids = {
-                row["instance_id"]
-                for row in rendering_rows
-                if row["variant"] == variant
-            }
-            check(
-                f"{variant} context rendering IDs",
-                observed_ids,
-                expected_ids,
-                rendering_source,
-            )
+    for path in paper_facing:
+        text = path.read_text(encoding="utf-8")
+        if "LocalPathRank" in text:
+            fail(f"obsolete LocalPathRank term remains in {path.relative_to(ROOT)}")
 
 
-def human_window_audit() -> None:
-    items_source = "human_window_items_20260718.json"
-    items_payload = json_file(RESULTS / items_source)
-    check("human window item rows", len(items_payload["items"]), 80, items_source)
-    check(
-        "human window item IDs",
-        len({item["annotation_id"] for item in items_payload["items"]}),
-        80,
-        items_source,
-    )
-    annotation_source = "human_window_annotations_20260718.tsv"
-    annotations = tsv(annotation_source)
-    check("human window judgments", len(annotations), 100, annotation_source)
-    check(
-        "human window annotators",
-        {row["annotator"] for row in annotations},
-        {"A", "B"},
-        annotation_source,
-    )
-    check(
-        "human window instances",
-        len({row["annotation_id"] for row in annotations}),
-        80,
-        annotation_source,
-    )
-    check(
-        "human window preference counts",
-        dict(Counter(row["preferred_method"] for row in annotations)),
-        {"MURAL": 54, "BM25-local": 19, "Comparable": 15, "Both insufficient": 12},
-        annotation_source,
-    )
-    manifest_source = "human_window_manifest_20260718.tsv"
-    manifest = tsv(manifest_source)
-    check("human window manifest rows", len(manifest), 80, manifest_source)
-    check(
-        "human window objective strata",
-        dict(Counter(row["objective_outcome"] for row in manifest)),
-        {"仅MURAL命中": 43, "仅BM25-local命中": 14, "两者均命中": 12, "两者均未命中": 11},
-        manifest_source,
-    )
-    summary_source = "human_window_summary_20260718.tsv"
-    summary = tsv(summary_source)
-    check("human window summary rows", len(summary), 17, summary_source)
-    agreement_source = "human_window_agreement_20260718.tsv"
-    agreement = tsv(agreement_source)
-    check("human window agreement rows", len(agreement), 1, agreement_source)
-    item = agreement[0]
-    check("human window overlap", int(item["overlap_n"]), 20, agreement_source)
-    check("human window agreements", int(item["agreement_n"]), 12, agreement_source)
-    close("human window observed agreement", float(item["observed_agreement"]), 0.60, agreement_source)
-    close(
-        "human window Cohen kappa",
-        float(item["cohen_kappa"]),
-        0.4666666666666666,
-        agreement_source,
-    )
-
-
-def reviewer_controls() -> None:
-    token_source = "token_budget_context_summary_20260718.tsv"
-    token_rows = tsv(token_source)
-    check("token control rows", len(token_rows), 12, token_source)
-    check("token control N", {int(row["N"]) for row in token_rows}, {500}, token_source)
-    mural_4k = where_one(token_rows, source="MURAL", token_budget="4000")
-    close("MURAL token Hit@4000", float(mural_4k["hit_rate"]), 0.662, token_source)
-    close(
-        "MURAL rendered tokens@4000",
-        float(mural_4k["context_tokens_mean"]),
-        3832.024,
-        token_source,
-    )
-    token_pair_source = "token_budget_context_paired_20260718.tsv"
-    token_pairs = tsv(token_pair_source)
-    mural_bm25_4k = where_one(
-        token_pairs,
-        baseline="BM25_projection",
-        treatment="MURAL",
-        token_budget="4000",
-        metric="hit",
-    )
-    close("MURAL-BM25 token delta@4000", float(mural_bm25_4k["delta"]), 0.106, token_pair_source)
-    close(
-        "MURAL-BM25 token p@4000",
-        float(mural_bm25_4k["exact_mcnemar_p"]),
-        1.3280368233066497e-11,
-        token_pair_source,
-        1e-18,
-    )
-
-    fallback_source = "localization_nonfallback_summary_20260718.tsv"
-    fallback_rows = tsv(fallback_source)
-    check("nonfallback N", {int(row["N"]) for row in fallback_rows}, {491}, fallback_source)
-    close(
-        "nonfallback MURAL Hit",
-        float(one(fallback_rows, "name", "MURAL")["hit_rate"]),
-        0.6680244399185336,
-        fallback_source,
-    )
-
-    selector_source = "selector_simple_summary_20260718.tsv"
-    selector_rows = tsv(selector_source)
-    close(
-        "compact selector Hit",
-        float(one(selector_rows, "name", "EntityProjection")["hit_rate"]),
-        0.57,
-        selector_source,
-    )
-    close(
-        "weighted selector Hit",
-        float(one(selector_rows, "name", "WeightedFeatures")["hit_rate"]),
-        0.60,
-        selector_source,
-    )
-
-    tail_source = "fixed_prefix_tail_summary_20260718.tsv"
-    tail_rows = tsv(tail_source)
-    close("complete-tail MURAL Hit", float(one(tail_rows, "name", "MURAL")["hit_rate"]), 0.802, tail_source)
-    count_source = "fixed_prefix_tail_counts_20260718.tsv"
-    count_rows = tsv(count_source)
-    check(
-        "MURAL complete tails",
-        int(one(count_rows, "tail", "MURAL")["complete_20"]),
-        500,
-        count_source,
-    )
-
-    history_source = "history_ablation_summary_20260718.tsv"
-    history_rows = tsv(history_source)
-    close(
-        "code-only fusion Hit",
-        float(one(history_rows, "name", "MURALCodeOnly")["hit_rate"]),
-        0.642,
-        history_source,
-    )
-    close(
-        "historical fusion Hit",
-        float(one(history_rows, "name", "MURALHistorical")["hit_rate"]),
-        0.672,
-        history_source,
-    )
-
-    transition_source = "repair_equal4000_transition_summary_20260718.tsv"
-    transition_rows = tsv(transition_source)
-    resolved = one(transition_rows, "outcome", "resolved")
-    check(
-        "repair resolved transitions",
-        (int(resolved["both"]), int(resolved["baseline_only"]), int(resolved["treatment_only"]), int(resolved["neither"])),
-        (102, 19, 25, 354),
-        transition_source,
-    )
-
-
-def repair_equal4000() -> None:
-    variants = ("bm25", "mural")
-    outcome_source = "repair_equal4000_outcomes_20260718.tsv"
-    outcome_rows = tsv(outcome_source)
-    outcome_by_key = {
-        (row["variant"], row["instance_id"]): row for row in outcome_rows
-    }
-    check("equal4000 outcome rows", len(outcome_rows), 1000, outcome_source)
-    check(
-        "equal4000 outcome keys unique",
-        len(outcome_by_key),
-        len(outcome_rows),
-        outcome_source,
-    )
-    id_sets = {
-        variant: {
-            row["instance_id"] for row in outcome_rows if row["variant"] == variant
-        }
-        for variant in variants
-    }
-    for variant in variants:
-        check(f"equal4000 {variant} N", len(id_sets[variant]), 500, outcome_source)
-    check(
-        "equal4000 variants share IDs",
-        id_sets["bm25"],
-        id_sets["mural"],
-        outcome_source,
-    )
-    invalid_flags = []
-    for row in outcome_rows:
-        flags = tuple(int(row[field]) for field in ("nonempty", "applied", "resolved"))
-        if any(value not in (0, 1) for value in flags) or not (
-            flags[2] <= flags[1] <= flags[0]
-        ):
-            invalid_flags.append((row["variant"], row["instance_id"], flags))
-    check("equal4000 outcome flags", len(invalid_flags), 0, outcome_source)
-
-    summary_source = "repair_equal4000_summary_20260718.tsv"
-    summary_rows = tsv(summary_source)
-    variant_rows = [row for row in summary_rows if row["kind"] == "variant"]
-    contrast_rows = [row for row in summary_rows if row["kind"] == "contrast"]
-    check("equal4000 summary rows", len(summary_rows), 5, summary_source)
-    check(
-        "equal4000 summary variants",
-        sorted(row["name"] for row in variant_rows),
-        sorted(variants),
-        summary_source,
-    )
-    check("equal4000 contrast rows", len(contrast_rows), 3, summary_source)
-
-    values: dict[str, dict[str, dict[str, bool]]] = {}
-    metric_fields = (
-        ("nonempty", "nonempty"),
-        ("applicable", "applied"),
-        ("resolved", "resolved"),
-    )
-    for variant in variants:
-        rows = [row for row in outcome_rows if row["variant"] == variant]
-        summary = one(variant_rows, "name", variant)
-        values[variant] = {
-            metric: {
-                row["instance_id"]: bool(int(row[field])) for row in rows
-            }
-            for metric, field in metric_fields
-        }
-        counts = {
-            "nonempty": sum(int(row["nonempty"]) for row in rows),
-            "applicable": sum(int(row["applied"]) for row in rows),
-            "resolved": sum(int(row["resolved"]) for row in rows),
-            "patch_apply_failed": sum(
-                row["error"] == "patch_apply_failed" for row in rows
-            ),
-            "test_timeout": sum(
-                row["error"].startswith("test_timeout") for row in rows
-            ),
-        }
-        for field, count in counts.items():
-            check(f"equal4000 {variant} {field}", int(summary[field]), count, summary_source)
-        for count_field, percent_field in (
-            ("nonempty", "nonempty_percent"),
-            ("applicable", "applicable_percent"),
-            ("resolved", "resolved_percent"),
-        ):
-            close(
-                f"equal4000 {variant} {count_field} percent",
-                float(summary[percent_field]),
-                counts[count_field] / 5.0,
-                summary_source,
-                5e-4,
-            )
-        close(
-            f"equal4000 {variant} conditional application",
-            float(summary["applicable_given_nonempty_percent"]),
-            100.0 * counts["applicable"] / counts["nonempty"],
-            summary_source,
-            5e-4,
-        )
-
-    def exact_mcnemar(wins: int, losses: int) -> float:
-        discordant = wins + losses
-        if discordant == 0:
-            return 1.0
-        tail = sum(
-            math.comb(discordant, index)
-            for index in range(min(wins, losses) + 1)
-        )
-        return min(1.0, 2.0 * tail / (2**discordant))
-
-    ordered_ids = [
-        row["instance_id"] for row in outcome_rows if row["variant"] == "bm25"
-    ]
-    for metric, _ in metric_fields:
-        row = pair(contrast_rows, "bm25", "mural", metric)
-        baseline = values["bm25"][metric]
-        treatment = values["mural"][metric]
-        wins = sum(treatment[item] and not baseline[item] for item in ordered_ids)
-        losses = sum(baseline[item] and not treatment[item] for item in ordered_ids)
-        difference = np.array(
-            [float(treatment[item]) - float(baseline[item]) for item in ordered_ids]
-        )
-        rng = np.random.default_rng(7)
-        means = np.empty(10_000, dtype=float)
-        for start in range(0, 10_000, 500):
-            stop = min(start + 500, 10_000)
-            indexes = rng.integers(
-                0, len(difference), size=(stop - start, len(difference))
-            )
-            means[start:stop] = difference[indexes].mean(axis=1)
-        low, high = np.percentile(means, [2.5, 97.5]) * 100
-        delta = 100.0 * difference.mean()
-        close(f"equal4000 {metric} delta", float(row["delta_pp"]), delta, summary_source, 5e-4)
-        close(f"equal4000 {metric} CI low", float(row["ci95_low"]), low, summary_source, 5e-4)
-        close(f"equal4000 {metric} CI high", float(row["ci95_high"]), high, summary_source, 5e-4)
-        check(f"equal4000 {metric} wins", int(row["wins"]), wins, summary_source)
-        check(f"equal4000 {metric} losses", int(row["losses"]), losses, summary_source)
-        close(
-            f"equal4000 {metric} exact p",
-            float(row["p_exact"]),
-            exact_mcnemar(wins, losses),
-            summary_source,
-            5e-10,
-        )
-
-    assembly_source = "repair_equal4000_assembly_20260718.tsv"
-    assembly_rows = tsv(assembly_source)
-    assembly_by_key = {
-        (row["variant"], row["instance_id"]): row for row in assembly_rows
-    }
-    check("equal4000 assembly rows", len(assembly_rows), 1000, assembly_source)
-    check("equal4000 assembly keys", set(assembly_by_key), set(outcome_by_key), assembly_source)
-    protocol_failures = []
-    for key, row in assembly_by_key.items():
-        try:
-            extra_body = json.loads(row["generation_extra_body"])
-        except json.JSONDecodeError:
-            extra_body = {}
-        valid = (
-            row["first_prompt_profile"] == "compact"
-            and row["context_profile_version"] == "rank_stratified_v3_allfiles"
-            and int(row["response_prefill"]) == 0
-            and int(row["max_retries"]) == 1
-            and 0 < int(row["first_prompt_tokens"]) <= 4000
-            and extra_body.get("enable_thinking") is False
-            and int(row["nonempty"]) == int(outcome_by_key[key]["nonempty"])
-        )
-        if not valid:
-            protocol_failures.append(key)
-    check("equal4000 assembly protocol", len(protocol_failures), 0, assembly_source)
-
-    rendering_source = "repair_equal4000_context_rendering_20260718.tsv"
-    rendering_rows = tsv(rendering_source)
-    rendering_by_key = {
-        (row["variant"], row["instance_id"]): row for row in rendering_rows
-    }
-    check("equal4000 rendering rows", len(rendering_rows), 1000, rendering_source)
-    check("equal4000 rendering keys", set(rendering_by_key), set(outcome_by_key), rendering_source)
-    rendering_failures = []
-    for key, row in rendering_by_key.items():
-        candidate = int(row["candidate_entities"])
-        rendered = int(row["rendered_entities"])
-        source_entities = int(row["source_entities"])
-        valid = (
-            0 <= source_entities <= rendered <= candidate <= 20
-            and 0 < int(row["prompt_tokens"]) <= 4000
-            and len(row["context_sha256"]) == 64
-            and len(row["prompt_sha256"]) == 64
-        )
-        if not valid:
-            rendering_failures.append(key)
-    check("equal4000 rendering protocol", len(rendering_failures), 0, rendering_source)
-
-    mapping_source = "repair_equal4000_prediction_mapping_20260718.tsv"
-    mapping_rows = tsv(mapping_source)
-    mapping_by_key = {
-        (row["variant"], row["instance_id"]): row for row in mapping_rows
-    }
-    check("equal4000 mapping rows", len(mapping_rows), 1000, mapping_source)
-    check("equal4000 mapping keys", set(mapping_by_key), set(outcome_by_key), mapping_source)
-    mapping_failures = []
-    for key, row in mapping_by_key.items():
-        valid = (
-            int(row["nonempty"]) == int(assembly_by_key[key]["nonempty"])
-            and row["patch_sha256"] == assembly_by_key[key]["patch_sha256"]
-            and row["prompt_sha256"] == rendering_by_key[key]["prompt_sha256"]
-            and bool(row["canonical_model"]) == bool(int(row["nonempty"]))
-        )
-        if not valid:
-            mapping_failures.append(key)
-    check("equal4000 mapping consistency", len(mapping_failures), 0, mapping_source)
-
-    dedup_source = "repair_equal4000_deduplication_summary_20260718.json"
-    dedup = json_file(RESULTS / dedup_source)
-    nonempty = sum(int(row["nonempty"]) for row in mapping_rows)
-    reuses = sum(int(row["reused_identical_patch"]) for row in mapping_rows)
-    check("equal4000 dedup variants", dedup["variants"], list(variants), dedup_source)
-    check("equal4000 dedup predictions", dedup["variant_predictions"], 1000, dedup_source)
-    check("equal4000 dedup nonempty", dedup["nonempty_variant_predictions"], nonempty, dedup_source)
-    check("equal4000 dedup reuses", dedup["identical_patch_reuses"], reuses, dedup_source)
-    check("equal4000 canonical predictions", dedup["canonical_predictions"], nonempty - reuses, dedup_source)
-    check("equal4000 prompt-match reuse", dedup["reuse_requires_prompt_match"], True, dedup_source)
-    check(
-        "equal4000 prompt-audit hash",
-        dedup["prompt_audit_sha256"],
-        hashlib.sha256((RESULTS / rendering_source).read_bytes()).hexdigest(),
-        dedup_source,
-    )
-
-    transition_source = "repair_equal4000_transition_summary_20260718.tsv"
-    transition_rows = tsv(transition_source)
-    check("equal4000 transition rows", len(transition_rows), 3, transition_source)
-    for metric, _ in metric_fields:
-        row = one(transition_rows, "outcome", "applied" if metric == "applicable" else metric)
-        baseline = values["bm25"][metric]
-        treatment = values["mural"][metric]
-        expected = (
-            sum(baseline[item] and treatment[item] for item in ordered_ids),
-            sum(baseline[item] and not treatment[item] for item in ordered_ids),
-            sum(treatment[item] and not baseline[item] for item in ordered_ids),
-            sum(not baseline[item] and not treatment[item] for item in ordered_ids),
-        )
-        observed = tuple(int(row[field]) for field in ("both", "baseline_only", "treatment_only", "neither"))
-        check(f"equal4000 {metric} transitions", observed, expected, transition_source)
-    transition_instances = tsv("repair_equal4000_transitions_20260718.tsv")
-    check("equal4000 transition instances", len(transition_instances), 500, "repair_equal4000_transitions_20260718.tsv")
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--scope", choices=("core", "all"), default="core")
-    parser.add_argument("--json-output", type=Path)
-    args = parser.parse_args()
-    try:
-        inventory(args.scope)
-        setup()
-        localization()
-        edit_targets()
-        budget_and_sensitivity()
-        external_localizers()
-        repository_and_java()
-        costs_and_audits()
-        human_window_audit()
-        reviewer_controls()
-        if args.scope == "all":
-            repair_equal4000()
-    except (AssertionError, FileNotFoundError, KeyError, ValueError) as exc:
-        check("verification execution", str(exc), "no exception", "verifier", False)
-    failures = [item for item in CHECKS if not item["ok"]]
-    payload = {"scope": args.scope, "checks": len(CHECKS), "failures": len(failures), "results": CHECKS}
-    if args.json_output:
-        args.json_output.parent.mkdir(parents=True, exist_ok=True)
-        args.json_output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    for item in failures:
-        print(f"FAIL: {item['name']}: observed={item['observed']!r}, "
-              f"expected={item['expected']!r} ({item['source']})")
-    print(f"Verified {len(CHECKS)} checks in {args.scope} scope; {len(failures)} failure(s).")
-    return 1 if failures else 0
+def main() -> None:
+    check_inventory()
+    check_instance_ledgers()
+    targets = check_targets()
+    check_localization()
+    check_frozen_rankings(targets)
+    check_token_budgets()
+    check_controls_and_budgets()
+    check_external()
+    check_prompts_and_human()
+    check_repair()
+    check_java_and_cost()
+    check_removed_terms()
+    check_manifest()
+    print("MURAL paper artifact verification passed.")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

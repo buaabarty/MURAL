@@ -1,9 +1,0 @@
-name	N	ranked_nonempty	file_rate	method_or_entity_rate	mrr	top20_hit_rate	source
-CoSIL-Qwen2.5-32B+MURAL	500	500	0.940000	0.722102	0.538737	0.812000	temp_run/CoSIL-release/loc_to_patch_verified/CoSIL/CoSIL_qwen_coder_32b_func.jsonl + temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src
-LocAgent-Qwen2.5-32B+MURAL	500	500	0.924000	0.694426	0.569209	0.782000	temp_run/CoSIL-release/loc_to_patch_verified/locagent/locagent_qwen_coder_32b_func.jsonl + temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src
-Agentless-Qwen2.5-32B+MURAL	500	500	0.922000	0.678195	0.464103	0.766000	temp_run/CoSIL-release/loc_to_patch_verified/agentless/agentless_qwen_coder_32b_func.jsonl + temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src
-CoSIL-Qwen2.5-32B	500	494	0.850000	0.558750	0.520400	0.656000	temp_run/CoSIL-release/loc_to_patch_verified/CoSIL/CoSIL_qwen_coder_32b_func.jsonl
-LocAgent-Qwen2.5-32B	500	430	0.762000	0.520109	0.530190	0.612000	temp_run/CoSIL-release/loc_to_patch_verified/locagent/locagent_qwen_coder_32b_func.jsonl
-Agentless-Qwen2.5-32B	500	486	0.814000	0.482900	0.432131	0.578000	temp_run/CoSIL-release/loc_to_patch_verified/agentless/agentless_qwen_coder_32b_func.jsonl
-OrcaLoca-Qwen2.5-32B+MURAL	500	500	0.886000	0.431564	0.237096	0.514000	temp_run/CoSIL-release/loc_to_patch_verified/orcaloca/orcaloca_qwen_coder_32b_func.jsonl + temp_run/mural_experiment_additions/selector_compact_main_20260715/mural_3src
-OrcaLoca-Qwen2.5-32B	500	480	0.690000	0.175671	0.167583	0.214000	temp_run/CoSIL-release/loc_to_patch_verified/orcaloca/orcaloca_qwen_coder_32b_func.jsonl

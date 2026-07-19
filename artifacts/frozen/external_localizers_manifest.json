@@ -1,0 +1,11 @@
+{
+  "source_repository": "https://github.com/ZhonghaoJiang/CoSIL.git",
+  "source_commit": "0568e423735b399d5b089996961fea9ae142e4c7",
+  "files": {
+    "CoSIL/CoSIL_qwen_coder_32b_func.jsonl": "f9e6026ee4dc1279f7d691c45d63b52f82dd332eb1f50eaf946efd9956c49040",
+    "agentless/agentless_qwen_coder_32b_func.jsonl": "0e368b8922a79893a66786186620eda1917ce2caf94edde461029521d7868b01",
+    "locagent/locagent_qwen_coder_32b_func.jsonl": "3f3166a85574ef686e4379a07860a49cd857f799effb43ad25191153247fea59",
+    "orcaloca/orcaloca_qwen_coder_32b_func.jsonl": "1864d962f4c094c9a8cf1cc0bd0376a5f7feb4dd3e6892c65620519c02c23cd9"
+  },
+  "note": "The evaluator consumes the upstream released Qwen2.5-Coder-32B function-localization outputs. The files are referenced by immutable commit and SHA-256 rather than redistributed."
+}

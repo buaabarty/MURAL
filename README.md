@@ -1,63 +1,55 @@
 # MURAL
 
-MURAL (Multi-source Unification of Retrieval And Localization) constructs a
-fixed-budget code context for issue-driven repository repair. Each retrieval
-adapter emits ranked files, one shared Entity Projection operator resolves those
-files into concrete code entities, and reciprocal-rank fusion (RRF) combines the
-entity rankings. MURAL can also preserve an existing localizer prefix and fill
-only its remaining context slots.
+MURAL (Multi-source Unification of Retrieval And Localization) constructs
+bounded code context for issue-driven repository repair. BM25 and dense
+ranked-file adapters feed one deterministic Entity Projection operator. The
+structural adapter canonically unifies its native entity ranking with the same
+projection applied to structurally ranked files. Reciprocal-rank fusion combines
+the three entity rankings, and prefix-preserving filling completes an upstream
+localizer without changing its resolved prefix.
 
-The default configuration uses three interchangeable sources:
+The default configuration combines BM25 lexical retrieval, dense code
+retrieval, and typed structural retrieval. Every adapter obeys the same entity
+identity and budget contract before fusion. The historical `kgcompass/` package
+name remains for API compatibility.
 
-- lexical file retrieval with BM25;
-- dense code retrieval;
-- a typed structural repository adapter.
-
-The structural adapter is one source implementation, not a prerequisite for the
-framework. The historical `kgcompass/` package name remains for API
-compatibility.
-
-## Verify the paper-facing results
+## Verify the paper-facing artifact
 
 ```bash
-python3 artifacts/scripts/verify_paper_results.py --scope all
+python3 artifacts/scripts/verify_paper_results.py
 ```
 
-The verifier checks the exact retained result inventory, benchmark completeness,
-aggregate values, paired bootstrap intervals, exact McNemar tests for
-nonempty, applicable-patch-yield, and resolved repair outcomes, conditional
-application rates, prediction provenance, and the cross-language ID set,
-selector version, evaluator hash, blinded-window annotation counts and
-agreement, and output hashes. No API key is
-stored in this repository.
+The verifier checks the retained result inventory, 1,044-target mapping, all
+article-facing aggregates and paired statistics, prompt hashes, human-audit
+counts, the complete Java population, frozen ranking digest, and every SHA-256
+entry in the submission manifest.
 
-## Repository layout
+## Evaluation scope
+
+- all 500 SWE-bench Verified instances, with entity targets matched by exact
+  path, kind, and qualified symbol and out-of-contract regions matched by an
+  exact-path fallback;
+- Top-20 localization, 2,000--8,000-token controls, selector controls, source
+  composition, RRF sensitivity, and fixed-prefix completion;
+- four released Qwen2.5-32B localizer outputs completed through the same
+  prefix-preserving interface;
+- all 91 SWE-bench-Java Verified instances across all six repositories;
+- 100 blinded judgments over 80 Python instances;
+- matched 4,000-token GLM-5.2 repair on all 500 Python instances, evaluated by
+  the official SWE-bench harness.
+
+## Layout
 
 | Path | Purpose |
 | --- | --- |
-| `kgcompass/` | Source adapters, localization, context rendering, and repair integration. |
-| `artifacts/scripts/` | Exporters, evaluators, statistical analyzers, and the result verifier. |
-| `artifacts/results/` | Paper-facing aggregate and per-instance ledgers only. |
-| `artifacts/inputs/` | Frozen provenance records and Java structural-source inputs. |
-| `artifacts/prompts/` | Verbatim localization and repair prompts. |
-| `artifacts/RESULT_TRACEABILITY.md` | Claim-to-ledger mapping and rerun commands. |
-
-The retained evaluation covers:
-
-- all 500 SWE-bench Verified instances for localization and edit-target
-  coverage;
-- BM25, dense, structural, and released-LLM source controls under one Top-20
-  entity budget;
-- source composition, RRF, budget, and repository-level analyses;
-- all 91 official SWE-bench-Java Verified instances for the cross-language
-  adapter check;
-- matched 4,000-token GLM-5.2 repair and official test-oracle outcomes for
-  BM25 and MURAL on all 500 SWE-bench Verified instances;
-- 100 blinded MURAL--BM25 window judgments over 80 stratified instances;
-- measured context-construction time and memory.
-
-See `artifacts/README.md` for the publication inventory and
-`artifacts/RESULT_TRACEABILITY.md` for exact provenance.
+| `kgcompass/` | Retrieval, context rendering, and repair integration. |
+| `artifacts/scripts/` | Exporters, evaluators, statistical analyzers, and verifier. |
+| `artifacts/results/` | Retained aggregate and per-instance paper ledgers. |
+| `artifacts/frozen/` | Compact Top-50 rankings and external-source provenance. |
+| `artifacts/inputs/` | Frozen Java inputs and benchmark manifests. |
+| `artifacts/prompts/` | Localization and repair prompts. |
+| `artifacts/submission_manifest_20260719.json` | Protocol and SHA-256 inventory. |
+| `artifacts/RESULT_TRACEABILITY.md` | Claim-to-ledger and regeneration map. |
 
 ## Environment
 
@@ -67,16 +59,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Full reruns require the benchmark repositories and archived upstream localizer
-outputs listed in `artifacts/RESULT_TRACEABILITY.md`. Hosted repair generation
-reads its key from `AUTODL_API_KEY`; the key must be supplied through the
-environment.
-
-## Web demo
-
-```bash
-pip install -r requirements_web.txt
-python3 demo_web.py
-```
-
-The Flask entry point is also available through `python3 app.py`.
+Full source regeneration additionally requires benchmark repository checkouts,
+Neo4j for the structural adapter, and the pinned dense encoder. Hosted repair
+generation reads `AUTODL_API_KEY` from the environment; no credential is stored
+in this repository.

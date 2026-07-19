@@ -1,0 +1,6 @@
+baseline	treatment	metric	delta	clustered_ci_low	clustered_ci_high	wins	losses	mcnemar_p
+BM25	MURAL	file_hit	1.000000	0.303490	2.622951	7	2	0.1796875
+BM25	MURAL	target_coverage	1.335952	-0.340398	3.786265			
+BM25	MURAL	hit	0.800000	-0.450450	3.608294	14	10	0.541256189346
+BM25	MURAL	mrr	0.552946	0.260860	0.732796			
+BM25	MURAL	complete	1.800000	-0.492641	4.693334	16	7	0.0931396484375

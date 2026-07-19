@@ -165,12 +165,7 @@ def round_robin(
 
 
 def identity(item: dict[str, Any]) -> tuple[Any, ...]:
-    return (
-        str(item.get("file_path") or ""),
-        str(item.get("signature") or item.get("name") or ""),
-        int(item.get("start_line") or 0),
-        int(item.get("end_line") or 0),
-    )
+    return miner.canonical_entity_id(item)
 
 
 def rank_variant(

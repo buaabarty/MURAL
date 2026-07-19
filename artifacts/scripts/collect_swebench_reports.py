@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -45,6 +46,10 @@ def count_tests(status: object, outcome: str) -> int:
     return len(values) if isinstance(values, list) else 0
 
 
+def sha256(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
 def terminal_error_row(
     instance_id: str, patch: str, log_path: Path
 ) -> dict[str, object] | None:
@@ -66,6 +71,7 @@ def terminal_error_row(
     return {
         "instance_id": instance_id,
         "patch_chars": len(patch),
+        "patch_sha256": sha256(patch),
         "patch_successfully_applied": applied,
         "resolved": False,
         "fail_to_pass_success": 0,
@@ -117,6 +123,7 @@ def main() -> int:
                     {
                         "instance_id": instance_id,
                         "patch_chars": len(patch),
+                        "patch_sha256": sha256(patch),
                         "patch_successfully_applied": False,
                         "resolved": False,
                         "fail_to_pass_success": 0,
@@ -143,6 +150,7 @@ def main() -> int:
             {
                 "instance_id": instance_id,
                 "patch_chars": len(patch),
+                "patch_sha256": sha256(patch),
                 "patch_successfully_applied": applied,
                 "resolved": resolved,
                 "fail_to_pass_success": count_tests(fail_to_pass, "success"),

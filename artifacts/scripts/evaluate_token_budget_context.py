@@ -13,36 +13,27 @@ from __future__ import annotations
 
 import argparse
 import csv
-import importlib.util
 import json
 import math
 import os
-import random
 import statistics
+import subprocess
 import sys
 from collections import defaultdict
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from unidiff import PatchSet
+
+from entity_identity import canonical_entity_id
 
 
 ARTIFACT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ARTIFACT_ROOT / "kgcompass"))
 
 from repair_claude import CodeRepair  # noqa: E402
-
-
-METRICS: dict[str, Callable[[dict[str, Any]], float]] = {
-    "file": lambda row: float(row["find_file"]),
-    "entity_recall": lambda row: float(row["ratio"]),
-    "mrr": lambda row: 0.0
-    if row.get("best_rank") is None
-    else 1.0 / float(row["best_rank"]),
-    "hit": lambda row: float(row["hit"]),
-}
 
 
 def parse_named_path(raw: str) -> tuple[str, Path]:
@@ -85,28 +76,13 @@ def load_dataset(path: Path) -> dict[str, dict[str, Any]]:
     return output
 
 
-def load_eval_module() -> Any:
-    path = Path(__file__).with_name("eval_controls_v3.py")
-    spec = importlib.util.spec_from_file_location("eval_controls_v3", path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Cannot import {path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def canonical_identity(item: dict[str, Any]) -> tuple[Any, ...]:
-    return (
-        str(item.get("file_path") or "").replace("\\", "/"),
-        str(item.get("signature") or item.get("name") or ""),
-        int(item.get("start_line") or 0),
-        int(item.get("end_line") or 0),
-    )
+    return canonical_entity_id(item)
 
 
 def ranked_entities(payload: dict[str, Any], max_candidates: int) -> list[dict[str, Any]]:
     related = payload.get("related_entities") or {}
-    candidates = list(related.get("methods") or []) + list(related.get("classes") or [])
+    candidates = list(related.get("methods") or [])
     output: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
     for item in candidates:
@@ -245,36 +221,6 @@ def percentile(values: list[float], quantile: float) -> float:
     return float(ordered[index])
 
 
-def exact_mcnemar_p(wins: int, losses: int) -> float:
-    discordant = wins + losses
-    if discordant == 0:
-        return 1.0
-    tail = min(wins, losses)
-    probability = sum(math.comb(discordant, index) for index in range(tail + 1)) / (
-        2**discordant
-    )
-    return min(1.0, 2.0 * probability)
-
-
-def bootstrap_ci(
-    pairs: list[tuple[float, float]], iterations: int, seed: int
-) -> tuple[float, float]:
-    rng = random.Random(seed)
-    size = len(pairs)
-    deltas: list[float] = []
-    for _ in range(iterations):
-        total = 0.0
-        for _ in range(size):
-            old, new = pairs[rng.randrange(size)]
-            total += new - old
-        deltas.append(total / size)
-    deltas.sort()
-    return (
-        deltas[int(0.025 * iterations)],
-        deltas[min(iterations - 1, int(0.975 * iterations))],
-    )
-
-
 def write_tsv(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if not rows:
@@ -297,11 +243,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--budget", action="append", type=int, dest="budgets")
     parser.add_argument("--ids-file", required=True, type=Path)
     parser.add_argument("--dataset-file", required=True, type=Path)
-    parser.add_argument("--gt-cache", required=True, type=Path)
+    parser.add_argument("--targets", required=True, type=Path)
     parser.add_argument("--output-root", required=True, type=Path)
     parser.add_argument("--output-summary", required=True, type=Path)
     parser.add_argument("--output-paired", required=True, type=Path)
     parser.add_argument("--output-instances", required=True, type=Path)
+    parser.add_argument("--output-packing-summary", type=Path)
+    parser.add_argument("--output-packing-instances", type=Path)
     parser.add_argument("--max-candidates", type=int, default=50)
     parser.add_argument("--bootstrap-iters", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=7)
@@ -324,8 +272,6 @@ def main() -> int:
     if missing_dataset:
         raise ValueError(f"Dataset misses {len(missing_dataset)} requested instances")
 
-    eval_module = load_eval_module()
-    gt_map = eval_module.load_or_build_gt_cache(ids, args.gt_cache)
     os.environ.setdefault("OPENAI_API_KEY", "offline-token-audit")
     repairer = CodeRepair(
         language="python",
@@ -350,7 +296,6 @@ def main() -> int:
     repairer._truncate_source_preserve_ends = cached_truncate
 
     instance_rows: list[dict[str, Any]] = []
-    eval_rows: dict[tuple[str, int], dict[str, dict[str, Any]]] = {}
     diagnostic_rows: dict[tuple[str, int], list[dict[str, Any]]] = defaultdict(list)
 
     for source_name, source_dir in sources:
@@ -358,7 +303,6 @@ def main() -> int:
             output_dir = args.output_root / f"{source_name}_t{budget}"
             output_dir.mkdir(parents=True, exist_ok=True)
             key = (source_name, budget)
-            eval_rows[key] = {}
             for position, instance_id in enumerate(ids, start=1):
                 source_path = source_dir / f"{instance_id}.json"
                 if not source_path.exists():
@@ -389,10 +333,6 @@ def main() -> int:
                     encoding="utf-8",
                 )
 
-                evaluation = eval_module.evaluate_one_instance(
-                    output, gt_map[instance_id], args.max_candidates
-                )
-                eval_rows[key][instance_id] = evaluation
                 full_lengths = [float(row["full_source_tokens"]) for row in diagnostics]
                 truncated = sum(int(row["truncated"]) for row in diagnostics)
                 row = {
@@ -410,12 +350,6 @@ def main() -> int:
                     "changed_lines_covered": covered_lines,
                     "changed_lines_total": total_lines,
                     "complete_changed_lines": int(total_lines > 0 and covered_lines == total_lines),
-                    "file_hit": evaluation["find_file"],
-                    "entity_recall": evaluation["ratio"],
-                    "mrr": 0.0
-                    if evaluation.get("best_rank") is None
-                    else 1.0 / float(evaluation["best_rank"]),
-                    "hit": evaluation["hit"],
                 }
                 instance_rows.append(row)
                 diagnostic_rows[key].extend(diagnostics)
@@ -475,60 +409,92 @@ def main() -> int:
                     "complete_changed_line_rate": statistics.mean(
                         row["complete_changed_lines"] for row in rows
                     ),
-                    "file_hit_rate": statistics.mean(row["file_hit"] for row in rows),
-                    "entity_recall": statistics.mean(row["entity_recall"] for row in rows),
-                    "mrr": statistics.mean(row["mrr"] for row in rows),
-                    "hit_rate": statistics.mean(row["hit"] for row in rows),
                     "dir": str(args.output_root / f"{source_name}_t{budget}"),
                 }
             )
 
-    paired_rows: list[dict[str, Any]] = []
-    for comparison_index, raw in enumerate(args.compare):
+    strict_command = [
+        sys.executable,
+        str(Path(__file__).with_name("evaluate_strict_reference_context.py")),
+        "--ids-file",
+        str(args.ids_file),
+        "--targets",
+        str(args.targets),
+        "--top-k",
+        str(args.max_candidates),
+        "--bootstrap",
+        str(args.bootstrap_iters),
+        "--seed",
+        str(args.seed),
+        "--output-summary",
+        str(args.output_summary),
+        "--output-instances",
+        str(args.output_instances),
+        "--output-paired",
+        str(args.output_paired),
+    ]
+    for source_name in source_names:
+        for budget in budgets:
+            strict_command.extend(
+                [
+                    "--row",
+                    f"{source_name}_t{budget}={args.output_root / f'{source_name}_t{budget}'}",
+                ]
+            )
+    for raw in args.compare:
         baseline, treatment = parse_comparison(raw)
         if baseline not in source_names or treatment not in source_names:
             raise ValueError(f"Unknown comparison {raw!r}")
         for budget in budgets:
-            old_rows = eval_rows[(baseline, budget)]
-            new_rows = eval_rows[(treatment, budget)]
-            for metric_index, (metric, extractor) in enumerate(METRICS.items()):
-                pairs = [(extractor(old_rows[i]), extractor(new_rows[i])) for i in ids]
-                wins = sum(new > old + 1e-12 for old, new in pairs)
-                losses = sum(new < old - 1e-12 for old, new in pairs)
-                low, high = bootstrap_ci(
-                    pairs,
-                    args.bootstrap_iters,
-                    args.seed + comparison_index * 100 + metric_index,
-                )
-                old_mean = statistics.mean(old for old, _ in pairs)
-                new_mean = statistics.mean(new for _, new in pairs)
-                paired_rows.append(
-                    {
-                        "baseline": baseline,
-                        "treatment": treatment,
-                        "token_budget": budget,
-                        "metric": metric,
-                        "N": len(pairs),
-                        "baseline_value": old_mean,
-                        "treatment_value": new_mean,
-                        "delta": new_mean - old_mean,
-                        "ci95_low": low,
-                        "ci95_high": high,
-                        "wins": wins,
-                        "losses": losses,
-                        "ties": len(pairs) - wins - losses,
-                        "exact_mcnemar_p": exact_mcnemar_p(wins, losses)
-                        if metric in {"file", "hit"}
-                        else "NA",
-                    }
-                )
+            strict_command.extend(
+                [
+                    "--compare",
+                    f"{baseline}_t{budget}={treatment}_t{budget}",
+                ]
+            )
+    subprocess.run(strict_command, check=True)
 
-    write_tsv(args.output_instances, instance_rows)
-    write_tsv(args.output_summary, summary_rows)
-    write_tsv(args.output_paired, paired_rows)
-    print(f"wrote {args.output_instances}")
-    print(f"wrote {args.output_summary}")
-    print(f"wrote {args.output_paired}")
+    if args.output_packing_instances:
+        instance_fields = (
+            "instance_id",
+            "source",
+            "token_budget",
+            "candidate_entities",
+            "selected_entities",
+            "rendered_context_tokens",
+            "budget_fill",
+            "mean_selected_source_tokens",
+            "truncated_entities",
+        )
+        write_tsv(
+            args.output_packing_instances,
+            [{field: row[field] for field in instance_fields} for row in instance_rows],
+        )
+        print(f"wrote {args.output_packing_instances}")
+
+    if args.output_packing_summary:
+        summary_fields = (
+            "source",
+            "token_budget",
+            "N",
+            "selected_mean",
+            "selected_p50",
+            "selected_p95",
+            "context_tokens_mean",
+            "context_tokens_p50",
+            "context_tokens_p95",
+            "budget_fill_mean",
+            "entity_tokens_p50",
+            "entity_tokens_p95",
+            "truncated_entity_rate",
+            "changed_line_recall",
+            "complete_changed_line_rate",
+        )
+        write_tsv(
+            args.output_packing_summary,
+            [{field: row[field] for field in summary_fields} for row in summary_rows],
+        )
+        print(f"wrote {args.output_packing_summary}")
     return 0
 
 
