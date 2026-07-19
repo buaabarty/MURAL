@@ -18,17 +18,10 @@ ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "artifacts" / "results"
 FROZEN = ROOT / "artifacts" / "frozen"
 MANIFEST = ROOT / "artifacts" / "submission_manifest_20260719.json"
+INPUTS = ROOT / "artifacts" / "inputs"
 
 EXPECTED_RESULTS = {
     "context_construction_cost_20260716.tsv",
-    "human_window_agreement_20260718.tsv",
-    "human_window_annotations_20260718.tsv",
-    "human_window_items_20260718.json",
-    "human_window_manifest_20260718.tsv",
-    "human_window_provenance_20260718.tsv",
-    "human_window_strict_judgments_20260719.tsv",
-    "human_window_strict_summary_20260719.tsv",
-    "human_window_summary_20260718.tsv",
     "java_cross_language_instances_20260714.jsonl",
     "java_cross_language_paired_20260714.tsv",
     "java_cross_language_summary_20260714.tsv",
@@ -418,7 +411,7 @@ def check_external() -> None:
 
 
 
-def check_prompts_and_human() -> None:
+def check_prompts() -> None:
     summary = rows("source_bearing_prompt_summary_20260719.tsv")
     expected = {
         "bm25": (16.744, 4.956, 3613.916, 50.247835, 62.2, 42.0),
@@ -440,28 +433,73 @@ def check_prompts_and_human() -> None:
     if any(not re.fullmatch(r"[0-9a-f]{64}", row["prompt_sha256"]) for row in prompt_rows):
         fail("invalid rendered prompt SHA-256")
 
-    human = rows("human_window_summary_20260718.tsv")
-    expected_decisions = {"MURAL": 54, "BM25-local": 19, "Comparable": 15, "Both insufficient": 12}
-    for decision, count in expected_decisions.items():
-        row = one(human, scope="all_judgments", category=decision)
-        equal(int(row["count"]), count, f"human decision {decision}")
-    agreement = rows("human_window_agreement_20260718.tsv")[0]
-    equal(int(agreement["overlap_n"]), 20, "human overlap")
-    equal(int(agreement["agreement_n"]), 12, "human agreement")
-    close(agreement["cohen_kappa"], 0.4666666666666666, "human kappa")
+def check_human_alignment_inputs() -> None:
+    items_payload = json_file(INPUTS / "human_window_items_current_20260719.json")
+    items = items_payload["items"]
+    equal(len(items), 80, "human reaudit item count")
+    equal(items_payload["protocol"]["window_size_entities"], 20, "human reaudit window size")
+    ranking_path = FROZEN / "strict_rankings_top50_20260719.jsonl.gz"
+    equal(
+        items_payload["protocol"]["ranking_file_sha256"],
+        hashlib.sha256(ranking_path.read_bytes()).hexdigest(),
+        "human reaudit ranking digest",
+    )
 
-    strict = rows("human_window_strict_summary_20260719.tsv")
-    for stratum, count in {"MURAL_only": 31, "BM25_only": 6, "both": 24, "neither": 19}.items():
-        row = one(strict, scope="unique_instances", strict_stratum=stratum, decision="instances")
-        equal(int(row["count"]), count, f"strict human stratum {stratum}")
-    for decision, count in {"aligned": 36, "neutral": 5, "opposed": 3}.items():
-        row = one(
-            strict,
-            scope="exclusive_hit_judgments",
-            strict_stratum="MURAL_only_or_BM25_only",
-            decision=decision,
-        )
-        equal(int(row["count"]), count, f"exclusive judgment {decision}")
+    with (INPUTS / "human_window_alignment_20260719.tsv").open(
+        newline="", encoding="utf-8"
+    ) as handle:
+        alignment = list(csv.DictReader(handle, delimiter="\t"))
+    equal(len(alignment), 80, "human alignment rows")
+    alignment_by_id = {row["annotation_id"]: row for row in alignment}
+    equal(len(alignment_by_id), 80, "human alignment unique ids")
+    equal(
+        sum(int(row["requires_reannotation"]) for row in alignment),
+        79,
+        "human rows requiring reannotation",
+    )
+    equal(
+        {row["annotation_id"] for row in alignment if row["requires_reannotation"] == "0"},
+        {"WIN-076"},
+        "human unchanged rows",
+    )
+
+    rankings = {}
+    with gzip.open(ranking_path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            record = json.loads(line)
+            rankings[record["instance_id"]] = record["sources"]
+    source_map = items_payload["protocol"]["ranking_sources"]
+    for item in items:
+        report = alignment_by_id[item["annotation_id"]]
+        equal(report["instance_id"], item["instance_id"], f"{item['annotation_id']} instance")
+        for side in ("a", "b"):
+            source = source_map[item[f"method_{side}"]]
+            candidates = rankings[item["instance_id"]][source][:20]
+            rendered_lines = []
+            identities = []
+            for rank, candidate in enumerate(candidates, start=1):
+                signature = " ".join(str(candidate.get("signature", "")).split())
+                if len(signature) > 360:
+                    signature = signature[:357] + "..."
+                rendered_lines.append(
+                    f"{rank:02d}. {candidate['file_path']} :: {signature}"
+                )
+                identities.append(
+                    [
+                        candidate.get("file_path", ""),
+                        candidate.get("entity_type", ""),
+                        candidate.get("name", ""),
+                        candidate.get("start_line"),
+                        candidate.get("end_line"),
+                    ]
+                )
+            equal(item[f"window_{side}"], "\n".join(rendered_lines), f"{item['annotation_id']} window {side}")
+            digest = hashlib.sha256(
+                json.dumps(identities, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+            ).hexdigest()
+            equal(item[f"window_{side}_sha256"], digest, f"{item['annotation_id']} digest {side}")
+            equal(report[f"window_{side}_sha256"], digest, f"{item['annotation_id']} report digest {side}")
+
 
 
 def check_repair() -> None:
@@ -647,7 +685,8 @@ def main() -> None:
     check_token_budgets()
     check_controls_and_budgets()
     check_external()
-    check_prompts_and_human()
+    check_prompts()
+    check_human_alignment_inputs()
     check_repair()
     check_java_and_cost()
     check_removed_terms()

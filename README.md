@@ -20,9 +20,9 @@ python3 artifacts/scripts/verify_paper_results.py
 ```
 
 The verifier checks the retained result inventory, 1,044-target mapping, all
-article-facing aggregates and paired statistics, prompt hashes, human-audit
-counts, the complete Java population, frozen ranking digest, and every SHA-256
-entry in the submission manifest.
+article-facing aggregates and paired statistics, prompt hashes, the complete
+Java population, frozen ranking digest, current blinded-reaudit window
+fingerprints, and every SHA-256 entry in the submission manifest.
 
 ## Evaluation scope
 
@@ -34,7 +34,6 @@ entry in the submission manifest.
 - four released Qwen2.5-32B localizer outputs completed through the same
   prefix-preserving interface;
 - all 91 SWE-bench-Java Verified instances across all six repositories;
-- 100 blinded judgments over 80 Python instances;
 - matched 4,000-token GLM-5.2 repair on all 500 Python instances, evaluated by
   the official SWE-bench harness.
 
@@ -46,7 +45,7 @@ entry in the submission manifest.
 | `artifacts/scripts/` | Exporters, evaluators, statistical analyzers, and verifier. |
 | `artifacts/results/` | Retained aggregate and per-instance paper ledgers. |
 | `artifacts/frozen/` | Compact Top-50 rankings and external-source provenance. |
-| `artifacts/inputs/` | Frozen Java inputs and benchmark manifests. |
+| `artifacts/inputs/` | Frozen Java inputs, benchmark manifests, and aligned blinded-reaudit windows. |
 | `artifacts/prompts/` | Localization and repair prompts. |
 | `artifacts/submission_manifest_20260719.json` | Protocol and SHA-256 inventory. |
 | `artifacts/RESULT_TRACEABILITY.md` | Claim-to-ledger and regeneration map. |

@@ -31,8 +31,6 @@ All paths below are relative to `artifacts/`.
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
-| Blinded judgments and agreement | `results/human_window_*_20260718.*` |
-| Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
 | Complete Java evaluation | `results/java_cross_language_*_20260714.*` |
 | Context-construction time | `results/context_construction_cost_20260716.tsv` |
 
@@ -159,15 +157,17 @@ python3 scripts/analyze_clustered_repair_stats.py \
 Hosted generation reads `AUTODL_API_KEY` from the environment. No credential is
 stored in the artifact.
 
-## Human audit
+## Blinded re-audit alignment
 
 ```bash
-python3 scripts/analyze_human_strict_alignment.py \
-  --annotations results/human_window_annotations_20260718.tsv \
-  --strict-instances results/strict_localization_instances_20260719.tsv \
-  --output-judgments ../temp_run/human_strict_judgments.tsv \
-  --output-summary ../temp_run/human_strict_summary.tsv
+python3 scripts/prepare_human_window_reaudit.py \
+  --old-items inputs/human_window_items_legacy_20260718.json \
+  --rankings frozen/strict_rankings_top50_20260719.jsonl.gz \
+  --output-items inputs/human_window_items_current_20260719.json \
+  --output-alignment inputs/human_window_alignment_20260719.tsv \
+  --version-date 2026-07-19
 ```
+
 
 ## Final integrity gate
 

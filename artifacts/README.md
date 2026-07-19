@@ -42,7 +42,7 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `export_compact_rankings.py`: compact ranking export.
 - `materialize_compact_rankings.py`: evaluator-compatible reconstruction.
 - `analyze_source_bearing_prompt_coverage.py`: rendered-prompt audit.
-- `analyze_human_strict_alignment.py`: manual-audit re-stratification.
+- `prepare_human_window_reaudit.py`: rebuild and fingerprint blinded windows from frozen rankings.
 - `analyze_clustered_repair_stats.py`: clustered repair statistics.
 - `evaluate_java_retrieve_localize.py`: complete Java evaluator.
 - `build_submission_manifest.py`: protocol and digest manifest.
@@ -76,18 +76,20 @@ binary paired contrasts use the two-sided exact McNemar test.
 Nonempty, applicable, and resolved retain 500 instances per context in the
 denominator. The official rows are keyed by instance and patch SHA-256.
 
-### Human and Java evaluations
+### Java evaluation
 
-- `results/human_window_{annotations,manifest,summary,agreement,provenance}_20260718.tsv`
-- `results/human_window_items_20260718.json`
-- `results/human_window_strict_{judgments,summary}_20260719.tsv`
 - `results/java_cross_language_{summary,paired}_20260714.tsv`
 - `results/java_cross_language_instances_20260714.jsonl`
 - `results/java_cross_language_targets_20260714.json`
 
-The audit has 100 judgments over 80 instances, including 20 double-coded items.
 The Java evaluation retains all 91 instances pinned by
 `inputs/java_cross_language_manifest_20260714.json`.
+
+### Blinded re-audit inputs
+
+- `inputs/human_window_items_current_20260719.json`
+- `inputs/human_window_alignment_20260719.tsv`
+
 
 ## Frozen rankings and provenance
 
