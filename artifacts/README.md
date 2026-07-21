@@ -94,6 +94,11 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 - `results/human_window_unique_strict_summary_20260719.tsv`
 - `frozen/human_window_rankings_20260712.jsonl.gz`
 - `frozen/human_window_rankings_manifest_20260719.json`
+- `results/human_construct_{annotations_raw,adjudicated}_20260721.tsv`
+- `results/human_support_{annotations_raw,adjudicated}_20260721.tsv`
+- `results/human_round2_summary_20260721.{tsv,json}`
+- `results/human_round2_provenance_20260721.tsv`
+- `scripts/analyze_human_round2.py`
 - `results/java_cross_language_{summary,paired}_20260714.tsv`
 - `results/java_cross_language_instances_20260714.jsonl`
 - `results/java_cross_language_targets_20260714.json`
@@ -107,6 +112,18 @@ record for that main experiment.
 `results/human_window_provenance_20260718.tsv` records the two anonymized
 source-workbook SHA-256 values and 50 Task-C rows per annotator. A row-wise
 source check found no mismatch across all 100 released judgments.
+
+The second-round audit retains both annotators' 80 construct judgments over 60
+instances and 120 support-role judgments over 100 candidate pairs. Evidence
+adjudication binds the construct records to the current strict target ledger:
+all 60 audited instances are covered, 26 entirely by exact entity targets and
+34 through at least one explicit exact-file fallback. The support-role ledger
+retains every independent label and the final B1--B4 evidence decision. Its 100
+adjudicated pairs contain 68 irrelevant, 18 weak, 12 strong, and two required
+candidates. The two source-workbook SHA-256 values and 100 Task-A/B rows per
+annotator are recorded in `human_round2_provenance_20260721.tsv`.
+Run `python3 scripts/analyze_human_round2.py` to recompute the counts and
+shared-item reliability values.
 
 The Java evaluation retains all 91 instances pinned by
 `inputs/java_cross_language_manifest_20260714.json`.

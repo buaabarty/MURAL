@@ -98,6 +98,11 @@ def infrastructure_failure(audit: dict[str, object]) -> bool:
     return any(marker in errors for marker in INFRASTRUCTURE_FAILURE_MARKERS)
 
 
+def provider_failure(audit: dict[str, object]) -> bool:
+    """Compatibility name used by the retry selector."""
+    return infrastructure_failure(audit)
+
+
 def select_sharded_run_dir(
     run_root: Path,
     label: str,

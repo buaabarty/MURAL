@@ -21,6 +21,13 @@ MANIFEST = ROOT / "artifacts" / "submission_manifest_20260719.json"
 
 EXPECTED_RESULTS = {
     "context_construction_cost_20260716.tsv",
+    "human_construct_adjudicated_20260721.tsv",
+    "human_construct_annotations_raw_20260721.tsv",
+    "human_round2_provenance_20260721.tsv",
+    "human_round2_summary_20260721.json",
+    "human_round2_summary_20260721.tsv",
+    "human_support_adjudicated_20260721.tsv",
+    "human_support_annotations_raw_20260721.tsv",
     "human_window_agreement_20260718.tsv",
     "human_window_annotations_20260718.tsv",
     "human_window_binding_20260719.tsv",
@@ -628,6 +635,61 @@ def check_prompts_and_human() -> None:
         equal(int(row["count"]), count, f"exclusive judgment {decision}")
 
 
+def check_human_round2() -> None:
+    construct_raw = rows("human_construct_annotations_raw_20260721.tsv")
+    equal(len(construct_raw), 80, "construct-audit judgments")
+    equal(Counter(row["annotator"] for row in construct_raw), Counter({"A": 40, "B": 40}), "construct annotators")
+    construct_counts = Counter(row["annotation_id"] for row in construct_raw)
+    equal(len(construct_counts), 60, "construct unique items")
+    equal(Counter(construct_counts.values()), Counter({1: 40, 2: 20}), "construct coding multiplicity")
+    shared_construct = [
+        [row for row in construct_raw if row["annotation_id"] == annotation_id]
+        for annotation_id, count in construct_counts.items()
+        if count == 2
+    ]
+    equal(sum(pair[0]["mapping_label"] == pair[1]["mapping_label"] for pair in shared_construct), 10, "construct mapping agreement")
+    equal(sum(pair[0]["extra_entity"] == pair[1]["extra_entity"] for pair in shared_construct), 16, "construct extra-entity agreement")
+
+    construct_final = rows("human_construct_adjudicated_20260721.tsv")
+    equal(len(construct_final), 60, "construct adjudicated items")
+    equal(Counter(row["final_coverage"] for row in construct_final), Counter({"covered": 60}), "construct final coverage")
+    equal(sum(int(row["unmatched_regions"]) for row in construct_final), 0, "construct unmatched regions")
+    equal(sum(int(row["fallback_regions"]) == 0 for row in construct_final), 26, "construct exact-only instances")
+    equal(sum(int(row["fallback_regions"]) > 0 for row in construct_final), 34, "construct fallback instances")
+
+    support_raw = rows("human_support_annotations_raw_20260721.tsv")
+    equal(len(support_raw), 120, "support-audit judgments")
+    equal(Counter(row["annotator"] for row in support_raw), Counter({"A": 60, "B": 60}), "support annotators")
+    support_counts = Counter(row["annotation_id"] for row in support_raw)
+    equal(len(support_counts), 100, "support unique pairs")
+    equal(Counter(support_counts.values()), Counter({1: 80, 2: 20}), "support coding multiplicity")
+    shared_support = [
+        [row for row in support_raw if row["annotation_id"] == annotation_id]
+        for annotation_id, count in support_counts.items()
+        if count == 2
+    ]
+    equal(sum(pair[0]["support_role"] == pair[1]["support_role"] for pair in shared_support), 0, "support role agreement")
+    equal(sum(pair[0]["exact_receiver"] == pair[1]["exact_receiver"] for pair in shared_support), 11, "support receiver agreement")
+
+    support_final = rows("human_support_adjudicated_20260721.tsv")
+    equal(len(support_final), 100, "support adjudicated pairs")
+    equal(
+        Counter(row["final_role"] for row in support_final),
+        Counter({"irrelevant": 68, "weak": 18, "strong": 12, "required": 2}),
+        "support adjudicated roles",
+    )
+    provenance = rows("human_round2_provenance_20260721.tsv")
+    equal(len(provenance), 2, "round-two provenance rows")
+    expected_hashes = {
+        "A": "95da3addff52a896a565aec051e6d9bc42c8dfa2d56458eacd207d2b12c9b005",
+        "B": "dc14e96c117c37e63a2dfb136ab839e33baf23042fcc53d0861ae1b0d1a5e06e",
+    }
+    for annotator, digest in expected_hashes.items():
+        row = one(provenance, annotator=annotator)
+        equal(row["source_sha256"], digest, f"round-two {annotator} workbook hash")
+        equal(int(row["source_rows"]), 100, f"round-two {annotator} source rows")
+
+
 def check_repair() -> None:
     outcomes = rows("repair_equal4000_strict_outcomes_20260719.tsv")
     equal(len(outcomes), 1000, "strict repair outcome rows")
@@ -766,7 +828,7 @@ def check_java_and_cost() -> None:
 
 def check_manifest() -> None:
     manifest = json_file(MANIFEST)
-    equal(manifest["schema_version"], 2, "manifest schema")
+    equal(manifest["schema_version"], 3, "manifest schema")
     equal(manifest["python_benchmark"]["instances"], 500, "manifest Python population")
     equal(manifest["strict_reference"]["target_counts"]["total"], 1044, "manifest target count")
     equal(manifest["java_benchmark"]["evaluated_instances"], 91, "manifest Java population")
@@ -788,6 +850,16 @@ def check_manifest() -> None:
         "artifacts/results/human_window_provenance_20260718.tsv",
         "manifest human source provenance",
     )
+    equal(manifest["human_audit"]["construct_audit"]["judgments"], 80, "manifest construct judgments")
+    equal(manifest["human_audit"]["construct_audit"]["covered_instances"], 60, "manifest construct coverage")
+    equal(manifest["human_audit"]["support_role_audit"]["judgments"], 120, "manifest support judgments")
+    equal(manifest["human_audit"]["support_role_audit"]["strong_or_required"], 14, "manifest strong support")
+    equal(
+        manifest["human_audit"]["round2_provenance"],
+        "artifacts/results/human_round2_provenance_20260721.tsv",
+        "manifest round-two provenance",
+    )
+    equal(manifest["annotation_update"], "2026-07-21", "manifest annotation update")
     equal(manifest["structural_temporal_boundary"]["cutoff"], "target issue created_at", "manifest issue cutoff")
     equal(
         manifest["structural_temporal_boundary"]["audit"],
@@ -839,6 +911,7 @@ def main() -> None:
     check_controls_and_budgets()
     check_external()
     check_prompts_and_human()
+    check_human_round2()
     check_repair()
     check_java_and_cost()
     check_removed_terms()

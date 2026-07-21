@@ -17,6 +17,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_clustered_repair_stats.py",
     "artifacts/scripts/analyze_repair_outcomes.py",
     "artifacts/scripts/analyze_human_strict_alignment.py",
+    "artifacts/scripts/analyze_human_round2.py",
     "artifacts/scripts/analyze_source_bearing_prompt_coverage.py",
     "artifacts/scripts/analyze_stratified_context_findings.py",
     "artifacts/scripts/plot_paper_findings.py",
@@ -89,8 +90,9 @@ def main() -> None:
         raise SystemExit(f"Missing manifest inputs: {missing}")
 
     manifest = {
-        "schema_version": 2,
+        "schema_version": 3,
         "frozen_date": "2026-07-19",
+        "annotation_update": "2026-07-21",
         "paper": {
             "title": "MURAL: Decoupling File Retrieval from Within-File Entity Selection for Bounded Repository-Repair Context",
             "artifact_repository": "https://github.com/buaabarty/MURAL",
@@ -178,6 +180,24 @@ def main() -> None:
                 "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
                 "BM25-local": "BM25_projection",
             },
+            "construct_audit": {
+                "judgments": 80,
+                "unique_instances": 60,
+                "double_coded_instances": 20,
+                "strict_target_binding": "artifacts/results/human_construct_adjudicated_20260721.tsv",
+                "covered_instances": 60,
+                "exact_entity_only_instances": 26,
+                "instances_using_file_fallback": 34,
+            },
+            "support_role_audit": {
+                "judgments": 120,
+                "unique_pairs": 100,
+                "double_coded_pairs": 20,
+                "adjudicated_labels": "artifacts/results/human_support_adjudicated_20260721.tsv",
+                "strong_or_required": 14,
+            },
+            "round2_provenance": "artifacts/results/human_round2_provenance_20260721.tsv",
+            "round2_summary": "artifacts/results/human_round2_summary_20260721.tsv",
         },
         "structural_temporal_boundary": {
             "cutoff": "target issue created_at",

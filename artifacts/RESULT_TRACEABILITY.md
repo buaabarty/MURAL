@@ -40,6 +40,9 @@ All paths below are relative to `artifacts/`.
 | Exact-window strict evaluation | `results/human_window_exact_instances_20260719.tsv` |
 | Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
 | Unique-instance strict judgment alignment | `results/human_window_unique_strict_summary_20260719.tsv` |
+| Second-round construct audit | `results/human_construct_*_20260721.tsv` |
+| Second-round support-role audit | `results/human_support_*_20260721.tsv` |
+| Second-round audit summary and provenance | `results/human_round2_*_20260721.*` |
 | Complete Java evaluation | `results/java_cross_language_*_20260714.*` |
 | Context-construction time | `results/context_construction_cost_20260716.tsv` |
 
@@ -187,10 +190,17 @@ python3 scripts/analyze_human_strict_alignment.py \
   --output-summary ../temp_run/human_strict_summary.tsv
 ```
 
+```bash
+python3 scripts/analyze_human_round2.py
+```
+
 The raw annotations and randomized A/B assignment remain exactly as supplied
 to the annotators. They audit the main RQ-1 `BM25_projection` versus
 `MURAL_2src` comparison. Strict alignment is computed from the exact windows
-the annotators inspected.
+the annotators inspected. The second-round ledgers separately retain all Task-A
+construct and Task-B support-role judgments, bind Task A to the current strict
+target ledger, and record the evidence-adjudicated Task-B labels without
+overwriting either annotator's original decisions.
 
 ## Regenerate the stratified analyses
 

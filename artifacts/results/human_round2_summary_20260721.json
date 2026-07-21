@@ -1,0 +1,47 @@
+{
+  "task_a": {
+    "unique_items": 60,
+    "judgments": 80,
+    "shared_items": 20,
+    "raw_mapping_reliability": {
+      "n": 20,
+      "agreement_count": 10,
+      "agreement": 0.5,
+      "kappa": 0.14163090128755368
+    },
+    "raw_extra_entity_reliability": {
+      "n": 20,
+      "agreement_count": 16,
+      "agreement": 0.8,
+      "kappa": 0.37499999999999983
+    },
+    "final_coverage": {
+      "covered": 60
+    },
+    "exact_entity_only_instances": 26,
+    "instances_using_file_fallback": 34
+  },
+  "task_b": {
+    "unique_items": 100,
+    "judgments": 120,
+    "shared_items": 20,
+    "raw_role_reliability": {
+      "n": 20,
+      "agreement_count": 0,
+      "agreement": 0,
+      "kappa": -0.025641025641025647
+    },
+    "raw_exact_receiver_reliability": {
+      "n": 20,
+      "agreement_count": 11,
+      "agreement": 0.55,
+      "kappa": 0.10000000000000009
+    },
+    "final_roles": {
+      "irrelevant": 68,
+      "required": 2,
+      "strong": 12,
+      "weak": 18
+    }
+  }
+}
