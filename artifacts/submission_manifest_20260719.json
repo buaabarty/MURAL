@@ -1,17 +1,17 @@
 {
-  "annotation_update": "2026-07-21",
+  "annotation_snapshot": "2026-07-21",
   "files": {
     "README.md": {
-      "bytes": 2950,
-      "sha256": "d8cea1cd580f6e750203d176d96eb61af9ff7d2f72cdba41645d766a9a2518c6"
+      "bytes": 2937,
+      "sha256": "d57070621afb890d2565e0c686946af0c252b0c36cb8db817e7c53b8ab09432c"
     },
     "artifacts/README.md": {
-      "bytes": 8027,
-      "sha256": "735e24ad6a47336b96a4b79b3c71e66bc0dd7e6bd7c56df18ca41e988d7129da"
+      "bytes": 8054,
+      "sha256": "23a1260750ab51acdecaad71e3e9cea2bd04c109ca63f7aebe6ee4532cdbd740"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 10614,
-      "sha256": "e8c30a76750d86ee256c200d2c94edbda6ead787dc7065607fb6b08b635cae35"
+      "bytes": 10603,
+      "sha256": "d27606c98b7b983eb90065a39a09411b7dbedd94592a672cd249515c17c48c88"
     },
     "artifacts/frozen/external_localizers_manifest.json": {
       "bytes": 815,
@@ -69,15 +69,15 @@
       "bytes": 61929,
       "sha256": "4d8579f28767b10411112b5b1136c8cf44f3238aa0582e1a318a0fe8731a69b1"
     },
-    "artifacts/results/human_round2_provenance_20260721.tsv": {
-      "bytes": 255,
-      "sha256": "0cce00e1f1e9528e55a11d5f14a0a3f51c6e44b932292073bd07564ccb90e831"
+    "artifacts/results/human_evidence_audit_provenance_20260721.tsv": {
+      "bytes": 245,
+      "sha256": "97a908aa6527fbae93274abfd8bd0a7401eef05171516bd41c0883a67805d37f"
     },
-    "artifacts/results/human_round2_summary_20260721.json": {
+    "artifacts/results/human_evidence_audit_summary_20260721.json": {
       "bytes": 1001,
       "sha256": "8a296fb3d7c882aeac58ce112478b9e90223a265fe3fac63075640a1040377d2"
     },
-    "artifacts/results/human_round2_summary_20260721.tsv": {
+    "artifacts/results/human_evidence_audit_summary_20260721.tsv": {
       "bytes": 493,
       "sha256": "ca32504c167efad37aa2648e5d78d62685d0389bd8d5e7223fcc1a5f4cb1f44f"
     },
@@ -353,9 +353,9 @@
       "bytes": 2924,
       "sha256": "c6b29b8e4365f2afa9c5bc7bf19df27b48ee253702ff2751a0a324f414ef7902"
     },
-    "artifacts/scripts/analyze_human_round2.py": {
-      "bytes": 4842,
-      "sha256": "f16da26bc59485e30edd53263bee44f9fb7ab62ad60e6568cac76e2899328286"
+    "artifacts/scripts/analyze_human_evidence_audit.py": {
+      "bytes": 4829,
+      "sha256": "c728418f5fcecb25803ad812a8224d4cbf6cabc08104fc7ab171106fd161e15a"
     },
     "artifacts/scripts/analyze_human_strict_alignment.py": {
       "bytes": 4319,
@@ -386,8 +386,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 10160,
-      "sha256": "f849b875c2c917d4e8fd5bae89ea633f6ef217109223b99313acad592ab0b8f9"
+      "bytes": 10202,
+      "sha256": "e09411bbf22b510639c16e1584f04c3df822b482f43c97b71b35aa8be6af21ed"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -502,8 +502,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 44600,
-      "sha256": "8aafb9992f54d4b8d4879922be691b47d9c77d39cb1395dcb3372dec51ffa2a9"
+      "bytes": 44688,
+      "sha256": "1b424594377e946f551e3e2434433a9c9fb804fd905ec259ceb21c909b89b2d6"
     },
     "test_entity_projection_ranking.py": {
       "bytes": 2935,
@@ -552,10 +552,10 @@
       "Both insufficient"
     ],
     "double_coded_instances": 20,
+    "evidence_audit_provenance": "artifacts/results/human_evidence_audit_provenance_20260721.tsv",
+    "evidence_audit_summary": "artifacts/results/human_evidence_audit_summary_20260721.tsv",
     "judgments": 100,
     "paper_comparison": "RQ-1 source-composition comparison",
-    "round2_provenance": "artifacts/results/human_round2_provenance_20260721.tsv",
-    "round2_summary": "artifacts/results/human_round2_summary_20260721.tsv",
     "source_workbook_provenance": "artifacts/results/human_window_provenance_20260718.tsv",
     "strict_window_evaluation": "artifacts/results/human_window_exact_instances_20260719.tsv",
     "support_role_audit": {

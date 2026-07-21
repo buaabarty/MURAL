@@ -23,9 +23,9 @@ EXPECTED_RESULTS = {
     "context_construction_cost_20260716.tsv",
     "human_construct_adjudicated_20260721.tsv",
     "human_construct_annotations_raw_20260721.tsv",
-    "human_round2_provenance_20260721.tsv",
-    "human_round2_summary_20260721.json",
-    "human_round2_summary_20260721.tsv",
+    "human_evidence_audit_provenance_20260721.tsv",
+    "human_evidence_audit_summary_20260721.json",
+    "human_evidence_audit_summary_20260721.tsv",
     "human_support_adjudicated_20260721.tsv",
     "human_support_annotations_raw_20260721.tsv",
     "human_window_agreement_20260718.tsv",
@@ -635,7 +635,7 @@ def check_prompts_and_human() -> None:
         equal(int(row["count"]), count, f"exclusive judgment {decision}")
 
 
-def check_human_round2() -> None:
+def check_human_evidence_audit() -> None:
     construct_raw = rows("human_construct_annotations_raw_20260721.tsv")
     equal(len(construct_raw), 80, "construct-audit judgments")
     equal(Counter(row["annotator"] for row in construct_raw), Counter({"A": 40, "B": 40}), "construct annotators")
@@ -678,16 +678,16 @@ def check_human_round2() -> None:
         Counter({"irrelevant": 68, "weak": 18, "strong": 12, "required": 2}),
         "support adjudicated roles",
     )
-    provenance = rows("human_round2_provenance_20260721.tsv")
-    equal(len(provenance), 2, "round-two provenance rows")
+    provenance = rows("human_evidence_audit_provenance_20260721.tsv")
+    equal(len(provenance), 2, "evidence-audit provenance rows")
     expected_hashes = {
         "A": "95da3addff52a896a565aec051e6d9bc42c8dfa2d56458eacd207d2b12c9b005",
         "B": "dc14e96c117c37e63a2dfb136ab839e33baf23042fcc53d0861ae1b0d1a5e06e",
     }
     for annotator, digest in expected_hashes.items():
         row = one(provenance, annotator=annotator)
-        equal(row["source_sha256"], digest, f"round-two {annotator} workbook hash")
-        equal(int(row["source_rows"]), 100, f"round-two {annotator} source rows")
+        equal(row["source_sha256"], digest, f"evidence-audit {annotator} workbook hash")
+        equal(int(row["source_rows"]), 100, f"evidence-audit {annotator} source rows")
 
 
 def check_repair() -> None:
@@ -855,11 +855,11 @@ def check_manifest() -> None:
     equal(manifest["human_audit"]["support_role_audit"]["judgments"], 120, "manifest support judgments")
     equal(manifest["human_audit"]["support_role_audit"]["strong_or_required"], 14, "manifest strong support")
     equal(
-        manifest["human_audit"]["round2_provenance"],
-        "artifacts/results/human_round2_provenance_20260721.tsv",
-        "manifest round-two provenance",
+        manifest["human_audit"]["evidence_audit_provenance"],
+        "artifacts/results/human_evidence_audit_provenance_20260721.tsv",
+        "manifest evidence-audit provenance",
     )
-    equal(manifest["annotation_update"], "2026-07-21", "manifest annotation update")
+    equal(manifest["annotation_snapshot"], "2026-07-21", "manifest annotation snapshot")
     equal(manifest["structural_temporal_boundary"]["cutoff"], "target issue created_at", "manifest issue cutoff")
     equal(
         manifest["structural_temporal_boundary"]["audit"],
@@ -911,7 +911,7 @@ def main() -> None:
     check_controls_and_budgets()
     check_external()
     check_prompts_and_human()
-    check_human_round2()
+    check_human_evidence_audit()
     check_repair()
     check_java_and_cost()
     check_removed_terms()

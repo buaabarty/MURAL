@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recompute the second-round construct and support-role audit statistics."""
+"""Recompute the construct and support-role audit statistics."""
 
 from __future__ import annotations
 

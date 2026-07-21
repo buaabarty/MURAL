@@ -17,7 +17,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_clustered_repair_stats.py",
     "artifacts/scripts/analyze_repair_outcomes.py",
     "artifacts/scripts/analyze_human_strict_alignment.py",
-    "artifacts/scripts/analyze_human_round2.py",
+    "artifacts/scripts/analyze_human_evidence_audit.py",
     "artifacts/scripts/analyze_source_bearing_prompt_coverage.py",
     "artifacts/scripts/analyze_stratified_context_findings.py",
     "artifacts/scripts/plot_paper_findings.py",
@@ -92,7 +92,7 @@ def main() -> None:
     manifest = {
         "schema_version": 3,
         "frozen_date": "2026-07-19",
-        "annotation_update": "2026-07-21",
+        "annotation_snapshot": "2026-07-21",
         "paper": {
             "title": "MURAL: Decoupling File Retrieval from Within-File Entity Selection for Bounded Repository-Repair Context",
             "artifact_repository": "https://github.com/buaabarty/MURAL",
@@ -196,8 +196,8 @@ def main() -> None:
                 "adjudicated_labels": "artifacts/results/human_support_adjudicated_20260721.tsv",
                 "strong_or_required": 14,
             },
-            "round2_provenance": "artifacts/results/human_round2_provenance_20260721.tsv",
-            "round2_summary": "artifacts/results/human_round2_summary_20260721.tsv",
+            "evidence_audit_provenance": "artifacts/results/human_evidence_audit_provenance_20260721.tsv",
+            "evidence_audit_summary": "artifacts/results/human_evidence_audit_summary_20260721.tsv",
         },
         "structural_temporal_boundary": {
             "cutoff": "target issue created_at",

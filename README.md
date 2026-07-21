@@ -21,7 +21,7 @@ python3 artifacts/scripts/verify_paper_results.py
 
 The verifier checks the retained result inventory, 1,044-target mapping, all
 article-facing aggregates and paired statistics, prompt hashes, the exact
-annotator-visible audit windows and judgments, the second-round construct and
+annotator-visible audit windows and judgments, the construct and
 support-role audit ledgers, the complete Java population, frozen ranking
 digests, and every SHA-256 entry in the submission manifest.
 
