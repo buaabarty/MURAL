@@ -32,6 +32,7 @@ EXPECTED_RESULTS = {
     "human_window_strict_summary_20260719.tsv",
     "human_window_unique_strict_summary_20260719.tsv",
     "human_window_summary_20260718.tsv",
+    "issue_creation_cutoff_audit_20260719.json",
     "java_cross_language_instances_20260714.jsonl",
     "java_cross_language_paired_20260714.tsv",
     "java_cross_language_summary_20260714.tsv",
@@ -121,6 +122,21 @@ def pair(name: str, baseline: str, treatment: str, metric: str) -> dict[str, str
 def check_inventory() -> None:
     observed = {path.name for path in RESULTS.iterdir() if path.is_file()}
     equal(sorted(observed), sorted(EXPECTED_RESULTS), "paper-facing result inventory")
+
+
+def check_issue_creation_cutoff() -> None:
+    audit = json_file(RESULTS / "issue_creation_cutoff_audit_20260719.json")
+    equal(audit["audit"], "target_issue_creation_cutoff", "issue-cutoff audit kind")
+    summary = audit["summary"]
+    equal(summary["dataset_instances"], 500, "issue-cutoff dataset population")
+    equal(summary["archived_runs"], 500, "issue-cutoff run population")
+    equal(summary["matching_target_issue_cutoffs"], 500, "matching issue cutoffs")
+    for field in ("mismatched_cutoffs", "missing_cutoffs", "missing_runs", "unexpected_runs"):
+        equal(summary[field], 0, f"issue-cutoff {field}")
+    for field in (
+        "cutoff_mismatches", "missing_cutoff_instances", "missing_run_instances", "unexpected_run_instances"
+    ):
+        equal(audit[field], [], f"issue-cutoff {field}")
 
 
 def check_targets() -> dict[str, Any]:
@@ -528,6 +544,20 @@ def check_prompts_and_human() -> None:
     if any(not re.fullmatch(r"[0-9a-f]{64}", row["prompt_sha256"]) for row in prompt_rows):
         fail("invalid rendered prompt SHA-256")
 
+    annotations = rows("human_window_annotations_20260718.tsv")
+    equal(len(annotations), 100, "human annotation rows")
+    equal(Counter(row["annotator"] for row in annotations), Counter({"A": 50, "B": 50}), "human annotator rows")
+    provenance = rows("human_window_provenance_20260718.tsv")
+    expected_sources = {
+        "annotator_A": ("55aa81725343df92dda7e2d203932a994ef95a46f7441186cc8b67f70c14d640", 50),
+        "annotator_B": ("29cc124822aad02b5c4267191724ce99ed8d5e45379be80ae853ab4f16fa0f77", 50),
+    }
+    equal(len(provenance), 2, "human source-workbook rows")
+    for source_role, (digest, task_rows) in expected_sources.items():
+        row = one(provenance, source_role=source_role)
+        equal(row["sha256"], digest, f"{source_role} workbook hash")
+        equal(int(row["task_c_rows"]), task_rows, f"{source_role} Task-C rows")
+
     human = rows("human_window_summary_20260718.tsv")
     expected_decisions = {"MURAL": 54, "BM25-local": 19, "Comparable": 15, "Both insufficient": 12}
     for decision, count in expected_decisions.items():
@@ -741,6 +771,7 @@ def check_manifest() -> None:
     equal(manifest["strict_reference"]["target_counts"]["total"], 1044, "manifest target count")
     equal(manifest["java_benchmark"]["evaluated_instances"], 91, "manifest Java population")
     equal(manifest["repair"]["prompt_hash_rows"], 1000, "manifest prompt hashes")
+    equal(manifest["repair"]["model"], "GLM-5", "manifest repair model")
     equal(manifest["human_audit"]["judgments"], 100, "manifest human judgments")
     equal(
         manifest["human_audit"]["window_rankings"],
@@ -751,6 +782,17 @@ def check_manifest() -> None:
         manifest["human_audit"]["configurations"]["MURAL"],
         "MURAL_2src (paper label: MURAL w/o Dense)",
         "manifest human MURAL mapping",
+    )
+    equal(
+        manifest["human_audit"]["source_workbook_provenance"],
+        "artifacts/results/human_window_provenance_20260718.tsv",
+        "manifest human source provenance",
+    )
+    equal(manifest["structural_temporal_boundary"]["cutoff"], "target issue created_at", "manifest issue cutoff")
+    equal(
+        manifest["structural_temporal_boundary"]["audit"],
+        "artifacts/results/issue_creation_cutoff_audit_20260719.json",
+        "manifest issue-cutoff audit",
     )
     for name, record in manifest["files"].items():
         path = ROOT / name
@@ -788,6 +830,7 @@ def check_removed_terms() -> None:
 def main() -> None:
     check_inventory()
     check_instance_ledgers()
+    check_issue_creation_cutoff()
     targets = check_targets()
     check_localization()
     check_stratified_findings()

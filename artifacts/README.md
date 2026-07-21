@@ -99,11 +99,14 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 - `results/java_cross_language_targets_20260714.json`
 
 The audit has 100 judgments over 80 instances, including 20 double-coded items.
-The packet is preserved without relabeling or replacing any student-visible
+The packet is preserved without relabeling or replacing any annotator-visible
 window. It audits the main RQ-1 source-composition comparison: `MURAL` maps to
 `MURAL_2src` (the `MURAL w/o Dense` row), and `BM25-local` maps to
 `BM25_projection`. The exact 80-instance ranking snapshot is the sample-level
 record for that main experiment.
+`results/human_window_provenance_20260718.tsv` records the two anonymized
+source-workbook SHA-256 values and 50 Task-C rows per annotator. A row-wise
+source check found no mismatch across all 100 released judgments.
 
 The Java evaluation retains all 91 instances pinned by
 `inputs/java_cross_language_manifest_20260714.json`.

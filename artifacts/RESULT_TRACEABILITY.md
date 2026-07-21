@@ -35,7 +35,7 @@ All paths below are relative to `artifacts/`.
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
 | Blinded judgments and agreement | `results/human_window_*_20260718.*` |
-| Exact student-visible audit rankings | `frozen/human_window_rankings_20260712.jsonl.gz` |
+| Exact annotator-visible audit rankings | `frozen/human_window_rankings_20260712.jsonl.gz` |
 | Audit window-to-source binding | `results/human_window_binding_20260719.tsv` |
 | Exact-window strict evaluation | `results/human_window_exact_instances_20260719.tsv` |
 | Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
@@ -188,9 +188,9 @@ python3 scripts/analyze_human_strict_alignment.py \
 ```
 
 The raw annotations and randomized A/B assignment remain exactly as supplied
-to the students. They audit the main RQ-1 `BM25_projection` versus
+to the annotators. They audit the main RQ-1 `BM25_projection` versus
 `MURAL_2src` comparison. Strict alignment is computed from the exact windows
-the students inspected.
+the annotators inspected.
 
 ## Regenerate the stratified analyses
 

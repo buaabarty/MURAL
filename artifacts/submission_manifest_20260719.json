@@ -1,16 +1,16 @@
 {
   "files": {
     "README.md": {
-      "bytes": 2889,
-      "sha256": "5ebc60b5a35e61da84b2f8127f8b8bb3a58ccc3075c50811a77f0937bbdc58de"
+      "bytes": 2891,
+      "sha256": "6107fbdd9f2b0b4522affda712a0fd8257c839d8ebd67c5a8db437b5a25cd0ac"
     },
     "artifacts/README.md": {
-      "bytes": 6734,
-      "sha256": "d41ea95c30eeb2e1645df308c3215e81fcf68a8def3d721f2a35335715c0e39f"
+      "bytes": 6952,
+      "sha256": "8b5ee7643b26c078e4eed034666eebacd364d9faa3527ed6226bbcab79f51374"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 10061,
-      "sha256": "df3ba47fd97c0af7c96c8004df6639f272dc6fa966db213af399b5bbb4c5d607"
+      "bytes": 10067,
+      "sha256": "13af737fa03cba45323f52b3321d5d8e420ae7f6c3cc8d1d0b84ee99f5e255d1"
     },
     "artifacts/frozen/external_localizers_manifest.json": {
       "bytes": 815,
@@ -103,6 +103,10 @@
     "artifacts/results/human_window_unique_strict_summary_20260719.tsv": {
       "bytes": 339,
       "sha256": "f05d78990caa94810b2e21ab44ca7b9ae39e3b9338bdeb6079c18719a8d129eb"
+    },
+    "artifacts/results/issue_creation_cutoff_audit_20260719.json": {
+      "bytes": 639,
+      "sha256": "f089317a2664d962b5c9776880c17a9a86324fdb3f2156e9e15d6a1ea3066534"
     },
     "artifacts/results/java_cross_language_instances_20260714.jsonl": {
       "bytes": 1203742,
@@ -340,13 +344,17 @@
       "bytes": 13328,
       "sha256": "a6dde65643ebd3e95e884bd0b65958d6864548c15c536cddfcc78122dacc6bd3"
     },
+    "artifacts/scripts/audit_issue_creation_cutoff.py": {
+      "bytes": 3903,
+      "sha256": "c3c220ecbe77e5c71928ad130c5676a180f6d037bfe878b213c4e31fe93176e0"
+    },
     "artifacts/scripts/build_strict_reference_targets.py": {
       "bytes": 15474,
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 8801,
-      "sha256": "d604c64a733479077cc103f06306ea98790a2bda5ab61c04f1463aac6b73a8d6"
+      "bytes": 9173,
+      "sha256": "8cbef4150ecf99c888ee765a24dd39d291bc49c8ef80c281ea56725a294327e8"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -461,8 +469,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 37822,
-      "sha256": "dc1da06faad6e969a7857ee0509e1ba0fa38a62d6c608323bf9a525b9fd43879"
+      "bytes": 40143,
+      "sha256": "45809534e24e937f2eec08e8c6069ff0845dc069c6642247e17664b810a01026"
     },
     "test_entity_projection_ranking.py": {
       "bytes": 2935,
@@ -504,6 +512,7 @@
     "double_coded_instances": 20,
     "judgments": 100,
     "paper_comparison": "RQ-1 source-composition comparison",
+    "source_workbook_provenance": "artifacts/results/human_window_provenance_20260718.tsv",
     "strict_window_evaluation": "artifacts/results/human_window_exact_instances_20260719.tsv",
     "unique_instances": 80,
     "window_binding": "artifacts/results/human_window_binding_20260719.tsv",
@@ -555,7 +564,7 @@
       "2026-07-19"
     ],
     "max_output_tokens": 2048,
-    "model_alias": "glm-5.2",
+    "model": "GLM-5",
     "official_harness": "swe-bench 4.1.0",
     "patch_format": "SEARCH/REPLACE converted to unified diff and checked against base commit",
     "prompt_hash_rows": 1000,
@@ -596,5 +605,10 @@
       "total": 1044
     },
     "target_file": "artifacts/results/strict_reference_targets_20260719.json"
+  },
+  "structural_temporal_boundary": {
+    "audit": "artifacts/results/issue_creation_cutoff_audit_20260719.json",
+    "audited_instances": 500,
+    "cutoff": "target issue created_at"
   }
 }
