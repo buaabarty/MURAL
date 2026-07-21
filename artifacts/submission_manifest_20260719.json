@@ -1,17 +1,32 @@
 {
   "annotation_snapshot": "2026-07-21",
+  "architecture_controls": {
+    "frozen_rankings": "artifacts/frozen/architecture_control_rankings_20260721.jsonl.gz",
+    "fusion_point": "file-level RRF then projection versus per-source projection then entity-level RRF",
+    "manifest": "artifacts/frozen/architecture_control_manifest_20260721.json",
+    "native_structural_branch": "projected-entity RRF versus full MURAL",
+    "ordering": "same BM25 files and candidate entities; file-primary versus entity-primary"
+  },
   "files": {
     "README.md": {
       "bytes": 2937,
       "sha256": "d57070621afb890d2565e0c686946af0c252b0c36cb8db817e7c53b8ab09432c"
     },
     "artifacts/README.md": {
-      "bytes": 8054,
-      "sha256": "23a1260750ab51acdecaad71e3e9cea2bd04c109ca63f7aebe6ee4532cdbd740"
+      "bytes": 9539,
+      "sha256": "ea29ca3e2aea56d105ad7af394a1af63b963aecebcdc77e3b2ee5b9478ca1fce"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 10603,
-      "sha256": "d27606c98b7b983eb90065a39a09411b7dbedd94592a672cd249515c17c48c88"
+      "bytes": 14306,
+      "sha256": "1dc5a385d505c98d4d692bae3d4f3c47ef24e25239a224e529fd36c735b24d22"
+    },
+    "artifacts/frozen/architecture_control_manifest_20260721.json": {
+      "bytes": 2012,
+      "sha256": "01733c7d68d62463b2ad14fa3b675569c99f0a3ef28c602a659570699110fbb1"
+    },
+    "artifacts/frozen/architecture_control_rankings_20260721.jsonl.gz": {
+      "bytes": 9842703,
+      "sha256": "332a3dd430b033320ef5104a7316e43b6a40e353b6e8ff270cf02d5e69a5499e"
     },
     "artifacts/frozen/external_localizers_manifest.json": {
       "bytes": 815,
@@ -57,9 +72,33 @@
       "bytes": 950,
       "sha256": "a809b72c070202716f182faf653585040d8836893f626e6b1defcdb6ae1cf1c0"
     },
+    "artifacts/results/architecture_control_instances_20260721.tsv": {
+      "bytes": 123155,
+      "sha256": "85195238d9297b6892c5855305fef1b322b6f829182dd2044b2e44377d82703f"
+    },
+    "artifacts/results/architecture_control_paired_20260721.tsv": {
+      "bytes": 912,
+      "sha256": "dd476710b92667e4729c0b4638b18e44795bb97571018187365fbe087b58d9ce"
+    },
+    "artifacts/results/architecture_control_summary_20260721.tsv": {
+      "bytes": 327,
+      "sha256": "0444d9d7ac97e1890f92bd47cd82a2c44c61f5f5f6d56644d6ae58b86386898e"
+    },
     "artifacts/results/context_construction_cost_20260716.tsv": {
       "bytes": 384,
       "sha256": "2166e4451d3307726a6cc1f48bc547c8436a3a073d250f429f5725667d57b1ef"
+    },
+    "artifacts/results/entity_ordering_control_instances_20260721.tsv": {
+      "bytes": 78974,
+      "sha256": "7df48c5efda8139117c5908c17d00b3fb35adc66816e108c5fce7aeb03c4c621"
+    },
+    "artifacts/results/entity_ordering_control_paired_20260721.tsv": {
+      "bytes": 483,
+      "sha256": "3ad543e69213339ac911e13806c60b268bbccfc96706550dcbac24c27fa29380"
+    },
+    "artifacts/results/entity_ordering_control_summary_20260721.tsv": {
+      "bytes": 240,
+      "sha256": "f3c505321248d0514af97168b61196019450c9901e464506664061cb7fb4ab5d"
     },
     "artifacts/results/human_construct_adjudicated_20260721.tsv": {
       "bytes": 34502,
@@ -152,6 +191,18 @@
     "artifacts/results/java_cross_language_targets_20260714.json": {
       "bytes": 89480,
       "sha256": "36c9bf6e082ee85bbcab41637d48489a6a326027e8413d0570aae59b2d291147"
+    },
+    "artifacts/results/line_coverage_instances_4000_20260721.tsv": {
+      "bytes": 74528,
+      "sha256": "cfa97c1abf2af2794a8e68f9e4bcc29f388568aff49aa190feb5defcf812b9b8"
+    },
+    "artifacts/results/line_coverage_summary_4000_20260721.tsv": {
+      "bytes": 484,
+      "sha256": "8672780d6b6de3743bcbad19d05b33f2053a73d854eb29bea2c774cf9e87951e"
+    },
+    "artifacts/results/reference_coverage_strata_4000_20260721.tsv": {
+      "bytes": 860,
+      "sha256": "73831721eb77675eb62f1d3359fa538d97f77aec4ee75723bd20a31c2e0d59d9"
     },
     "artifacts/results/repair_equal4000_clustered_paired_20260719.tsv": {
       "bytes": 308,
@@ -361,6 +412,10 @@
       "bytes": 4319,
       "sha256": "3407b93b2046acb4a0faa1b27eeab492d2c2a77bb2420a67a8d4148618316433"
     },
+    "artifacts/scripts/analyze_reference_coverage_strata.py": {
+      "bytes": 6612,
+      "sha256": "a1bb1fb13efd1352e62538dab7911c5fbcaaf761774234fce054e04d8cc0584a"
+    },
     "artifacts/scripts/analyze_repair_outcomes.py": {
       "bytes": 10622,
       "sha256": "58aa7787d609bb992f8867dca2d9ac116e99cb7584ebd7020a9d881d24ea44fd"
@@ -386,8 +441,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 10202,
-      "sha256": "e09411bbf22b510639c16e1584f04c3df822b482f43c97b71b35aa8be6af21ed"
+      "bytes": 11482,
+      "sha256": "97f363c5ba19a7a921d5468e080f9eac7d91011f5b16f15d68093b5c1a30a54a"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -414,8 +469,8 @@
       "sha256": "50740f850d6d31402061ce393cc7ac7a392cad774a39998afb1781c98637fbb7"
     },
     "artifacts/scripts/evaluate_token_budget_context.py": {
-      "bytes": 19610,
-      "sha256": "22078308f98c3cfd5c918afb582813f7e3013fa911fa0a2f11ec3cd722f563a7"
+      "bytes": 19898,
+      "sha256": "8a39204cb92169d33087d9dc23bc52e68f852df9ae512c10f91c7beabdce3bd3"
     },
     "artifacts/scripts/export_compact_rankings.py": {
       "bytes": 3517,
@@ -428,6 +483,14 @@
     "artifacts/scripts/export_entity_projection.py": {
       "bytes": 197,
       "sha256": "3fbdb04146745494ab6307532993751ef9ff9fc9312c8eed8aa2e1228315314f"
+    },
+    "artifacts/scripts/export_file_primary_ranking.py": {
+      "bytes": 3473,
+      "sha256": "b1aa045c31592fc3574a2db69b9010af4510efa4b01c62ac755d58a67bcf726e"
+    },
+    "artifacts/scripts/export_file_rrf_seeds.py": {
+      "bytes": 6597,
+      "sha256": "300b8c4828a305471b917b509dfa7ac3cce50388a941c32d7d01a3a6f6fd2b11"
     },
     "artifacts/scripts/export_fixed_prefix_fusion.py": {
       "bytes": 4605,
@@ -446,8 +509,8 @@
       "sha256": "4e82c1c3afbab7cbb5ef64d5b3e076c3e751b45f319b6aa34f396205e8bf3c30"
     },
     "artifacts/scripts/export_selector_simple_baselines.py": {
-      "bytes": 10504,
-      "sha256": "987f268c71d6d73ac9905286c3a109bd085497e936ab6f4d5573114779f4ef4b"
+      "bytes": 10506,
+      "sha256": "40de155b4206c55b19d8c2c032075ada48b834a696f3ac08afbd438855227f69"
     },
     "artifacts/scripts/export_text_baselines.py": {
       "bytes": 24692,
@@ -478,8 +541,8 @@
       "sha256": "c0a901fa521d44edf8f930794865784287412ab78e0882efc1bc2e5ee651a795"
     },
     "artifacts/scripts/plot_paper_findings.py": {
-      "bytes": 8020,
-      "sha256": "21f889c99a734f6ec38e8bb9b1397294e331d49237182f7316c694845cf594d4"
+      "bytes": 8017,
+      "sha256": "36c46af6e0afcb15f6ab5408184a43d39590f74c0e47482debb08ea05efb3660"
     },
     "artifacts/scripts/reanalyze_java_clustered_stats.py": {
       "bytes": 3366,
@@ -502,8 +565,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 44688,
-      "sha256": "1b424594377e946f551e3e2434433a9c9fb804fd905ec259ceb21c909b89b2d6"
+      "bytes": 51295,
+      "sha256": "d0b31c424db93fb101767af299adb59990427b5d7fd040e5ab87814567328f4b"
     },
     "test_entity_projection_ranking.py": {
       "bytes": 2935,
@@ -530,8 +593,9 @@
       "sha256": "d0f9ca8639b6aa3687b16e4ec13ab51bd009d4e97ab36dd5fc3dc218354551d5"
     }
   },
-  "frozen_date": "2026-07-19",
+  "frozen_date": "2026-07-21",
   "human_audit": {
+    "audit_scope": "patch-grounded target consistency",
     "configurations": {
       "BM25-local": "BM25_projection",
       "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)"
@@ -582,7 +646,7 @@
     "frozen_rankings": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
     "fusion": "equal-weight reciprocal-rank fusion over canonical adapter rankings",
     "prefix_policy": "preserve resolved prefix; scan secondary head, localizer remainder, then secondary remainder",
-    "projection": "one shared deterministic Entity Projection implementation for ranked-file branches",
+    "projection": "one shared deterministic global issue-conditioned entity ranking over each retrieved file pool",
     "python_identity": "normalized path, inferred kind, and qualified symbol base",
     "rrf_k": 60,
     "source_adapters": {
@@ -593,7 +657,7 @@
   },
   "paper": {
     "artifact_repository": "https://github.com/buaabarty/MURAL",
-    "title": "MURAL: Decoupling File Retrieval from Within-File Entity Selection for Bounded Repository-Repair Context"
+    "title": "MURAL: Multi-Source Retrieval-to-Entity Context Construction for Repository Repair"
   },
   "python_benchmark": {
     "instances": 500,
@@ -601,6 +665,25 @@
     "query": "original issue title and body",
     "repositories": 12,
     "snapshot": "official base commit"
+  },
+  "rendered_coverage": {
+    "identity_metrics": [
+      "EntityCov",
+      "EntityComplete"
+    ],
+    "instances": "artifacts/results/line_coverage_instances_4000_20260721.tsv",
+    "line_metrics": [
+      "LineRecall",
+      "CompleteLine"
+    ],
+    "strata": [
+      "entity-only",
+      "mixed",
+      "file-only"
+    ],
+    "strata_ledger": "artifacts/results/reference_coverage_strata_4000_20260721.tsv",
+    "summary": "artifacts/results/line_coverage_summary_4000_20260721.tsv",
+    "token_budget": 4000
   },
   "repair": {
     "api_key_environment_variable": "AUTODL_API_KEY",

@@ -24,6 +24,9 @@ All paths below are relative to `artifacts/`.
 | Equal rendered-token comparison | `results/strict_token_context_{summary,instances,paired}_20260719.tsv` |
 | Packing, truncation, and changed-line coverage | `results/strict_token_packing_{summary,instances}_20260719.tsv` |
 | Selector controls | `results/strict_selector_{summary,instances,paired}_20260719.tsv` |
+| File-primary versus entity-primary ordering | `results/entity_ordering_control_{summary,instances,paired}_20260721.tsv` |
+| File-level versus entity-level fusion and native structural branch | `results/architecture_control_{summary,instances,paired}_20260721.tsv` |
+| Entity and rendered changed-line coverage by target stratum | `results/reference_coverage_strata_4000_20260721.tsv`, `results/line_coverage_{summary,instances}_4000_20260721.tsv` |
 | Complete GLM-prefix tail controls | `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv` |
 | Released localizer completion | `results/strict_external_localizer_{summary,instances,paired}_20260719.tsv` |
 | Entity budgets 5, 10, 20, and 40 | `results/strict_budget_b*_{summary,instances,paired}_20260719.tsv` |
@@ -34,7 +37,7 @@ All paths below are relative to `artifacts/`.
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
-| Blinded judgments and agreement | `results/human_window_*_20260718.*` |
+| Patch-grounded target-consistency judgments and agreement | `results/human_window_*_20260718.*` |
 | Exact annotator-visible audit rankings | `frozen/human_window_rankings_20260712.jsonl.gz` |
 | Audit window-to-source binding | `results/human_window_binding_20260719.tsv` |
 | Exact-window strict evaluation | `results/human_window_exact_instances_20260719.tsv` |
@@ -78,6 +81,83 @@ python3 scripts/evaluate_strict_reference_context.py \
 
 The verifier compares these frozen-source values with the article-facing
 localization ledger.
+
+## Reproduce the architecture controls
+
+Materialize the compact control rankings:
+
+```bash
+python3 scripts/materialize_compact_rankings.py \
+  --input frozen/architecture_control_rankings_20260721.jsonl.gz \
+  --output-root ../temp_run/mural_architecture_controls
+```
+
+Recompute the fixed-pool ordering comparison:
+
+```bash
+python3 scripts/evaluate_strict_reference_context.py \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --targets results/strict_reference_targets_20260719.json \
+  --row FilePrimary=../temp_run/mural_architecture_controls/FilePrimary \
+  --row EntityPrimary=../temp_run/mural_strict_rankings/BM25_projection \
+  --compare FilePrimary=EntityPrimary --top-k 20 --bootstrap 10000 --seed 7 \
+  --output-summary ../temp_run/entity_ordering_summary.tsv \
+  --output-instances ../temp_run/entity_ordering_instances.tsv \
+  --output-paired ../temp_run/entity_ordering_paired.tsv
+```
+
+Recompute the fusion-point and native-structural comparison:
+
+```bash
+python3 scripts/evaluate_strict_reference_context.py \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --targets results/strict_reference_targets_20260719.json \
+  --row FileFusionProjection=../temp_run/mural_architecture_controls/FileFusionProjection \
+  --row ProjectedEntityRRF=../temp_run/mural_architecture_controls/ProjectedEntityRRF \
+  --row MURAL=../temp_run/mural_strict_rankings/MURAL \
+  --compare FileFusionProjection=ProjectedEntityRRF \
+  --compare ProjectedEntityRRF=MURAL --top-k 20 --bootstrap 10000 --seed 7 \
+  --output-summary ../temp_run/architecture_summary.tsv \
+  --output-instances ../temp_run/architecture_instances.tsv \
+  --output-paired ../temp_run/architecture_paired.tsv
+```
+
+The retained compact-ranking digest and control definitions are recorded in
+`frozen/architecture_control_manifest_20260721.json`.
+
+## Reproduce rendered changed-line coverage
+
+Pack the retained BM25 and MURAL rankings with the paper renderer:
+
+```bash
+python3 scripts/evaluate_token_budget_context.py \
+  --source BM25=../temp_run/mural_strict_rankings/BM25_projection \
+  --source MURAL=../temp_run/mural_strict_rankings/MURAL \
+  --compare BM25=MURAL --budget 4000 \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --dataset-file SWE_BENCH_VERIFIED_ARROW \
+  --targets results/strict_reference_targets_20260719.json \
+  --output-root ../temp_run/line4000 \
+  --output-summary ../temp_run/line4000_summary.tsv \
+  --output-paired ../temp_run/line4000_paired.tsv \
+  --output-instances ../temp_run/line4000_instances.tsv \
+  --output-packing-summary ../temp_run/line4000_packing_summary.tsv \
+  --output-packing-instances ../temp_run/line4000_packing_instances.tsv \
+  --max-candidates 50 --bootstrap-iters 10000 --seed 7
+```
+
+Compute entity and changed-line metrics separately for entity-only, mixed, and
+file-only reference strata:
+
+```bash
+python3 scripts/analyze_reference_coverage_strata.py \
+  --targets results/strict_reference_targets_20260719.json \
+  --row BM25=../temp_run/line4000/BM25_t4000 \
+  --row MURAL=../temp_run/line4000/MURAL_t4000 \
+  --budget-label 4000-token \
+  --packing-instances ../temp_run/line4000_packing_instances.tsv \
+  --output ../temp_run/reference_coverage_strata_4000.tsv
+```
 
 ## Regenerate source rankings
 

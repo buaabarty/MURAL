@@ -17,6 +17,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_clustered_repair_stats.py",
     "artifacts/scripts/analyze_repair_outcomes.py",
     "artifacts/scripts/analyze_human_strict_alignment.py",
+    "artifacts/scripts/analyze_reference_coverage_strata.py",
     "artifacts/scripts/analyze_human_evidence_audit.py",
     "artifacts/scripts/analyze_source_bearing_prompt_coverage.py",
     "artifacts/scripts/analyze_stratified_context_findings.py",
@@ -30,6 +31,8 @@ CRITICAL_FILES = [
     "artifacts/scripts/evaluate_java_retrieve_localize.py",
     "artifacts/scripts/evaluate_strict_external_localizers.py",
     "artifacts/scripts/evaluate_strict_reference_context.py",
+    "artifacts/scripts/export_file_primary_ranking.py",
+    "artifacts/scripts/export_file_rrf_seeds.py",
     "artifacts/scripts/evaluate_token_budget_context.py",
     "artifacts/scripts/freeze_human_window_rankings.py",
     "artifacts/scripts/export_compact_rankings.py",
@@ -91,10 +94,10 @@ def main() -> None:
 
     manifest = {
         "schema_version": 3,
-        "frozen_date": "2026-07-19",
+        "frozen_date": "2026-07-21",
         "annotation_snapshot": "2026-07-21",
         "paper": {
-            "title": "MURAL: Decoupling File Retrieval from Within-File Entity Selection for Bounded Repository-Repair Context",
+            "title": "MURAL: Multi-Source Retrieval-to-Entity Context Construction for Repository Repair",
             "artifact_repository": "https://github.com/buaabarty/MURAL",
         },
         "python_benchmark": {
@@ -127,13 +130,29 @@ def main() -> None:
                 "dense": "ranked files through shared Entity Projection",
                 "structural": "canonical minimum-rank union of native structural entities and projected structurally ranked files",
             },
-            "projection": "one shared deterministic Entity Projection implementation for ranked-file branches",
+            "projection": "one shared deterministic global issue-conditioned entity ranking over each retrieved file pool",
             "python_identity": "normalized path, inferred kind, and qualified symbol base",
             "fusion": "equal-weight reciprocal-rank fusion over canonical adapter rankings",
             "rrf_k": 60,
             "default_entity_budget": 20,
             "prefix_policy": "preserve resolved prefix; scan secondary head, localizer remainder, then secondary remainder",
             "frozen_rankings": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
+        },
+        "architecture_controls": {
+            "frozen_rankings": "artifacts/frozen/architecture_control_rankings_20260721.jsonl.gz",
+            "manifest": "artifacts/frozen/architecture_control_manifest_20260721.json",
+            "ordering": "same BM25 files and candidate entities; file-primary versus entity-primary",
+            "fusion_point": "file-level RRF then projection versus per-source projection then entity-level RRF",
+            "native_structural_branch": "projected-entity RRF versus full MURAL",
+        },
+        "rendered_coverage": {
+            "token_budget": 4000,
+            "strata": ["entity-only", "mixed", "file-only"],
+            "identity_metrics": ["EntityCov", "EntityComplete"],
+            "line_metrics": ["LineRecall", "CompleteLine"],
+            "summary": "artifacts/results/line_coverage_summary_4000_20260721.tsv",
+            "instances": "artifacts/results/line_coverage_instances_4000_20260721.tsv",
+            "strata_ledger": "artifacts/results/reference_coverage_strata_4000_20260721.tsv",
         },
         "statistics": {
             "bootstrap": "paired repository-clustered percentile interval",
@@ -168,6 +187,7 @@ def main() -> None:
         },
         "human_audit": {
             "judgments": 100,
+            "audit_scope": "patch-grounded target consistency",
             "unique_instances": 80,
             "double_coded_instances": 20,
             "decision_labels": ["MURAL", "BM25-local", "Comparable", "Both insufficient"],

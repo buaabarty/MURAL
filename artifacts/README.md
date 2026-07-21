@@ -21,6 +21,11 @@ entity kind, and qualified symbol. The final mapping contains 1,044 targets:
 evaluation maps changed lines to declarations present in the official base commit;
 its complete benchmark includes all 91 instances and six repositories.
 
+`RefComplete` denotes complete matching of these evaluator identities. Exact-file
+fallbacks contribute path identity only. Rendered changed-line recall and
+`CompleteLine` separately measure whether the final source excerpts contain the
+base-side changed lines.
+
 Every Python comparison retains all 500 SWE-bench Verified instances. Confidence
 intervals use 10,000 repository-clustered bootstrap resamples with seed 7;
 binary paired contrasts use the two-sided exact McNemar test.
@@ -35,6 +40,9 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `export_ranked_file_seeds.py`: ranked-file seed materialization.
 - `export_entity_projection.py`: projection entry point.
 - `export_path_mined_filelocal.py`: shared projection implementation.
+- `export_file_primary_ranking.py`: file-primary ordering control over a fixed projected pool.
+- `export_file_rrf_seeds.py`: file-level RRF followed by projection control.
+- `analyze_reference_coverage_strata.py`: entity and changed-line coverage by target stratum.
 - `fuse_path_mined_with_kg.py`: canonical union of native structural and projected entities.
 - `export_multi_source_rrf_fusion.py`: deterministic multi-source RRF.
 - `export_fixed_prefix_fusion.py`: prefix-preserving completion.
@@ -71,6 +79,19 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `results/strict_repository_robustness_20260719.tsv`
 - `results/context_construction_cost_20260716.tsv`
 
+
+### Architecture and rendered-line controls
+
+- `results/entity_ordering_control_{summary,instances,paired}_20260721.tsv`
+- `results/architecture_control_{summary,instances,paired}_20260721.tsv`
+- `results/reference_coverage_strata_4000_20260721.tsv`
+- `results/line_coverage_{summary,instances}_4000_20260721.tsv`
+- `frozen/architecture_control_rankings_20260721.jsonl.gz`
+- `frozen/architecture_control_manifest_20260721.json`
+
+The ordering control holds the BM25 files and projected candidates fixed. The
+fusion-point control compares file-level RRF followed by one projection with
+per-source projection followed by entity-level RRF.
 ### Repair prompts and official outcomes
 
 - `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv`
@@ -135,6 +156,11 @@ BM25 projection, the structural adapter, dense projection, two-source MURAL, and
 three-source MURAL for all 500 Python instances.
 `frozen/source_rankings_manifest_20260719.json` records the construction and
 canonical-identity contract for those five rankings.
+`frozen/architecture_control_rankings_20260721.jsonl.gz` contains file-primary,
+file-fusion-then-projection, and projected-entity-RRF rankings for all 500
+instances. `frozen/architecture_control_manifest_20260721.json` records their
+construction, digest, and relation to the retained BM25-projection and MURAL
+rankings.
 `frozen/external_localizers_manifest.json` records the upstream repository commit
 and SHA-256 values for released localizer files.
 

@@ -21,6 +21,15 @@ MANIFEST = ROOT / "artifacts" / "submission_manifest_20260719.json"
 
 EXPECTED_RESULTS = {
     "context_construction_cost_20260716.tsv",
+    "architecture_control_instances_20260721.tsv",
+    "architecture_control_paired_20260721.tsv",
+    "architecture_control_summary_20260721.tsv",
+    "entity_ordering_control_instances_20260721.tsv",
+    "entity_ordering_control_paired_20260721.tsv",
+    "entity_ordering_control_summary_20260721.tsv",
+    "line_coverage_instances_4000_20260721.tsv",
+    "line_coverage_summary_4000_20260721.tsv",
+    "reference_coverage_strata_4000_20260721.tsv",
     "human_construct_adjudicated_20260721.tsv",
     "human_construct_annotations_raw_20260721.tsv",
     "human_evidence_audit_provenance_20260721.tsv",
@@ -391,6 +400,121 @@ def check_frozen_rankings(targets: dict[str, Any]) -> None:
         for field in ("file_hit", "target_coverage", "mrr", "hit", "complete"):
             observed = 100 * sum(float(item[field]) for item in metrics) / len(metrics)
             close(observed, float(ledger[field]), f"frozen {source} {field}", 1e-5)
+
+
+def check_architecture_and_line_coverage() -> None:
+    ordering = rows("entity_ordering_control_summary_20260721.tsv")
+    equal(len(ordering), 2, "entity-ordering summary rows")
+    expected_ordering = {
+        "FilePrimary": (64.8, 46.136955, 30.406252, 54.0, 39.6),
+        "EntityPrimary": (73.6, 49.276162, 31.095705, 57.8, 42.2),
+    }
+    for approach, values in expected_ordering.items():
+        row = one(ordering, approach=approach)
+        equal(int(row["N"]), 500, f"{approach} ordering N")
+        for field, value in zip(
+            ("file_hit", "target_coverage", "mrr", "hit", "complete"), values
+        ):
+            close(row[field], value, f"{approach} ordering {field}")
+
+    row = pair(
+        "entity_ordering_control_paired_20260721.tsv",
+        "FilePrimary",
+        "EntityPrimary",
+        "hit",
+    )
+    close(row["delta"], 3.8, "entity-primary Hit delta")
+    close(row["clustered_ci_low"], 0.751833, "entity-primary Hit low")
+    close(row["clustered_ci_high"], 5.560033, "entity-primary Hit high")
+    equal(int(row["wins"]), 40, "entity-primary Hit wins")
+    equal(int(row["losses"]), 21, "entity-primary Hit losses")
+    close(row["mcnemar_p"], 0.0204147137996, "entity-primary Hit p", 1e-12)
+
+    architecture = rows("architecture_control_summary_20260721.tsv")
+    equal(len(architecture), 3, "architecture-control summary rows")
+    expected_architecture = {
+        "FileFusionProjection": (84.4, 55.090216, 33.934454, 64.6, 46.8),
+        "ProjectedEntityRRF": (82.2, 55.947035, 37.423157, 65.4, 47.8),
+        "MURAL": (83.0, 57.588463, 37.950833, 67.2, 49.6),
+    }
+    for approach, values in expected_architecture.items():
+        row = one(architecture, approach=approach)
+        equal(int(row["N"]), 500, f"{approach} architecture N")
+        for field, value in zip(
+            ("file_hit", "target_coverage", "mrr", "hit", "complete"), values
+        ):
+            close(row[field], value, f"{approach} architecture {field}")
+
+    fusion_hit = pair(
+        "architecture_control_paired_20260721.tsv",
+        "FileFusionProjection",
+        "ProjectedEntityRRF",
+        "hit",
+    )
+    close(fusion_hit["delta"], 0.8, "entity-level fusion Hit delta")
+    close(fusion_hit["mcnemar_p"], 0.658738077024, "entity-level fusion Hit p")
+    fusion_mrr = pair(
+        "architecture_control_paired_20260721.tsv",
+        "FileFusionProjection",
+        "ProjectedEntityRRF",
+        "mrr",
+    )
+    close(fusion_mrr["delta"], 3.488703, "entity-level fusion MRR delta")
+    native_hit = pair(
+        "architecture_control_paired_20260721.tsv",
+        "ProjectedEntityRRF",
+        "MURAL",
+        "hit",
+    )
+    close(native_hit["delta"], 1.8, "native structural Hit delta")
+    close(native_hit["mcnemar_p"], 0.00390625, "native structural Hit p")
+
+    ranking_path = FROZEN / "architecture_control_rankings_20260721.jsonl.gz"
+    ranking_hash = hashlib.sha256(ranking_path.read_bytes()).hexdigest()
+    equal(
+        ranking_hash,
+        "332a3dd430b033320ef5104a7316e43b6a40e353b6e8ff270cf02d5e69a5499e",
+        "architecture ranking SHA-256",
+    )
+    control_manifest = json_file(
+        FROZEN / "architecture_control_manifest_20260721.json"
+    )
+    equal(control_manifest["rankings"]["sha256"], ranking_hash, "architecture manifest hash")
+    equal(control_manifest["population"], 500, "architecture manifest population")
+    expected_sources = {"FilePrimary", "FileFusionProjection", "ProjectedEntityRRF"}
+    seen: set[str] = set()
+    with gzip.open(ranking_path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            item = json.loads(line)
+            seen.add(item["instance_id"])
+            equal(set(item["sources"]), expected_sources, "architecture ranking sources")
+            equal(int(item["top_k"]), 20, "architecture ranking Top-K")
+            for candidates in item["sources"].values():
+                equal(len(candidates), 20, "architecture ranking candidate count")
+    equal(len(seen), 500, "architecture ranking population")
+
+    line_summary = rows("line_coverage_summary_4000_20260721.tsv")
+    equal(len(line_summary), 2, "line-coverage summary rows")
+    expected_lines = {
+        "BM25": (0.2568409645082633, 0.194, 0.2725600519368102),
+        "MURAL": (0.31373611487401787, 0.232, 0.23050986001839174),
+    }
+    for source, values in expected_lines.items():
+        row = one(line_summary, source=source)
+        equal(int(row["N"]), 500, f"{source} line-coverage N")
+        close(row["changed_line_recall"], values[0], f"{source} changed-line recall")
+        close(row["complete_changed_line_rate"], values[1], f"{source} CompleteLine")
+        close(row["truncated_entity_rate"], values[2], f"{source} truncation rate")
+
+    strata = rows("reference_coverage_strata_4000_20260721.tsv")
+    equal(len(strata), 6, "reference-coverage stratum rows")
+    entity_only = one(strata, approach="MURAL", stratum="entity-only")
+    close(entity_only["entity_target_coverage"], 57.1698048847046, "MURAL entity-only EntityCov")
+    close(entity_only["complete_entity"], 54.154727793696274, "MURAL entity-only EntityComplete")
+    mixed = one(strata, approach="MURAL", stratum="mixed")
+    close(mixed["changed_line_recall"], 26.801922050186867, "MURAL mixed LineRecall")
+    file_only = one(strata, approach="MURAL", stratum="file-only")
+    close(file_only["changed_line_recall"], 6.779661016949152, "MURAL file-only LineRecall")
 
 
 def check_token_budgets() -> None:
@@ -829,6 +953,26 @@ def check_java_and_cost() -> None:
 def check_manifest() -> None:
     manifest = json_file(MANIFEST)
     equal(manifest["schema_version"], 3, "manifest schema")
+    equal(
+        manifest["paper"]["title"],
+        "MURAL: Multi-Source Retrieval-to-Entity Context Construction for Repository Repair",
+        "manifest paper title",
+    )
+    equal(
+        manifest["architecture_controls"]["manifest"],
+        "artifacts/frozen/architecture_control_manifest_20260721.json",
+        "manifest architecture controls",
+    )
+    equal(
+        manifest["rendered_coverage"]["line_metrics"],
+        ["LineRecall", "CompleteLine"],
+        "manifest line metrics",
+    )
+    equal(
+        manifest["human_audit"]["audit_scope"],
+        "patch-grounded target consistency",
+        "manifest human audit scope",
+    )
     equal(manifest["python_benchmark"]["instances"], 500, "manifest Python population")
     equal(manifest["strict_reference"]["target_counts"]["total"], 1044, "manifest target count")
     equal(manifest["java_benchmark"]["evaluated_instances"], 91, "manifest Java population")
@@ -907,6 +1051,7 @@ def main() -> None:
     check_localization()
     check_stratified_findings()
     check_frozen_rankings(targets)
+    check_architecture_and_line_coverage()
     check_token_budgets()
     check_controls_and_budgets()
     check_external()

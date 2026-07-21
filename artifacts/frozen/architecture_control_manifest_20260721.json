@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-07-21",
+  "benchmark": "SWE-bench Verified",
+  "population": 500,
+  "top_k": 20,
+  "canonical_identity": "normalized path, inferred kind, and qualified symbol base",
+  "rankings": {
+    "file": "artifacts/frozen/architecture_control_rankings_20260721.jsonl.gz",
+    "sha256": "332a3dd430b033320ef5104a7316e43b6a40e353b6e8ff270cf02d5e69a5499e",
+    "approaches": [
+      "FilePrimary",
+      "FileFusionProjection",
+      "ProjectedEntityRRF"
+    ]
+  },
+  "reference_rankings": {
+    "EntityPrimary": "BM25_projection in artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
+    "MURAL": "MURAL in artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz"
+  },
+  "controls": {
+    "FilePrimary": "same BM25 retrieved files and projected candidates; source file rank is primary",
+    "EntityPrimary": "same BM25 retrieved files and projected candidates; issue-conditioned entity evidence is primary",
+    "FileFusionProjection": "equal-weight RRF over BM25, structural, and dense file rankings followed by one Entity Projection",
+    "ProjectedEntityRRF": "Entity Projection per file-ranking source followed by equal-weight entity-level RRF",
+    "MURAL": "ProjectedEntityRRF with the native structural entity branch"
+  },
+  "scripts": [
+    "artifacts/scripts/export_file_primary_ranking.py",
+    "artifacts/scripts/export_file_rrf_seeds.py",
+    "artifacts/scripts/export_entity_projection.py",
+    "artifacts/scripts/export_multi_source_rrf_fusion.py",
+    "artifacts/scripts/evaluate_strict_reference_context.py"
+  ],
+  "result_ledgers": [
+    "artifacts/results/entity_ordering_control_summary_20260721.tsv",
+    "artifacts/results/entity_ordering_control_instances_20260721.tsv",
+    "artifacts/results/entity_ordering_control_paired_20260721.tsv",
+    "artifacts/results/architecture_control_summary_20260721.tsv",
+    "artifacts/results/architecture_control_instances_20260721.tsv",
+    "artifacts/results/architecture_control_paired_20260721.tsv"
+  ]
+}

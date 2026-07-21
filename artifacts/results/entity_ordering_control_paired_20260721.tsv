@@ -1,0 +1,6 @@
+baseline	treatment	metric	delta	clustered_ci_low	clustered_ci_high	wins	losses	mcnemar_p
+FilePrimary	EntityPrimary	file_hit	8.800000	4.761607	12.299570	58	14	1.6464300116e-07
+FilePrimary	EntityPrimary	target_coverage	3.139206	1.765933	4.402976	NA	NA	NA
+FilePrimary	EntityPrimary	hit	3.800000	0.751833	5.560033	40	21	0.0204147137996
+FilePrimary	EntityPrimary	mrr	0.689453	-2.815256	4.566106	NA	NA	NA
+FilePrimary	EntityPrimary	complete	2.600000	1.153791	5.283057	32	19	0.0919145498159

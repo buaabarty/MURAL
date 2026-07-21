@@ -36,5 +36,5 @@ preferred-citation:
       given-names: Bach
     - family-names: Tian
       given-names: Haoye
-  title: "MURAL: Decoupling File Retrieval from Within-File Entity Selection for Bounded Repository-Repair Context"
+  title: "MURAL: Multi-Source Retrieval-to-Entity Context Construction for Repository Repair"
   year: "2026"

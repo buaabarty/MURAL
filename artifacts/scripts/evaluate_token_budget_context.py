@@ -25,6 +25,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from datasets import Dataset
 from unidiff import PatchSet
 
 from entity_identity import canonical_entity_id
@@ -67,6 +68,10 @@ def load_ids(path: Path) -> list[str]:
 
 
 def load_dataset(path: Path) -> dict[str, dict[str, Any]]:
+    if path.suffix == ".arrow":
+        return {
+            str(item["instance_id"]): dict(item) for item in Dataset.from_file(str(path))
+        }
     output: dict[str, dict[str, Any]] = {}
     for raw in path.read_text(encoding="utf-8").splitlines():
         if not raw.strip():
@@ -465,6 +470,9 @@ def main() -> int:
             "budget_fill",
             "mean_selected_source_tokens",
             "truncated_entities",
+            "changed_lines_covered",
+            "changed_lines_total",
+            "complete_changed_lines",
         )
         write_tsv(
             args.output_packing_instances,

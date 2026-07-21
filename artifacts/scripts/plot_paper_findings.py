@@ -203,7 +203,7 @@ def plot_target_multiplicity(rows: list[dict[str, str]], output_dir: Path) -> No
         markersize=4.8,
         markerfacecolor="white",
         markeredgewidth=1.0,
-        label="CompleteTarget",
+        label="RefComplete",
         zorder=3,
     )
 

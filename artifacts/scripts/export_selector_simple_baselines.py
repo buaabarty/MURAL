@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Export simple within-file allocation baselines for Entity Projection.
+"""Export simple entity-ordering and allocation baselines for Entity Projection.
 
 Every variant starts from the same ranked BM25 files and the same parsed
-base-commit entities.  Only the within-file ordering/allocation policy changes.
+base-commit entities. Only the entity ordering/allocation policy changes.
 """
 
 from __future__ import annotations
