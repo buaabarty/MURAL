@@ -15,6 +15,11 @@ All paths below are relative to `artifacts/`.
   over all 12 repository clusters for Hit@20 and LineRecall.
 - Strict targets: 1,044 total, comprising 836 functions or class methods,
   32 assignments, and 176 exact-file fallbacks.
+- Context objects: ranked candidates precede rendering; metadata-visible
+  candidates appear by path and symbol; source-bearing candidates additionally
+  contribute concrete excerpts.
+- Renderers: controlled token analyses use strict-prefix packing; executed
+  repair prompts use the fixed rank-banded renderer documented below.
 
 ## Claim-to-ledger map
 
@@ -24,7 +29,7 @@ All paths below are relative to `artifacts/`.
 | Main Top-20 rows shown in the paper | `results/paper_main_results_20260722.tsv`, derived from `results/strict_localization_summary_20260719.tsv` |
 | Strict target policy and per-instance targets | `results/strict_reference_targets_20260719.json` |
 | Exact Top-20 rows, per-instance outcomes, paired statistics, and GLM-prefix rows | `results/strict_localization_{summary,instances,paired}_20260719.tsv` |
-| Equal rendered-token comparison | `results/strict_token_context_{summary,instances,paired}_20260719.tsv` |
+| Controlled strict-prefix rendered-token comparison | `results/strict_token_context_{summary,instances,paired}_20260719.tsv` |
 | All single-source, pairwise, and three-source combinations at Top-20, 4,000 tokens, and after the GLM-5 prefix | `results/source_combinations_*_20260722.tsv`, `results/source_combination_attribution_20260722.tsv` |
 | Packing, truncation, and changed-line coverage | `results/strict_token_packing_{summary,instances}_20260719.tsv` |
 | Insertion/deletion/mixed changed-line analysis | `results/changed_line_hunk_profile_20260722.tsv`, `results/changed_line_strata_*_20260722.tsv` |
@@ -140,7 +145,7 @@ The retained compact-ranking digest and control definitions are recorded in
 
 ## Reproduce rendered changed-line coverage
 
-Pack the retained BM25 and MURAL rankings with the paper renderer:
+Pack the retained BM25 and MURAL rankings with the controlled strict-prefix renderer:
 
 ```bash
 python3 scripts/evaluate_token_budget_context.py \
@@ -271,7 +276,10 @@ python3 scripts/evaluate_token_budget_context.py \
 
 `results/source_bearing_prompt_instances_20260719.tsv` records the
 SHA-256 of every executed prompt and the exact source-bearing entities retained
-by the renderer. Strict predictions and official evaluations are stored
+by the renderer. The executed renderer reserves excerpts for up to four
+candidates from ranks 1 to 10 and four from ranks 11 to 20, with at most two
+excerpts per file in each band; other retained candidates remain metadata-only.
+Strict predictions and official evaluations are stored
 separately for BM25 and MURAL. The provenance ledger records whether each prompt
 and patch changed during canonical-identity regeneration; an official outcome
 is reused only when instance and patch SHA-256 are identical.

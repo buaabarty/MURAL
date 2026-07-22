@@ -1299,6 +1299,26 @@ def check_manifest() -> None:
         "manifest paper title",
     )
     equal(
+        manifest["mural"]["context_objects"]["source_bearing_candidate"],
+        "metadata-visible candidate with a concrete source excerpt",
+        "manifest source-bearing candidate",
+    )
+    equal(
+        manifest["mural"]["controlled_token_renderer"],
+        "strict ranked-prefix packing with 700 source tokens for the first entity and 260 thereafter",
+        "manifest controlled renderer",
+    )
+    equal(
+        manifest["repair"]["renderer"],
+        "rank-banded excerpts: up to four candidates from ranks 1-10 and four from ranks 11-20, at most two excerpts per file in each band",
+        "manifest repair renderer",
+    )
+    equal(
+        manifest["repair"]["coverage_unit"],
+        "only source-bearing candidate excerpts contribute prompt TargetCov and RefComplete",
+        "manifest repair coverage unit",
+    )
+    equal(
         manifest["architecture_controls"]["manifest"],
         "artifacts/frozen/architecture_control_manifest_20260721.json",
         "manifest architecture controls",

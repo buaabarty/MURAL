@@ -13,12 +13,12 @@
       "sha256": "6fa4561989dc95a23bebbdbd20c21553dd56553c405fb7b547d3d5ac3269bd47"
     },
     "artifacts/README.md": {
-      "bytes": 13652,
-      "sha256": "3e6a5c85854d0c86dbe2fc4fed16322eff46a4f83def69bab9b6b4f1be955df8"
+      "bytes": 14212,
+      "sha256": "36e2a2db739e676707c23d7ce8f3fe2d6a88a41db64bf97db9828a893fe4185b"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 17856,
-      "sha256": "7e2a52b81bc0fada4fbb36477e92ad786f0c15208d1ffe565d2bb2c228cab9fc"
+      "bytes": 18435,
+      "sha256": "d3db2f1f086d04064179fdd81887615cf2c8319026e2d2effdd31211399a2614"
     },
     "artifacts/frozen/architecture_control_manifest_20260721.json": {
       "bytes": 2012,
@@ -645,8 +645,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 14624,
-      "sha256": "18e67c3e74ce56ffffbd34c6f7b2361f4d155c0c6b9881e5dbbbfc0cf1e48908"
+      "bytes": 15370,
+      "sha256": "19e047b668e2a83c87b45f0780911949c95575d617bb0942460c8620c537fe16"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -777,8 +777,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 68501,
-      "sha256": "eaa25771fcac3d917cdce8a5ec30c70bdc7b8cf923022766969c8c9fb669423d"
+      "bytes": 69353,
+      "sha256": "f30e728095f46330574aea3a35feb291e3a8a680fb55df23d138ecae70c792c9"
     },
     "artifacts/structural_temporal_metadata_20260722.json": {
       "bytes": 347,
@@ -871,6 +871,12 @@
     "repositories": 6
   },
   "mural": {
+    "context_objects": {
+      "metadata_visible_candidate": "ranked candidate shown by path and symbol in the prompt",
+      "ranked_candidate": "canonical entity before prompt rendering",
+      "source_bearing_candidate": "metadata-visible candidate with a concrete source excerpt"
+    },
+    "controlled_token_renderer": "strict ranked-prefix packing with 700 source tokens for the first entity and 260 thereafter",
     "default_entity_budget": 20,
     "frozen_rankings": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
     "fusion": "equal-weight reciprocal-rank fusion over canonical adapter rankings",
@@ -928,6 +934,7 @@
     "api_style": "OpenAI-compatible",
     "assistant_response_prefill": false,
     "candidate_entity_budget": 20,
+    "coverage_unit": "only source-bearing candidate excerpts contribute prompt TargetCov and RefComplete",
     "enable_thinking": false,
     "endpoint": "https://www.autodl.art/api/v1",
     "failure_conditioned_retries": 1,
@@ -942,6 +949,7 @@
     "prompt_hash_rows": 1000,
     "prompt_token_ceiling": 4000,
     "provider": "AutoDL",
+    "renderer": "rank-banded excerpts: up to four candidates from ranks 1-10 and four from ranks 11-20, at most two excerpts per file in each band",
     "request_timeout_seconds": 600,
     "selection": "first applicable patch",
     "temperature": 0.0,

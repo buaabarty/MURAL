@@ -42,6 +42,14 @@ fallbacks contribute path identity only. Rendered changed-line recall and
 `CompleteLine` separately measure whether the final source excerpts contain the
 base-side changed lines.
 
+Context records distinguish three objects: ranked candidates before rendering,
+metadata-visible candidates shown by path and symbol, and source-bearing
+candidates whose concrete excerpts enter the model input. Controlled RQ-1 and
+RQ-2 token analyses use deterministic strict-prefix packing. The archived RQ-3
+prompts and RQ-4 repair execution use the fixed rank-banded renderer, which may
+show metadata for more candidates than it supplies with excerpts. Prompt
+identity and changed-line metrics count only source-bearing candidates.
+
 Every Python comparison retains all 500 SWE-bench Verified instances. Confidence
 intervals use 10,000 repository-clustered bootstrap resamples with seed 7;
 binary paired contrasts use the two-sided exact McNemar test. Exact sign-flip
@@ -55,7 +63,7 @@ LineRecall at 4,000 tokens.
 - `evaluate_strict_reference_context.py`: exact localization evaluator.
 - `evaluate_strict_external_localizers.py`: released-prefix completion with class-to-member granularity normalization.
 - `export_external_localizer_completions.py`: matched completion rankings for released localizer prefixes.
-- `evaluate_token_budget_context.py`: rendered-token packing.
+- `evaluate_token_budget_context.py`: controlled strict-prefix rendered-token packing.
 - `export_static_structural_ablation.py`: history-free structural replay.
 - `analyze_primary_cluster_randomization.py`: exact repository-cluster sign-flip tests.
 - `analyze_target_fallback_evidence.py`: exact-file fallback evidence accounting.
