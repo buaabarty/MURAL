@@ -50,6 +50,8 @@ EXPECTED_RESULTS = {
     "human_window_summary_20260718.tsv",
     "issue_creation_cutoff_audit_20260719.json",
     "java_cross_language_instances_20260714.jsonl",
+    "paper_dataset_profile_20260722.tsv",
+    "paper_main_results_20260722.tsv",
     "java_cross_language_paired_20260714.tsv",
     "java_cross_language_summary_20260714.tsv",
     "java_cross_language_targets_20260714.json",
@@ -90,6 +92,10 @@ EXPECTED_RESULTS = {
     "strict_token_context_summary_20260719.tsv",
     "strict_token_packing_instances_20260719.tsv",
     "strict_token_packing_summary_20260719.tsv",
+}
+STALE_RESULTS = {
+    "retrieve_then_localize_top20_20260711.tsv",
+    "tse_gt_mapping_v6.tsv",
 }
 for budget in (5, 10, 20, 40):
     for suffix in ("summary", "instances", "paired"):
@@ -137,6 +143,9 @@ def pair(name: str, baseline: str, treatment: str, metric: str) -> dict[str, str
 
 def check_inventory() -> None:
     observed = {path.name for path in RESULTS.iterdir() if path.is_file()}
+    stale = sorted(observed & STALE_RESULTS)
+    if stale:
+        fail(f"superseded result ledgers remain in paper-facing inventory: {stale}")
     equal(sorted(observed), sorted(EXPECTED_RESULTS), "paper-facing result inventory")
 
 
@@ -191,6 +200,16 @@ def check_targets() -> dict[str, Any]:
         121,
         "mixed-target instances",
     )
+    equal(
+        sum(item["file_target_count"] == 0 and item["entity_target_count"] > 0 for item in items.values()),
+        349,
+        "entity-only instances",
+    )
+    equal(
+        sum(item["file_target_count"] > 0 and item["entity_target_count"] == 0 for item in items.values()),
+        30,
+        "file-only instances",
+    )
     equal(sum(len(item["patch_files"]) == 1 for item in items.values()), 429, "single-file instances")
     equal(
         meta["diagnostics"],
@@ -204,29 +223,91 @@ def check_targets() -> dict[str, Any]:
         },
         "target diagnostics",
     )
+
+    profile = rows("paper_dataset_profile_20260722.tsv")
+    observed_profile = {
+        (row["category"], row["item"]): int(row["count"])
+        for row in profile
+    }
+    expected_profile = {
+        ("population", "instances"): 500,
+        ("targets", "total"): 1044,
+        ("target_type", "function"): 836,
+        ("target_type", "assignment"): 32,
+        ("target_type", "file_fallback"): 176,
+        ("target_stratum", "entity_only"): 349,
+        ("target_stratum", "mixed"): 121,
+        ("target_stratum", "file_only"): 30,
+        ("target_multiplicity", "single"): 319,
+        ("target_multiplicity", "multi"): 181,
+        ("file_fallback", "instances_with_file_fallback"): 151,
+    }
+    equal(observed_profile, expected_profile, "paper dataset profile")
+    equal(
+        {row["source_ledger"] for row in profile},
+        {"artifacts/results/strict_reference_targets_20260719.json"},
+        "paper dataset profile source",
+    )
     return data
 
 
 def check_localization() -> None:
     summary = rows("strict_localization_summary_20260719.tsv")
     equal(len(summary), 13, "strict localization rows")
-    expected = {
-        "BM25_entities": (77.0, 47.190685, 32.137738, 57.2, 40.2),
-        "BM25_projection": (73.6, 49.276162, 31.095705, 57.8, 42.2),
-        "Structural_adapter": (59.2, 46.615664, 31.437884, 52.6, 42.0),
-        "Dense_projection": (83.6, 55.086248, 34.514952, 64.4, 47.0),
-        "MURAL_2src": (77.0, 54.358203, 34.936758, 63.2, 46.8),
-        "MURAL": (83.0, 57.588463, 37.950833, 67.2, 49.6),
+    expected_glm = {
         "GLM5": (87.4, 54.306883, 55.257309, 66.6, 45.0),
         "GLM5_BM25": (94.2, 68.470043, 57.958244, 79.0, 59.4),
         "GLM5_MURAL2": (94.6, 69.881840, 58.501354, 79.2, 61.4),
         "GLM5_MURAL": (95.2, 69.805996, 58.511191, 79.8, 61.2),
     }
-    for approach, values in expected.items():
+    for approach, values in expected_glm.items():
         row = one(summary, approach=approach)
         equal(int(row["N"]), 500, f"{approach} N")
         for field, value in zip(("file_hit", "target_coverage", "mrr", "hit", "complete"), values):
             close(row[field], value, f"{approach} {field}")
+
+    paper = rows("paper_main_results_20260722.tsv")
+    expected_mapping = [
+        ("BM25 entities", "BM25_entities"),
+        ("BM25 projection", "BM25_projection"),
+        ("Dense projection", "Dense_projection"),
+        ("BLUiR", "BLUiR"),
+        ("CodeGraph", "CodeGraph"),
+        ("Structural entities", "Structural_entities"),
+        ("Structural adapter", "Structural_adapter"),
+        ("MURAL w/o Dense", "MURAL_2src"),
+        ("MURAL", "MURAL"),
+    ]
+    equal(
+        [(row["paper_label"], row["source_approach"]) for row in paper],
+        expected_mapping,
+        "paper main-result row mapping",
+    )
+    equal(
+        {row["approach"] for row in summary},
+        {source for _, source in expected_mapping} | set(expected_glm),
+        "strict localization approach inventory",
+    )
+    metric_mapping = {
+        "file_hit": "file_hit",
+        "target_coverage": "target_coverage",
+        "mrr": "mrr",
+        "hit_at_20": "hit",
+        "ref_complete": "complete",
+    }
+    for paper_row in paper:
+        approach = paper_row["source_approach"]
+        strict_row = one(summary, approach=approach)
+        equal(int(paper_row["N"]), int(strict_row["N"]), f"{approach} paper N")
+        equal(int(paper_row["top_k"]), int(strict_row["top_k"]), f"{approach} paper Top-K")
+        equal(
+            paper_row["source_ledger"],
+            "artifacts/results/strict_localization_summary_20260719.tsv",
+            f"{approach} paper source ledger",
+        )
+        for paper_field, strict_field in metric_mapping.items():
+            rounded = float(f'{float(strict_row[strict_field]):.1f}')
+            close(paper_row[paper_field], rounded, f"{approach} paper {paper_field}")
 
     comparisons = [
         ("BM25_projection", "MURAL", "hit", 9.4, 6.093034, 10.628067, 53, 6, 1.75391874635e-10),
@@ -395,11 +476,24 @@ def check_frozen_rankings(targets: dict[str, Any]) -> None:
                 )
     equal(len(seen), 500, "frozen ranking population")
     summary = rows("strict_localization_summary_20260719.tsv")
+    paper = {
+        row["source_approach"]: row
+        for row in rows("paper_main_results_20260722.tsv")
+    }
+    paper_fields = {
+        "file_hit": "file_hit",
+        "target_coverage": "target_coverage",
+        "mrr": "mrr",
+        "hit": "hit_at_20",
+        "complete": "ref_complete",
+    }
     for source, metrics in source_metrics.items():
         ledger = one(summary, approach=source)
         for field in ("file_hit", "target_coverage", "mrr", "hit", "complete"):
             observed = 100 * sum(float(item[field]) for item in metrics) / len(metrics)
             close(observed, float(ledger[field]), f"frozen {source} {field}", 1e-5)
+            rounded = float(f"{observed:.1f}")
+            close(rounded, float(paper[source][paper_fields[field]]), f"frozen {source} paper {field}")
 
 
 def check_architecture_and_line_coverage() -> None:
@@ -974,6 +1068,21 @@ def check_manifest() -> None:
         "manifest human audit scope",
     )
     equal(manifest["python_benchmark"]["instances"], 500, "manifest Python population")
+    equal(
+        manifest["paper_ledgers"]["dataset_profile"],
+        "artifacts/results/paper_dataset_profile_20260722.tsv",
+        "manifest paper dataset profile",
+    )
+    equal(
+        manifest["paper_ledgers"]["main_results"],
+        "artifacts/results/paper_main_results_20260722.tsv",
+        "manifest paper main results",
+    )
+    equal(
+        manifest["paper_ledgers"]["generator"],
+        "artifacts/scripts/build_paper_ledgers.py",
+        "manifest paper ledger generator",
+    )
     equal(manifest["strict_reference"]["target_counts"]["total"], 1044, "manifest target count")
     equal(manifest["java_benchmark"]["evaluated_instances"], 91, "manifest Java population")
     equal(manifest["repair"]["prompt_hash_rows"], 1000, "manifest prompt hashes")

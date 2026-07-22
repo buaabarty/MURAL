@@ -9,16 +9,16 @@
   },
   "files": {
     "README.md": {
-      "bytes": 2937,
-      "sha256": "d57070621afb890d2565e0c686946af0c252b0c36cb8db817e7c53b8ab09432c"
+      "bytes": 2935,
+      "sha256": "28471de2a898fa9d2692ee64ef513af7f72809bce6c6e0dfef5138608c5ca45a"
     },
     "artifacts/README.md": {
-      "bytes": 9539,
-      "sha256": "ea29ca3e2aea56d105ad7af394a1af63b963aecebcdc77e3b2ee5b9478ca1fce"
+      "bytes": 10388,
+      "sha256": "bf5f6867d8055ea8b5de18dcb80c3384b46a50084655d9ff14629570fc902a72"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 14306,
-      "sha256": "1dc5a385d505c98d4d692bae3d4f3c47ef24e25239a224e529fd36c735b24d22"
+      "bytes": 14637,
+      "sha256": "139f74b45164492cc1c2f66968400fdbd1547812500ab7381a59b920b6aa071c"
     },
     "artifacts/frozen/architecture_control_manifest_20260721.json": {
       "bytes": 2012,
@@ -199,6 +199,14 @@
     "artifacts/results/line_coverage_summary_4000_20260721.tsv": {
       "bytes": 484,
       "sha256": "8672780d6b6de3743bcbad19d05b33f2053a73d854eb29bea2c774cf9e87951e"
+    },
+    "artifacts/results/paper_dataset_profile_20260722.tsv": {
+      "bytes": 978,
+      "sha256": "a0ad0f60d77a4abec60d6544f2fd475393d71c2fe463732656e53c4800a4aac6"
+    },
+    "artifacts/results/paper_main_results_20260722.tsv": {
+      "bytes": 1164,
+      "sha256": "48bd0dc7d82bee82a2c32b314ab942008d4a180671c85cb65dc68af6e78f3e90"
     },
     "artifacts/results/reference_coverage_strata_4000_20260721.tsv": {
       "bytes": 860,
@@ -436,13 +444,17 @@
       "bytes": 3903,
       "sha256": "c3c220ecbe77e5c71928ad130c5676a180f6d037bfe878b213c4e31fe93176e0"
     },
+    "artifacts/scripts/build_paper_ledgers.py": {
+      "bytes": 4488,
+      "sha256": "a0bdddfa887854237a84d66381a1fcb34dc491974589c4eda7ea8863416fed02"
+    },
     "artifacts/scripts/build_strict_reference_targets.py": {
       "bytes": 15474,
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 11482,
-      "sha256": "97f363c5ba19a7a921d5468e080f9eac7d91011f5b16f15d68093b5c1a30a54a"
+      "bytes": 11805,
+      "sha256": "7bd1e8c0eaa6617dec8636086ed409136f6cd772c5f4aa1b281eb6260edaab22"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -565,8 +577,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 51295,
-      "sha256": "d0b31c424db93fb101767af299adb59990427b5d7fd040e5ab87814567328f4b"
+      "bytes": 55198,
+      "sha256": "4e82f9da7002b8ee451339d48684ec6e8a0e2cb7288ce1902e64d4279fa23d3d"
     },
     "test_entity_projection_ranking.py": {
       "bytes": 2935,
@@ -658,6 +670,11 @@
   "paper": {
     "artifact_repository": "https://github.com/buaabarty/MURAL",
     "title": "MURAL: Multi-Source Retrieval-to-Entity Context Construction for Repository Repair"
+  },
+  "paper_ledgers": {
+    "dataset_profile": "artifacts/results/paper_dataset_profile_20260722.tsv",
+    "generator": "artifacts/scripts/build_paper_ledgers.py",
+    "main_results": "artifacts/results/paper_main_results_20260722.tsv"
   },
   "python_benchmark": {
     "instances": 500,

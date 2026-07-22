@@ -4,6 +4,20 @@ This directory contains the prompts, strict evaluators, frozen rankings,
 article-facing result ledgers, and protocol manifest used by the manuscript and
 its independently compiled supplement.
 
+## Canonical paper-facing ledgers
+
+- `results/paper_main_results_20260722.tsv` contains the rows and one-decimal
+  values displayed in the main Top-20 localization table. In particular,
+  `MURAL w/o Dense` maps to `MURAL_2src`, while `MURAL` is the three-source
+  configuration.
+- `results/paper_dataset_profile_20260722.tsv` contains the target strata and
+  multiplicity counts displayed in the dataset table.
+
+Both files are generated from the strict result ledgers by
+`scripts/build_paper_ledgers.py`. The development ledgers
+`retrieve_then_localize_top20_20260711.tsv` and `tse_gt_mapping_v6.tsv` are
+superseded and excluded from the paper-facing inventory.
+
 ## Evaluation contract
 
 Localization reads the original issue and official base commit. Official
@@ -32,6 +46,7 @@ binary paired contrasts use the two-sided exact McNemar test.
 
 ## Core scripts
 
+- `build_paper_ledgers.py`: derives the canonical paper-facing tables from the strict ledgers.
 - `build_strict_reference_targets.py`: independent Python-AST target builder.
 - `evaluate_strict_reference_context.py`: exact localization evaluator.
 - `evaluate_strict_external_localizers.py`: released-prefix completion.
@@ -65,6 +80,8 @@ binary paired contrasts use the two-sided exact McNemar test.
 
 ### Strict Python localization
 
+- `results/paper_main_results_20260722.tsv`
+- `results/paper_dataset_profile_20260722.tsv`
 - `results/strict_reference_targets_20260719.json`
 - `results/strict_localization_{summary,instances,paired}_20260719.tsv`
 - `results/strict_token_context_{summary,instances,paired}_20260719.tsv`

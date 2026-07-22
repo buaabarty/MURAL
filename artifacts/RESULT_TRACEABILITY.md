@@ -19,8 +19,10 @@ All paths below are relative to `artifacts/`.
 
 | Manuscript evidence | Retained ledger |
 | --- | --- |
-| Strict target policy and population | `results/strict_reference_targets_20260719.json` |
-| Top-20 retrieval, projection, fusion, and GLM-prefix rows | `results/strict_localization_{summary,instances,paired}_20260719.tsv` |
+| Dataset profile shown in the paper | `results/paper_dataset_profile_20260722.tsv`, derived from `results/strict_reference_targets_20260719.json` |
+| Main Top-20 rows shown in the paper | `results/paper_main_results_20260722.tsv`, derived from `results/strict_localization_summary_20260719.tsv` |
+| Strict target policy and per-instance targets | `results/strict_reference_targets_20260719.json` |
+| Exact Top-20 rows, per-instance outcomes, paired statistics, and GLM-prefix rows | `results/strict_localization_{summary,instances,paired}_20260719.tsv` |
 | Equal rendered-token comparison | `results/strict_token_context_{summary,instances,paired}_20260719.tsv` |
 | Packing, truncation, and changed-line coverage | `results/strict_token_packing_{summary,instances}_20260719.tsv` |
 | Selector controls | `results/strict_selector_{summary,instances,paired}_20260719.tsv` |

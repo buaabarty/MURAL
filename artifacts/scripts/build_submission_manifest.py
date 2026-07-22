@@ -23,6 +23,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_stratified_context_findings.py",
     "artifacts/scripts/plot_paper_findings.py",
     "artifacts/scripts/audit_issue_creation_cutoff.py",
+    "artifacts/scripts/build_paper_ledgers.py",
     "artifacts/scripts/build_strict_reference_targets.py",
     "artifacts/scripts/build_submission_manifest.py",
     "artifacts/scripts/collect_swebench_reports.py",
@@ -106,6 +107,11 @@ def main() -> None:
             "repositories": 12,
             "query": "original issue title and body",
             "snapshot": "official base commit",
+        },
+        "paper_ledgers": {
+            "dataset_profile": "artifacts/results/paper_dataset_profile_20260722.tsv",
+            "main_results": "artifacts/results/paper_main_results_20260722.tsv",
+            "generator": "artifacts/scripts/build_paper_ledgers.py",
         },
         "strict_reference": {
             "builder": "artifacts/scripts/build_strict_reference_targets.py",
