@@ -7,4 +7,6 @@ CodeGraph	CodeGraph	500	20	63.6	43.7	30.6	52.0	38.6	artifacts/results/strict_loc
 Structural entities	Structural_entities	500	20	55.6	41.0	29.0	46.2	37.0	artifacts/results/strict_localization_summary_20260719.tsv
 Structural adapter	Structural_adapter	500	20	59.2	46.6	31.4	52.6	42.0	artifacts/results/strict_localization_summary_20260719.tsv
 MURAL w/o Dense	MURAL_2src	500	20	77.0	54.4	34.9	63.2	46.8	artifacts/results/strict_localization_summary_20260719.tsv
+BM25 + Dense	BM25_Dense	500	20	81.4	54.7	34.9	63.8	47.0	artifacts/results/source_combinations_top20_summary_20260722.tsv
+Structural + Dense	Structural_Dense	500	20	82.2	57.6	38.2	66.4	49.6	artifacts/results/source_combinations_top20_summary_20260722.tsv
 MURAL	MURAL	500	20	83.0	57.6	38.0	67.2	49.6	artifacts/results/strict_localization_summary_20260719.tsv

@@ -5,9 +5,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gzip
 import json
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import mean
 
@@ -37,7 +38,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ids-file", type=Path, required=True)
     parser.add_argument("--targets", type=Path, required=True)
     parser.add_argument("--external-root", type=Path, required=True)
-    parser.add_argument("--mural-dir", type=Path, required=True)
+    rankings = parser.add_mutually_exclusive_group(required=True)
+    rankings.add_argument("--mural-dir", type=Path)
+    rankings.add_argument("--rankings-archive", type=Path)
     parser.add_argument("--workspace-root", type=Path, required=True)
     parser.add_argument("--top-k", type=int, default=20)
     parser.add_argument("--primary-prefix", type=int, default=10)
@@ -47,6 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-summary", type=Path, required=True)
     parser.add_argument("--output-instances", type=Path, required=True)
     parser.add_argument("--output-paired", type=Path, required=True)
+    parser.add_argument("--output-resolution", type=Path)
     return parser.parse_args()
 
 
@@ -117,35 +121,78 @@ def canonical_external_label(candidate: dict) -> str:
     )
 
 
+def load_archive_tail(path: Path, source: str, limit: int) -> dict[str, list[dict]]:
+    opener = gzip.open if path.suffix == ".gz" else open
+    output: dict[str, list[dict]] = {}
+    with opener(path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            output[str(row["instance_id"])] = list(
+                (row.get("sources") or {}).get(source) or []
+            )[:limit]
+    return output
+
+
+def entity_candidate(entity: object, file_path: str) -> dict:
+    kind = str(getattr(entity, "kind"))
+    qualified_name = str(getattr(entity, "qualified_name"))
+    signature = (
+        f"{qualified_name} = <assignment>"
+        if kind == "assignment"
+        else f"{qualified_name}()"
+    )
+    return {
+        "source": "external",
+        "file_path": file_path,
+        "kind": kind,
+        "label": qualified_name,
+        "signature": signature,
+        "source_code": "",
+    }
+
+
 def resolve_external_candidates(
     row: dict | None,
     reference: dict,
     workspace_root: Path,
     limit: int,
-    entity_cache: dict[tuple[str, str, str], list],
+    entity_cache: dict[tuple[str, str, str], tuple[list, str]],
+    diagnostics: Counter | None = None,
 ) -> list[dict]:
+    diagnostics = diagnostics if diagnostics is not None else Counter()
     output: list[dict] = []
     seen: set[tuple[str, str, str]] = set()
     repo = str(reference["repo"])
     base_commit = str(reference["base_commit"])
-    for raw in external_candidates(row, 500):
+    raw_candidates = external_candidates(row, 500)
+    diagnostics["raw_predictions"] += len(raw_candidates)
+    for raw in raw_candidates:
         file_path = normalized_path(raw.get("file_path"))
         label = canonical_external_label(raw)
         if not file_path or not label:
+            diagnostics["invalid_predictions"] += 1
             continue
         cache_key = (repo, base_commit, file_path)
         if cache_key not in entity_cache:
             source = read_commit_file(workspace_root, repo, base_commit, file_path)
             if source is None:
-                entity_cache[cache_key] = []
+                entity_cache[cache_key] = ([], "missing_file")
             else:
                 entities, error = parse_entities(source, file_path)
-                entity_cache[cache_key] = [] if error else entities
+                entity_cache[cache_key] = (
+                    ([], "parse_error") if error else (entities, "ok")
+                )
 
+        entities, status = entity_cache[cache_key]
+        if status != "ok":
+            diagnostics[status] += 1
+            continue
         requested_kind = str(raw.get("kind") or "unknown")
         matches = [
             entity
-            for entity in entity_cache[cache_key]
+            for entity in entities
             if entity.qualified_name == label
             and (
                 requested_kind == "unknown"
@@ -153,31 +200,33 @@ def resolve_external_candidates(
                 and entity.kind == "function"
                 or requested_kind == "variable"
                 and entity.kind == "assignment"
+                or requested_kind == "class"
             )
         ]
-        if len(matches) != 1:
+        resolution = "exact_predictions"
+        if not matches and requested_kind == "class":
+            prefix = f"{label}."
+            matches = [
+                entity
+                for entity in entities
+                if entity.qualified_name.startswith(prefix)
+                and "." not in entity.qualified_name[len(prefix) :]
+            ]
+            resolution = "class_expansion_predictions"
+        if not matches:
+            diagnostics["unresolved_predictions"] += 1
             continue
-        entity = matches[0]
-        signature = (
-            f"{entity.qualified_name} = <assignment>"
-            if entity.kind == "assignment"
-            else f"{entity.qualified_name}()"
-        )
-        candidate = {
-            "source": "external",
-            "file_path": file_path,
-            "kind": entity.kind,
-            "label": entity.qualified_name,
-            "signature": signature,
-            "source_code": "",
-        }
-        identity = canonical_identity(candidate)
-        if identity in seen:
-            continue
-        seen.add(identity)
-        output.append(candidate)
-        if len(output) >= limit:
-            break
+        diagnostics[resolution] += 1
+        for entity in matches:
+            candidate = entity_candidate(entity, file_path)
+            identity = canonical_identity(candidate)
+            if identity in seen:
+                diagnostics["duplicate_entities"] += 1
+                continue
+            seen.add(identity)
+            diagnostics["resolved_unique_entities"] += 1
+            if len(output) < limit:
+                output.append(candidate)
     return output
 
 
@@ -214,7 +263,10 @@ def write_tsv(path: Path, rows: list[dict], fields: list[str]) -> None:
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t", lineterminator="\n")
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(
+            {key: 'NA' if value == '' else value for key, value in row.items()}
+            for row in rows
+        )
 
 
 def main() -> int:
@@ -227,30 +279,66 @@ def main() -> int:
         "LocAgent": args.external_root / "locagent" / "locagent_qwen_coder_32b_func.jsonl",
         "OrcaLoca": args.external_root / "orcaloca" / "orcaloca_qwen_coder_32b_func.jsonl",
     }
-    tail = {
-        instance_id: mural_candidates(
-            args.mural_dir / f"{instance_id}.json",
-            max(args.top_k, args.secondary_pool),
-        )
-        for instance_id in ids
-    }
+    tail_limit = max(args.top_k, args.secondary_pool)
+    if args.rankings_archive:
+        tail = load_archive_tail(args.rankings_archive, "MURAL", tail_limit)
+    else:
+        tail = {
+            instance_id: mural_candidates(
+                args.mural_dir / f"{instance_id}.json",
+                tail_limit,
+            )
+            for instance_id in ids
+        }
+    missing_tail = sorted(set(ids) - set(tail))
+    if missing_tail:
+        raise ValueError(f"MURAL tail misses {len(missing_tail)} instances")
 
     rows: list[dict] = []
     by_name: dict[str, dict[str, dict]] = defaultdict(dict)
-    entity_cache: dict[tuple[str, str, str], list] = {}
+    entity_cache: dict[tuple[str, str, str], tuple[list, str]] = {}
     comparisons: list[tuple[str, str]] = []
+    resolution_rows: list[dict] = []
     for name, source_path in specs.items():
         external = {row["instance_id"]: row for row in load_jsonl(source_path)}
-        prefix = {
-            instance_id: resolve_external_candidates(
+        diagnostics: Counter = Counter()
+        prefix: dict[str, list[dict]] = {}
+        for instance_id in ids:
+            prefix[instance_id] = resolve_external_candidates(
                 external.get(instance_id),
                 targets[instance_id],
                 args.workspace_root,
                 args.primary_prefix,
                 entity_cache,
+                diagnostics,
             )
-            for instance_id in ids
-        }
+        resolved_predictions = (
+            diagnostics["exact_predictions"]
+            + diagnostics["class_expansion_predictions"]
+        )
+        resolution_rows.append(
+            {
+                "localizer": name,
+                "instances": len(ids),
+                "raw_predictions": diagnostics["raw_predictions"],
+                "exact_predictions": diagnostics["exact_predictions"],
+                "class_expansion_predictions": diagnostics[
+                    "class_expansion_predictions"
+                ],
+                "unresolved_predictions": diagnostics["unresolved_predictions"],
+                "missing_file_predictions": diagnostics["missing_file"],
+                "parse_error_predictions": diagnostics["parse_error"],
+                "duplicate_entities": diagnostics["duplicate_entities"],
+                "resolved_unique_entities": diagnostics["resolved_unique_entities"],
+                "prediction_resolution_rate": (
+                    f"{100 * resolved_predictions / diagnostics['raw_predictions']:.6f}"
+                    if diagnostics["raw_predictions"]
+                    else "0.000000"
+                ),
+                "prefix_count_mean": f"{mean(len(items) for items in prefix.values()):.6f}",
+                "nonempty_prefix_instances": sum(bool(items) for items in prefix.values()),
+            }
+        )
         fused = {
             instance_id: fuse_candidates_exact(
                 prefix[instance_id],
@@ -348,7 +436,11 @@ def main() -> int:
     write_tsv(args.output_instances, rows, instance_fields)
     write_tsv(args.output_summary, summary, list(summary[0]))
     write_tsv(args.output_paired, paired, list(paired[0]))
+    if args.output_resolution:
+        write_tsv(args.output_resolution, resolution_rows, list(resolution_rows[0]))
     print(f"wrote {args.output_summary}, {args.output_instances}, and {args.output_paired}")
+    if args.output_resolution:
+        print(f"wrote {args.output_resolution}")
     return 0
 
 

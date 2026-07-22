@@ -15,7 +15,10 @@ CRITICAL_FILES = [
     "artifacts/README.md",
     "artifacts/RESULT_TRACEABILITY.md",
     "artifacts/scripts/analyze_clustered_repair_stats.py",
+    "artifacts/scripts/analyze_changed_line_strata.py",
+    "artifacts/scripts/analyze_repair_context_alignment.py",
     "artifacts/scripts/analyze_repair_outcomes.py",
+    "artifacts/scripts/analyze_source_combinations.py",
     "artifacts/scripts/analyze_human_strict_alignment.py",
     "artifacts/scripts/analyze_reference_coverage_strata.py",
     "artifacts/scripts/analyze_human_evidence_audit.py",
@@ -23,6 +26,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_stratified_context_findings.py",
     "artifacts/scripts/plot_paper_findings.py",
     "artifacts/scripts/audit_issue_creation_cutoff.py",
+    "artifacts/scripts/audit_structural_temporal_provenance.py",
     "artifacts/scripts/build_paper_ledgers.py",
     "artifacts/scripts/build_strict_reference_targets.py",
     "artifacts/scripts/build_submission_manifest.py",
@@ -57,12 +61,15 @@ CRITICAL_FILES = [
     "artifacts/scripts/run_text_baselines.py",
     "artifacts/scripts/verify_human_window_binding.py",
     "artifacts/scripts/verify_paper_results.py",
+    "artifacts/structural_temporal_metadata_20260722.json",
+    "kgcompass/fl.py",
     "test_entity_projection_ranking.py",
     "test_fusion_identity.py",
     "test_human_window_binding.py",
     "test_strict_external_localizers.py",
     "test_strict_reference_evaluator.py",
     "test_strict_reference_target_builder.py",
+    "test_temporal_content_boundary.py",
 ]
 
 
@@ -95,10 +102,10 @@ def main() -> None:
 
     manifest = {
         "schema_version": 3,
-        "frozen_date": "2026-07-21",
+        "frozen_date": "2026-07-22",
         "annotation_snapshot": "2026-07-21",
         "paper": {
-            "title": "MURAL: Multi-Source Retrieval-to-Entity Context Construction for Repository Repair",
+            "title": "MURAL: Unifying Fault Localization and Bounded Context Construction for Repository Repair",
             "artifact_repository": "https://github.com/buaabarty/MURAL",
         },
         "python_benchmark": {
@@ -144,6 +151,20 @@ def main() -> None:
             "prefix_policy": "preserve resolved prefix; scan secondary head, localizer remainder, then secondary remainder",
             "frozen_rankings": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
         },
+        "source_composition": {
+            "sources": ["BM25", "structural", "dense"],
+            "combinations": [
+                "BM25",
+                "Structural",
+                "Dense",
+                "BM25_Structural",
+                "BM25_Dense",
+                "Structural_Dense",
+                "MURAL",
+            ],
+            "scenarios": ["standalone Top-20", "4,000 rendered tokens", "GLM-5 prefix completion"],
+            "attribution": "artifacts/results/source_combination_attribution_20260722.tsv",
+        },
         "architecture_controls": {
             "frozen_rankings": "artifacts/frozen/architecture_control_rankings_20260721.jsonl.gz",
             "manifest": "artifacts/frozen/architecture_control_manifest_20260721.json",
@@ -159,6 +180,9 @@ def main() -> None:
             "summary": "artifacts/results/line_coverage_summary_4000_20260721.tsv",
             "instances": "artifacts/results/line_coverage_instances_4000_20260721.tsv",
             "strata_ledger": "artifacts/results/reference_coverage_strata_4000_20260721.tsv",
+            "hunk_profile": "artifacts/results/changed_line_hunk_profile_20260722.tsv",
+            "hunk_strata": "artifacts/results/changed_line_strata_4000_20260722.tsv",
+            "hunk_strata_paired": "artifacts/results/changed_line_strata_paired_4000_20260722.tsv",
         },
         "statistics": {
             "bootstrap": "paired repository-clustered percentile interval",
@@ -190,6 +214,7 @@ def main() -> None:
             "timeout_outcome": "unresolved",
             "prompt_hash_rows": 1000,
             "variants": ["bm25", "mural"],
+            "context_alignment": "artifacts/results/repair_context_alignment_summary_20260722.tsv",
         },
         "human_audit": {
             "judgments": 100,
@@ -227,8 +252,14 @@ def main() -> None:
         },
         "structural_temporal_boundary": {
             "cutoff": "target issue created_at",
+            "artifact_policy": "created and last modified no later than the cutoff",
             "audited_instances": 500,
-            "audit": "artifacts/results/issue_creation_cutoff_audit_20260719.json",
+            "cutoff_record_audit": "artifacts/results/issue_creation_cutoff_audit_20260719.json",
+            "provenance_audit": "artifacts/results/structural_temporal_provenance_20260722.json",
+            "historical_artifacts_observed": 1,
+            "time_ineligible_path_rows": 0,
+            "changed_top20_windows": 0,
+            "changed_4000_token_windows": 0,
         },
         "java_benchmark": {
             "name": "SWE-bench-Java Verified",

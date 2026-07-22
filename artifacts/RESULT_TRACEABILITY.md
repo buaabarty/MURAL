@@ -24,13 +24,15 @@ All paths below are relative to `artifacts/`.
 | Strict target policy and per-instance targets | `results/strict_reference_targets_20260719.json` |
 | Exact Top-20 rows, per-instance outcomes, paired statistics, and GLM-prefix rows | `results/strict_localization_{summary,instances,paired}_20260719.tsv` |
 | Equal rendered-token comparison | `results/strict_token_context_{summary,instances,paired}_20260719.tsv` |
+| All single-source, pairwise, and three-source combinations at Top-20, 4,000 tokens, and after the GLM-5 prefix | `results/source_combinations_*_20260722.tsv`, `results/source_combination_attribution_20260722.tsv` |
 | Packing, truncation, and changed-line coverage | `results/strict_token_packing_{summary,instances}_20260719.tsv` |
+| Insertion/deletion/mixed changed-line analysis | `results/changed_line_hunk_profile_20260722.tsv`, `results/changed_line_strata_*_20260722.tsv` |
 | Selector controls | `results/strict_selector_{summary,instances,paired}_20260719.tsv` |
 | File-primary versus entity-primary ordering | `results/entity_ordering_control_{summary,instances,paired}_20260721.tsv` |
 | File-level versus entity-level fusion and native structural branch | `results/architecture_control_{summary,instances,paired}_20260721.tsv` |
 | Entity and rendered changed-line coverage by target stratum | `results/reference_coverage_strata_4000_20260721.tsv`, `results/line_coverage_{summary,instances}_4000_20260721.tsv` |
 | Complete GLM-prefix tail controls | `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv` |
-| Released localizer completion | `results/strict_external_localizer_{summary,instances,paired}_20260719.tsv` |
+| Released localizer completion and granularity normalization | `results/strict_external_localizer_{summary,instances,paired}_20260722.tsv`, `results/external_localizer_resolution_20260722.tsv` |
 | Entity budgets 5, 10, 20, and 40 | `results/strict_budget_b*_{summary,instances,paired}_20260719.tsv` |
 | RRF sensitivity | `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv` |
 | Opportunity-matched entity selection and shared-hit rank shifts | `results/strict_mechanism_analysis_20260719.tsv` |
@@ -39,6 +41,8 @@ All paths below are relative to `artifacts/`.
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
+| Alignment between context inclusion and repair outcomes | `results/repair_context_alignment_{summary,instances}_20260722.tsv` |
+| Strict structural-artifact temporal provenance | `results/structural_temporal_provenance_20260722.json`, `results/structural_temporal_provenance_instances_20260722.tsv`, `structural_temporal_metadata_20260722.json` |
 | Patch-grounded target-consistency judgments and agreement | `results/human_window_*_20260718.*` |
 | Exact annotator-visible audit rankings | `frozen/human_window_rankings_20260712.jsonl.gz` |
 | Audit window-to-source binding | `results/human_window_binding_20260719.tsv` |
@@ -82,7 +86,9 @@ python3 scripts/evaluate_strict_reference_context.py \
 ```
 
 The verifier compares these frozen-source values with the article-facing
-localization ledger.
+localization ledger. `scripts/analyze_source_combinations.py` evaluates the
+remaining pairwise combinations and records leave-one-source-out and
+single-source-exclusive attribution from these same instance ledgers.
 
 ## Reproduce the architecture controls
 

@@ -1,0 +1,9 @@
+stratum	metric	N	delta_points	clustered_ci_low	clustered_ci_high	wins	losses	mcnemar_p
+all	instance_mean_line_recall	500	6.035950	4.219044	7.480712	65	10	NA
+all	complete_line	500	3.800000	0.803186	5.531937	23	4	0.000310748815536
+insertion_only	instance_mean_line_recall	100	3.500000	-3.783129	10.000000	7	2	NA
+insertion_only	complete_line	100	2.000000	-5.406634	7.500000	4	2	0.6875
+mixed_or_combined	instance_mean_line_recall	398	6.703454	4.797923	8.319131	58	8	NA
+mixed_or_combined	complete_line	398	4.271357	1.418440	6.010929	19	2	0.000221252441406
+deletion_only	instance_mean_line_recall	2	0.000000	0.000000	0.000000	0	0	NA
+deletion_only	complete_line	2	0.000000	0.000000	0.000000	0	0	1

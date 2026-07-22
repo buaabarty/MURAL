@@ -221,9 +221,16 @@ class CodeAnalyzer:
         self.linked_issues = set()
         self.linked_issue_contents = set()
         self.searched_methods = set()
-        self.artifact_stats = {"skipped_due_to_time": 0, "valid_related_items": 0}
+        self.artifact_stats = {
+            "skipped_due_to_time": 0,
+            "skipped_due_to_content_time": 0,
+            "skipped_due_to_unknown_content_time": 0,
+            "valid_related_items": 0,
+        }
         self.counted_valid_artifact_ids = set()
         self.counted_skipped_artifact_ids = set()
+        self.counted_content_time_skips = set()
+        self.counted_unknown_content_time_skips = set()
         self.target_issue_ids = {self._target_issue_number()} - {None, ""}
 
     def _target_issue_number(self):
@@ -434,6 +441,56 @@ class CodeAnalyzer:
                 self.artifact_stats["valid_related_items"] += 1
                 self.counted_valid_artifact_ids.add(unique_id)
             return True # Valid by time
+
+    @staticmethod
+    def _artifact_update_timestamp(artifact):
+        """Return the timestamp of the current artifact representation."""
+        for attribute in ("updated_at", "last_modified", "modified_at", "changetime"):
+            value = getattr(artifact, attribute, None)
+            if value is None:
+                continue
+            if hasattr(value, "timestamp"):
+                return float(value.timestamp())
+            if isinstance(value, (int, float)):
+                return float(value)
+            if isinstance(value, str):
+                try:
+                    return datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp()
+                except ValueError:
+                    continue
+        return None
+
+    def _artifact_content_visible_at_cutoff(self, artifact, artifact_unique_id: str) -> bool:
+        """Admit only artifact content known to be final by the task cutoff.
+
+        Creation time controls whether an artifact existed. Its current title,
+        description, and PR file list are safe only when the artifact was not
+        updated after the target issue was created. Unknown update times fail
+        closed in the paper-valid configuration.
+        """
+        if artifact is None:
+            return False
+        created_at = getattr(artifact, "created_at", None)
+        if created_at is None or not self._check_and_count_artifact_time(
+            created_at.timestamp(), artifact_unique_id
+        ):
+            return False
+
+        if os.getenv("KGCOMPASS_STRICT_CONTENT_CUTOFF", "1") != "1":
+            return True
+        updated_at = self._artifact_update_timestamp(artifact)
+        unique_id = str(artifact_unique_id)
+        if updated_at is None:
+            if unique_id not in self.counted_unknown_content_time_skips:
+                self.artifact_stats["skipped_due_to_unknown_content_time"] += 1
+                self.counted_unknown_content_time_skips.add(unique_id)
+            return False
+        if updated_at > self.created_at:
+            if unique_id not in self.counted_content_time_skips:
+                self.artifact_stats["skipped_due_to_content_time"] += 1
+                self.counted_content_time_skips.add(unique_id)
+            return False
+        return True
 
     @lru_cache(maxsize=None)
     def _parser_for_file(self, file_path: str):
@@ -1052,6 +1109,13 @@ class CodeAnalyzer:
             print(f"#{issue_id} is not a PR, skipping")
             return
 
+        if self._is_target_issue_id(issue_id, pr):
+            print(f"PR #{issue_id} is the target artifact; benchmark text already represents it")
+            return
+        if not self._artifact_content_visible_at_cutoff(pr, f"issue_or_pr_{issue_id}"):
+            print(f"PR #{issue_id} content was not frozen by the target-issue cutoff")
+            return
+
         if pr.created_at.timestamp() > self.created_at - 100:
             print(f"PR #{issue_id} created later than task creation time, skipping")
             return
@@ -1059,6 +1123,9 @@ class CodeAnalyzer:
         # Get PR file changes
         repo = self.github.get_repo(self.config['repo_name'])
         pull = repo.get_pull(int(issue_id))
+        if not self._artifact_content_visible_at_cutoff(pull, f"pull_{issue_id}"):
+            print(f"PR #{issue_id} file state was not frozen by the target-issue cutoff")
+            return
 
         print(f"Processing PR #{issue_id} file changes")
         for file in pull.get_files():
@@ -1926,8 +1993,6 @@ class CodeAnalyzer:
         # If a sufficiently similar issue is found, establish association
         if best_match_issue:
             self._mark_target_issue_id(best_match_issue.number)
-            issue_ids.add(str(best_match_issue.number))
-            self.kg.create_issue_entity_by_github_issue(self._get_issues(self.config['repo_name'], int(best_match_issue.number)))
             print(f"Found best match {'PR' if best_match_issue.pull_request else 'Issue'} #{best_match_issue.number}, similarity: {max_similarity}")
             print(best_match_issue.title)
         root_related_issues = list(issue_ids)
@@ -1946,6 +2011,12 @@ class CodeAnalyzer:
                 issue = self._get_issues(self.config['repo_name'], int(issue_id))
                 if issue is None:
                     print(f"Issue #{issue_id} does not exist")
+                    continue
+                if self._is_target_issue_id(issue_id, issue):
+                    print(f"Issue #{issue_id} is represented by the benchmark root text")
+                    continue
+                if not self._artifact_content_visible_at_cutoff(issue, f"issue_or_pr_{issue_id}"):
+                    print(f"Issue #{issue_id} content was not frozen by the target-issue cutoff")
                     continue
                 print('Analyzing issue', issue.number)
                 content = f"{issue.title}\n{issue.full_body or ''}".strip()
@@ -2118,6 +2189,12 @@ class CodeAnalyzer:
         if issue is None:
             print(f"Issue #{issue_id} does not exist")
             return extended_issue_ids
+        if self._is_target_issue_id(issue_id, issue):
+            print(f"Issue #{issue_id} is represented by the benchmark root text")
+            return extended_issue_ids
+        if not self._artifact_content_visible_at_cutoff(issue, f"issue_or_pr_{issue_id}"):
+            print(f"Issue/PR #{issue_id} content was not frozen by the target-issue cutoff")
+            return extended_issue_ids
         # Get basic information
         title = issue.title
         content = issue.full_body or ""
@@ -2144,6 +2221,16 @@ class CodeAnalyzer:
                     ref_issue = self._get_issues(self.config['repo_name'], int(ref_id))
                     if ref_issue is None:
                         print(f"Issue #{ref_id} does not exist")
+                        continue
+                    if self._is_target_issue_id(ref_id, ref_issue):
+                        continue
+                    if not self._artifact_content_visible_at_cutoff(
+                        ref_issue, f"issue_or_pr_{ref_id}"
+                    ):
+                        print(
+                            f"Referenced Issue/PR #{ref_id} content was not frozen "
+                            "by the target-issue cutoff"
+                        )
                         continue
                     
                     # Check and count referenced issue time

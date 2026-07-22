@@ -2,12 +2,12 @@
   "purpose": "Document the paper-valid information boundary for issue comments, fixing artifacts, and benchmark hints.",
   "core_policy": {
     "target_issue": "Use only the original issue title/body. Do not use target-issue follow-up comments.",
-    "historical_issues_and_prs": "Use only titles/descriptions from time-eligible historical issues and pull requests. Do not use comments.",
+    "historical_issues_and_prs": "Use only titles/descriptions whose creation and last-modification timestamps are no later than the target issue created_at cutoff. Do not use comments.",
     "benchmark_hint_fields": "hint_text and hints_text are treated as unavailable benchmark-only fields and are stripped before localization, KG export, test generation, or repair prompts are built.",
-    "temporal_cutoff": "The target issue created_at timestamp is the cutoff. Other repository artifacts must have timestamps no later than the target issue creation time.",
+    "temporal_cutoff": "The target issue created_at timestamp is the cutoff. Other repository artifacts must both exist and have their current text finalized by that time.",
     "target_fixing_pull_request": "Do not use the target fixing pull request, its title/body, its patch diff, its merged commit, explicit target fixing PR/issue references from the issue text, or any artifact created after the target issue cutoff.",
     "linked_patch_or_commit_expansion": "Linked patch files and raw commit hashes in issue text are not expanded in the paper-valid KG construction path.",
-    "online_artifact_lookup": "The main TSE setting admits only target-issue-time-eligible artifact titles/descriptions; comments, benchmark hints, later artifacts, and patch/commit expansion are excluded. KGCOMPASS_OFFLINE_ARTIFACTS=1 is not the main TSE configuration."
+    "online_artifact_lookup": "The main TSE setting admits only historical artifact titles/descriptions whose creation and last-modification timestamps pass the target-issue cutoff; comments, benchmark hints, later artifacts, and patch/commit expansion are excluded."
   },
   "why": "Issue and pull-request comments can contain maintainer-provided localization hints, even when they predate the target issue. The reported pipeline therefore excludes comments entirely.",
   "motivating_case_check": {
@@ -57,15 +57,21 @@
     {
       "path": "kgcompass/benchmark.py",
       "guard": "BenchmarkManager strips hint_text/hints_text when loading SWE-bench or local benchmark rows."
+    },
+    {
+      "path": "kgcompass/fl.py",
+      "guard": "KGCOMPASS_STRICT_CONTENT_CUTOFF=1 requires both created_at and the current representation's update timestamp to precede the target-issue cutoff; unknown update times fail closed."
     }
   ],
   "temporal_cutoff_audit": {
-    "script": "artifacts/scripts/audit_issue_creation_cutoff.py",
-    "result": "artifacts/results/issue_creation_cutoff_audit_20260719.json",
+    "script": "artifacts/scripts/audit_structural_temporal_provenance.py",
+    "result": "artifacts/results/structural_temporal_provenance_20260722.json",
     "executed_runs": 500,
-    "matching_target_issue_cutoffs": 500,
-    "missing_cutoffs": 0,
-    "mismatched_cutoffs": 0
+    "historical_artifacts_observed": 1,
+    "historical_pull_requests_observed": 0,
+    "time_ineligible_path_rows": 0,
+    "changed_top20_windows": 0,
+    "changed_4000_token_windows": 0
   },
   "audit_command": "rg -n \"hint_text|hints_text|comments excluded|Comment by|discussion comments|EXPAND_PATCH_LINKS|USE_TIMELINE|strip_target_fix_references|target_fix_reference\" -S kgcompass mine_kg_bulk.py run_evidence_graph_resume.sh temp_run/run_open_testcase_rounds.py temp_run/run_claudecode_repairs.py temp_run/run_minisweagent_repairs.py temp_run/export_agentless_project_structures.py scripts external/kgcompass-paper"
 }

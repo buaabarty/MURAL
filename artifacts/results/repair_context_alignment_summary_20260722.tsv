@@ -1,0 +1,13 @@
+context_metric	context_transition	N	bm25_resolved	mural_resolved	repair_mural_only	repair_bm25_only	repair_both	repair_neither
+hit	mural_only	60	9	12	5	2	7	46
+hit	bm25_only	8	1	1	0	0	1	7
+hit	both	273	89	92	12	9	80	172
+hit	neither	159	24	23	8	9	15	127
+entity_complete	mural_only	44	10	13	5	2	8	29
+entity_complete	bm25_only	7	1	1	0	0	1	6
+entity_complete	both	201	81	83	11	9	72	109
+entity_complete	neither	248	31	31	9	9	22	208
+complete_line	mural_only	23	9	12	4	1	8	10
+complete_line	bm25_only	4	2	2	0	0	2	2
+complete_line	both	93	42	42	6	6	36	45
+complete_line	neither	380	70	72	15	13	57	295

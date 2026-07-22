@@ -68,9 +68,10 @@ EXPECTED_RESULTS = {
     "source_bearing_prompt_instances_20260719.tsv",
     "source_bearing_prompt_paired_20260719.tsv",
     "source_bearing_prompt_summary_20260719.tsv",
-    "strict_external_localizer_instances_20260719.tsv",
-    "strict_external_localizer_paired_20260719.tsv",
-    "strict_external_localizer_summary_20260719.tsv",
+    "external_localizer_resolution_20260722.tsv",
+    "strict_external_localizer_instances_20260722.tsv",
+    "strict_external_localizer_paired_20260722.tsv",
+    "strict_external_localizer_summary_20260722.tsv",
     "strict_localization_instances_20260719.tsv",
     "strict_localization_paired_20260719.tsv",
     "strict_localization_summary_20260719.tsv",
@@ -100,6 +101,30 @@ STALE_RESULTS = {
 for budget in (5, 10, 20, 40):
     for suffix in ("summary", "instances", "paired"):
         EXPECTED_RESULTS.add(f"strict_budget_b{budget}_{suffix}_20260719.tsv")
+
+EXPECTED_RESULTS.update(
+    {
+        "changed_line_hunk_profile_20260722.tsv",
+        "changed_line_strata_4000_20260722.tsv",
+        "changed_line_strata_paired_4000_20260722.tsv",
+        "repair_context_alignment_instances_20260722.tsv",
+        "repair_context_alignment_summary_20260722.tsv",
+        "source_combination_attribution_20260722.tsv",
+        "source_combinations_glm_prefix_instances_20260722.tsv",
+        "source_combinations_glm_prefix_paired_20260722.tsv",
+        "source_combinations_glm_prefix_summary_20260722.tsv",
+        "source_combinations_token4000_instances_20260722.tsv",
+        "source_combinations_token4000_packing_instances_20260722.tsv",
+        "source_combinations_token4000_packing_summary_20260722.tsv",
+        "source_combinations_token4000_paired_20260722.tsv",
+        "source_combinations_token4000_summary_20260722.tsv",
+        "source_combinations_top20_instances_20260722.tsv",
+        "source_combinations_top20_paired_20260722.tsv",
+        "source_combinations_top20_summary_20260722.tsv",
+        "structural_temporal_provenance_20260722.json",
+        "structural_temporal_provenance_instances_20260722.tsv",
+    }
+)
 
 
 def fail(message: str) -> None:
@@ -276,6 +301,8 @@ def check_localization() -> None:
         ("Structural entities", "Structural_entities"),
         ("Structural adapter", "Structural_adapter"),
         ("MURAL w/o Dense", "MURAL_2src"),
+        ("BM25 + Dense", "BM25_Dense"),
+        ("Structural + Dense", "Structural_Dense"),
         ("MURAL", "MURAL"),
     ]
     equal(
@@ -283,9 +310,14 @@ def check_localization() -> None:
         expected_mapping,
         "paper main-result row mapping",
     )
+    strict_paper_sources = {
+        source
+        for _, source in expected_mapping
+        if source not in {"BM25_Dense", "Structural_Dense"}
+    }
     equal(
         {row["approach"] for row in summary},
-        {source for _, source in expected_mapping} | set(expected_glm),
+        strict_paper_sources | set(expected_glm),
         "strict localization approach inventory",
     )
     metric_mapping = {
@@ -295,18 +327,24 @@ def check_localization() -> None:
         "hit_at_20": "hit",
         "ref_complete": "complete",
     }
+    combination_rows = {
+        row["approach"]: row
+        for row in rows("source_combinations_top20_summary_20260722.tsv")
+    }
     for paper_row in paper:
         approach = paper_row["source_approach"]
-        strict_row = one(summary, approach=approach)
-        equal(int(paper_row["N"]), int(strict_row["N"]), f"{approach} paper N")
-        equal(int(paper_row["top_k"]), int(strict_row["top_k"]), f"{approach} paper Top-K")
-        equal(
-            paper_row["source_ledger"],
-            "artifacts/results/strict_localization_summary_20260719.tsv",
-            f"{approach} paper source ledger",
+        is_pair = approach in {"BM25_Dense", "Structural_Dense"}
+        source_row = combination_rows[approach] if is_pair else one(summary, approach=approach)
+        equal(int(paper_row["N"]), int(source_row["N"]), f"{approach} paper N")
+        equal(int(paper_row["top_k"]), int(source_row["top_k"]), f"{approach} paper Top-K")
+        expected_ledger = (
+            "artifacts/results/source_combinations_top20_summary_20260722.tsv"
+            if is_pair
+            else "artifacts/results/strict_localization_summary_20260719.tsv"
         )
+        equal(paper_row["source_ledger"], expected_ledger, f"{approach} paper source ledger")
         for paper_field, strict_field in metric_mapping.items():
-            rounded = float(f'{float(strict_row[strict_field]):.1f}')
+            rounded = float(f'{float(source_row[strict_field]):.1f}')
             close(paper_row[paper_field], rounded, f"{approach} paper {paper_field}")
 
     comparisons = [
@@ -712,32 +750,43 @@ def check_controls_and_budgets() -> None:
 
 
 def check_external() -> None:
-    summary = rows("strict_external_localizer_summary_20260719.tsv")
+    summary = rows("strict_external_localizer_summary_20260722.tsv")
     expected = {
-        "CoSIL": (4.046, 67.8, 51.0),
-        "CoSIL+MURAL": (20.0, 84.0, 65.2),
-        "Agentless": (2.518, 47.6, 34.6),
-        "Agentless+MURAL": (20.0, 76.4, 58.2),
-        "LocAgent": (3.784, 65.0, 49.0),
-        "LocAgent+MURAL": (20.0, 81.4, 62.4),
-        "OrcaLoca": (0.298, 14.0, 10.8),
-        "OrcaLoca+MURAL": (20.0, 70.0, 52.2),
+        "CoSIL": (4.558, 69.4, 52.4),
+        "CoSIL+MURAL": (20.0, 84.8, 66.0),
+        "Agentless": (6.696, 54.6, 39.2),
+        "Agentless+MURAL": (20.0, 77.8, 59.4),
+        "LocAgent": (3.810, 65.0, 49.2),
+        "LocAgent+MURAL": (20.0, 81.4, 62.6),
+        "OrcaLoca": (5.614, 45.4, 33.4),
+        "OrcaLoca+MURAL": (20.0, 73.8, 57.8),
     }
     for approach, values in expected.items():
         row = one(summary, approach=approach)
         for field, value in zip(("candidate_count_mean", "hit", "complete"), values):
             close(row[field], value, f"{approach} {field}")
     for baseline, delta in {
-        "CoSIL": 16.2,
-        "Agentless": 28.8,
+        "CoSIL": 15.4,
+        "Agentless": 23.2,
         "LocAgent": 16.4,
-        "OrcaLoca": 56.0,
+        "OrcaLoca": 28.4,
     }.items():
-        row = pair("strict_external_localizer_paired_20260719.tsv", baseline, f"{baseline}+MURAL", "hit")
+        row = pair("strict_external_localizer_paired_20260722.tsv", baseline, f"{baseline}+MURAL", "hit")
         close(row["delta"], delta, f"{baseline} completion delta")
         equal(int(row["losses"]), 0, f"{baseline} prefix-preserving losses")
         if float(row["clustered_ci_low"]) <= 0:
             fail(f"{baseline}: completion interval includes zero")
+
+    resolution = rows("external_localizer_resolution_20260722.tsv")
+    for localizer, prefix_mean, rate in (
+        ("CoSIL", 4.558, 85.349026),
+        ("Agentless", 6.696, 76.201710),
+        ("LocAgent", 3.810, 97.347347),
+        ("OrcaLoca", 5.614, 86.952715),
+    ):
+        row = one(resolution, localizer=localizer)
+        close(row["prefix_count_mean"], prefix_mean, f"{localizer} resolved prefix")
+        close(row["prediction_resolution_rate"], rate, f"{localizer} resolution rate")
 
     provenance = json_file(FROZEN / "external_localizers_manifest.json")
     equal(provenance["source_commit"], "0568e423735b399d5b089996961fea9ae142e4c7", "external source commit")
@@ -1044,12 +1093,106 @@ def check_java_and_cost() -> None:
     close(one(cost, stage="structural_adapter")["median_s"], 66.9057985, "structural median seconds")
 
 
+def check_comprehensive_additions() -> None:
+    top20 = rows("source_combinations_top20_summary_20260722.tsv")
+    equal(len(top20), 7, "Top-20 source combinations")
+    close(one(top20, approach="MURAL")["hit"], 67.2, "MURAL source-combination Hit")
+    close(
+        one(top20, approach="Structural_Dense")["mrr"],
+        38.206905,
+        "structural+dense MRR",
+    )
+    close(
+        one(top20, approach="Structural_Dense")["complete"],
+        49.6,
+        "structural+dense complete coverage",
+    )
+
+    attribution = rows("source_combination_attribution_20260722.tsv")
+    expected_exclusive = {"BM25": 13, "Structural": 45, "Dense": 27}
+    for source, expected in expected_exclusive.items():
+        row = one(
+            attribution,
+            scenario="standalone_top20",
+            analysis="single_source_exclusive",
+            metric="hit",
+            source=source,
+        )
+        equal(int(row["full_only"]), expected, f"{source} exclusive hits")
+
+    token = rows("source_combinations_token4000_summary_20260722.tsv")
+    equal(len(token), 7, "4k source combinations")
+    close(one(token, approach="MURAL_t4000")["hit"], 66.6, "MURAL 4k Hit")
+    packing = rows("source_combinations_token4000_packing_summary_20260722.tsv")
+    close(
+        100 * float(one(packing, source="Structural_Dense")["complete_changed_line_rate"]),
+        24.6,
+        "structural+dense CompleteLine",
+    )
+
+    prefix = rows("source_combinations_glm_prefix_summary_20260722.tsv")
+    equal(len(prefix), 7, "GLM-prefix source combinations")
+    close(one(prefix, approach="GLM_Dense")["hit"], 80.0, "GLM+dense Hit")
+    close(one(prefix, approach="GLM_MURAL")["hit"], 79.8, "GLM+MURAL Hit")
+
+    profile = rows("changed_line_hunk_profile_20260722.tsv")
+    equal(len(profile), 500, "changed-line hunk profile population")
+    equal(
+        Counter(row["stratum"] for row in profile),
+        Counter({"mixed_or_combined": 398, "insertion_only": 100, "deletion_only": 2}),
+        "changed-line hunk strata",
+    )
+    changed = rows("changed_line_strata_paired_4000_20260722.tsv")
+    all_complete = one(changed, stratum="all", metric="complete_line")
+    close(all_complete["delta_points"], 3.8, "CompleteLine delta")
+    close(all_complete["clustered_ci_low"], 0.803186, "CompleteLine CI low")
+
+    line_rows = rows("source_combinations_token4000_packing_instances_20260722.tsv")
+    complete_by_instance: dict[str, dict[str, int]] = {}
+    for row in line_rows:
+        if row["source"] not in {"BM25", "MURAL"}:
+            continue
+        complete_by_instance.setdefault(row["instance_id"], {})[row["source"]] = int(
+            row["complete_changed_lines"]
+        )
+    repositories = sorted(instance_id.rsplit("-", 1)[0] for instance_id in complete_by_instance)
+    repositories = sorted(set(repositories))
+    leave_one_out = []
+    for dropped in repositories:
+        differences = [
+            values["MURAL"] - values["BM25"]
+            for instance_id, values in complete_by_instance.items()
+            if instance_id.rsplit("-", 1)[0] != dropped
+        ]
+        leave_one_out.append(100 * sum(differences) / len(differences))
+    close(min(leave_one_out), 2.6022304832713754, "CompleteLine LORO minimum")
+    close(max(leave_one_out), 4.470588235294118, "CompleteLine LORO maximum")
+
+    repair = rows("repair_context_alignment_summary_20260722.tsv")
+    aligned = one(repair, context_metric="complete_line", context_transition="mural_only")
+    equal(int(aligned["N"]), 23, "MURAL-only CompleteLine instances")
+    equal(int(aligned["bm25_resolved"]), 9, "BM25 resolved in MURAL-only CompleteLine")
+    equal(int(aligned["mural_resolved"]), 12, "MURAL resolved in MURAL-only CompleteLine")
+    equal(int(aligned["repair_mural_only"]), 4, "repair MURAL-only alignment")
+    equal(int(aligned["repair_bm25_only"]), 1, "repair BM25-only alignment")
+
+    temporal = json_file(RESULTS / "structural_temporal_provenance_20260722.json")
+    equal(temporal["audit"], "strict_structural_artifact_time_boundary", "temporal audit kind")
+    equal(temporal["configuration"]["instances"], 500, "temporal audit population")
+    summary = temporal["summary"]
+    equal(summary["historical_issue_artifacts"], 1, "historical issues observed")
+    equal(summary["historical_pull_request_artifacts"], 0, "historical PRs observed")
+    equal(summary["time_ineligible_path_rows_removed"], 0, "time-ineligible paths")
+    equal(summary["top20_changed_instances"], 0, "temporal Top-20 changes")
+    equal(summary["packed_4000_changed_instances"], 0, "temporal packed changes")
+
+
 def check_manifest() -> None:
     manifest = json_file(MANIFEST)
     equal(manifest["schema_version"], 3, "manifest schema")
     equal(
         manifest["paper"]["title"],
-        "MURAL: Multi-Source Retrieval-to-Entity Context Construction for Repository Repair",
+        "MURAL: Unifying Fault Localization and Bounded Context Construction for Repository Repair",
         "manifest paper title",
     )
     equal(
@@ -1115,9 +1258,15 @@ def check_manifest() -> None:
     equal(manifest["annotation_snapshot"], "2026-07-21", "manifest annotation snapshot")
     equal(manifest["structural_temporal_boundary"]["cutoff"], "target issue created_at", "manifest issue cutoff")
     equal(
-        manifest["structural_temporal_boundary"]["audit"],
-        "artifacts/results/issue_creation_cutoff_audit_20260719.json",
-        "manifest issue-cutoff audit",
+        manifest["structural_temporal_boundary"]["provenance_audit"],
+        "artifacts/results/structural_temporal_provenance_20260722.json",
+        "manifest temporal provenance audit",
+    )
+    equal(len(manifest["source_composition"]["combinations"]), 7, "manifest source combinations")
+    equal(
+        manifest["repair"]["context_alignment"],
+        "artifacts/results/repair_context_alignment_summary_20260722.tsv",
+        "manifest repair alignment",
     )
     for name, record in manifest["files"].items():
         path = ROOT / name
@@ -1168,6 +1317,7 @@ def main() -> None:
     check_human_evidence_audit()
     check_repair()
     check_java_and_cost()
+    check_comprehensive_additions()
     check_removed_terms()
     check_manifest()
     print("MURAL paper artifact verification passed.")

@@ -1,0 +1,9 @@
+stratum	source	N	line_recall	complete_line
+all	BM25	500	25.684096	19.400000
+all	MURAL	500	31.373611	23.200000
+insertion_only	BM25	100	29.220779	26.000000
+insertion_only	MURAL	100	31.818182	28.000000
+mixed_or_combined	BM25	398	25.538549	17.587940
+mixed_or_combined	MURAL	398	31.377551	21.859296
+deletion_only	BM25	2	22.222222	50.000000
+deletion_only	MURAL	2	22.222222	50.000000

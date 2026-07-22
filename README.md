@@ -1,7 +1,8 @@
 # MURAL
 
-MURAL (Multi-source Unification of Retrieval And Localization) constructs
-bounded code context for issue-driven repository repair. BM25 and dense
+MURAL (Multi-source Unification of Retrieval And Localization) unifies fault
+localization with bounded context construction for issue-driven repository
+repair. BM25 and dense
 ranked-file adapters feed one deterministic Entity Projection operator. The
 structural adapter canonically unifies its native entity ranking with the same
 projection applied to structurally ranked files. Reciprocal-rank fusion combines
@@ -30,8 +31,9 @@ digests, and every SHA-256 entry in the submission manifest.
 - all 500 SWE-bench Verified instances, with entity targets matched by exact
   path, kind, and qualified symbol and out-of-contract regions matched by an
   exact-path fallback;
-- Top-20 localization, 2,000--8,000-token controls, selector controls, source
-  composition, RRF sensitivity, and fixed-prefix completion;
+- Top-20 localization, 2,000--8,000-token controls, selector controls, all
+  single-source and pairwise source combinations, RRF sensitivity, and
+  fixed-prefix completion;
 - four released Qwen2.5-32B localizer outputs completed through the same
   prefix-preserving interface;
 - all 91 SWE-bench-Java Verified instances across all six repositories;

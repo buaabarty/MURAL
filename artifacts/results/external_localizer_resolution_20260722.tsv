@@ -1,0 +1,5 @@
+localizer	instances	raw_predictions	exact_predictions	class_expansion_predictions	unresolved_predictions	missing_file_predictions	parse_error_predictions	duplicate_entities	resolved_unique_entities	prediction_resolution_rate	prefix_count_mean	nonempty_prefix_instances
+CoSIL	500	2464	2034	69	340	0	0	83	3235	85.349026	4.558000	490
+Agentless	500	3391	1417	1167	784	2	0	511	21591	76.201710	6.696000	467
+LocAgent	500	1998	1945	0	32	0	0	54	1945	97.347347	3.810000	429
+OrcaLoca	500	1142	595	398	55	85	0	564	14464	86.952715	5.614000	395

@@ -1,0 +1,43 @@
+{
+  "audit": "strict_structural_artifact_time_boundary",
+  "configuration": {
+    "instances": 500,
+    "rrf_k": 60,
+    "source_order": [
+      "BM25",
+      "Structural",
+      "Dense"
+    ],
+    "token_budget": 4000,
+    "top_k": 20
+  },
+  "historical_artifacts": [
+    {
+      "artifact": "issue#25384",
+      "created_at": "2015-09-11T15:11:53Z",
+      "instances": [
+        "django__django-16662"
+      ],
+      "kind": "issue",
+      "last_modified_at": "2015-09-12T11:35:59Z",
+      "metadata_present": true,
+      "repository": "django/django",
+      "source": "Django Trac ticket header and timeline links",
+      "url": "https://code.djangoproject.com/ticket/25384"
+    }
+  ],
+  "policy": "Retain a historical issue or pull request only when both creation and last-modification times are no later than the target issue cutoff.",
+  "summary": {
+    "artifacts_with_verified_timestamps": 1,
+    "historical_issue_artifacts": 1,
+    "historical_path_rows_observed": 2,
+    "historical_pull_request_artifacts": 0,
+    "instances_with_historical_paths": 1,
+    "packed_4000_changed_instances": 0,
+    "time_ineligible_only_entity_identities": 0,
+    "time_ineligible_path_rows_removed": 0,
+    "top20_changed_instances": 0,
+    "top50_changed_instances": 0,
+    "unique_historical_artifacts": 1
+  }
+}

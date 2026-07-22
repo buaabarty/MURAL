@@ -23,7 +23,9 @@ superseded and excluded from the paper-facing inventory.
 Localization reads the original issue and official base commit. Official
 patches are evaluator-only. Retrieval never reads the target repair record,
 patch, linked repair commit, comments, benchmark hints, test outcomes, or later
-repository artifacts.
+repository artifacts. Historical issue or pull-request text is admitted only
+when both its creation and last-modification timestamps precede the target
+issue's creation time.
 
 The Python candidate unit is a synchronous module function, direct synchronous
 class method, or simple module/class assignment. The independent target builder
@@ -49,7 +51,7 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `build_paper_ledgers.py`: derives the canonical paper-facing tables from the strict ledgers.
 - `build_strict_reference_targets.py`: independent Python-AST target builder.
 - `evaluate_strict_reference_context.py`: exact localization evaluator.
-- `evaluate_strict_external_localizers.py`: released-prefix completion.
+- `evaluate_strict_external_localizers.py`: released-prefix completion with class-to-member granularity normalization.
 - `evaluate_token_budget_context.py`: rendered-token packing.
 - `entity_identity.py`: shared canonical entity identity and deduplication.
 - `export_ranked_file_seeds.py`: ranked-file seed materialization.
@@ -72,6 +74,10 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `analyze_stratified_context_findings.py`: opportunity-matched, multiplicity, rank-shift, repository, and instance-level audit statistics.
 - `plot_paper_findings.py`: publication figures for token-budget robustness and target-scope coverage.
 - `analyze_clustered_repair_stats.py`: clustered repair statistics.
+- `analyze_source_combinations.py`: all single-source and pairwise source combinations.
+- `analyze_changed_line_strata.py`: changed-line coverage by patch-hunk type.
+- `analyze_repair_context_alignment.py`: context-transition and repair-outcome alignment.
+- `audit_structural_temporal_provenance.py`: strict created/last-modified provenance audit.
 - `evaluate_java_retrieve_localize.py`: complete Java evaluator.
 - `build_submission_manifest.py`: protocol and digest manifest.
 - `verify_paper_results.py`: end-to-end artifact check.
@@ -89,13 +95,29 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `results/strict_budget_b{5,10,20,40}_{summary,instances,paired}_20260719.tsv`
 - `results/strict_selector_{summary,instances,paired}_20260719.tsv`
 - `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv`
-- `results/strict_external_localizer_{summary,instances,paired}_20260719.tsv`
+- `results/strict_external_localizer_{summary,instances,paired}_20260722.tsv`
+- `results/external_localizer_resolution_20260722.tsv`
 - `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv`
 - `results/strict_mechanism_analysis_20260719.tsv`
 - `results/strict_target_multiplicity_20260719.tsv`
 - `results/strict_repository_robustness_20260719.tsv`
 - `results/context_construction_cost_20260716.tsv`
 
+### Complete source composition and robustness
+
+- `results/source_combinations_top20_{summary,instances,paired}_20260722.tsv`
+- `results/source_combinations_token4000_{summary,instances,paired}_20260722.tsv`
+- `results/source_combinations_token4000_packing_{summary,instances}_20260722.tsv`
+- `results/source_combinations_glm_prefix_{summary,instances,paired}_20260722.tsv`
+- `results/source_combination_attribution_20260722.tsv`
+- `results/structural_temporal_provenance_20260722.json`
+- `results/structural_temporal_provenance_instances_20260722.tsv`
+- `structural_temporal_metadata_20260722.json`
+
+These ledgers enumerate all three single sources, all three pairwise fusions,
+and full MURAL at Top-20, under 4,000 rendered tokens, and after the fixed
+GLM-5 prefix. The temporal audit verifies both creation and last-modification
+times for every historical artifact observed in the frozen structural paths.
 
 ### Architecture and rendered-line controls
 
@@ -103,6 +125,8 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `results/architecture_control_{summary,instances,paired}_20260721.tsv`
 - `results/reference_coverage_strata_4000_20260721.tsv`
 - `results/line_coverage_{summary,instances}_4000_20260721.tsv`
+- `results/changed_line_strata_{4000,paired_4000}_20260722.tsv`
+- `results/changed_line_hunk_profile_20260722.tsv`
 - `frozen/architecture_control_rankings_20260721.jsonl.gz`
 - `frozen/architecture_control_manifest_20260721.json`
 
@@ -118,6 +142,7 @@ per-source projection followed by entity-level RRF.
 - `results/repair_equal4000_clustered_paired_20260719.tsv`
 - `results/repair_equal4000_strict_prediction_provenance_20260719.tsv`
 - `results/repair_equal4000_strict_regeneration_{bm25,mural}_20260719.tsv`
+- `results/repair_context_alignment_{summary,instances}_20260722.tsv`
 
 Nonempty, applicable, and resolved retain 500 instances per context in the
 denominator. The official rows are keyed by instance and patch SHA-256.
@@ -172,7 +197,9 @@ The Java evaluation retains all 91 instances pinned by
 BM25 projection, the structural adapter, dense projection, two-source MURAL, and
 three-source MURAL for all 500 Python instances.
 `frozen/source_rankings_manifest_20260719.json` records the construction and
-canonical-identity contract for those five rankings.
+canonical-identity contract for those five rankings. The two missing pairwise
+rankings are deterministically derived from the same frozen single-source
+rankings, and their complete evaluation ledgers are retained above.
 `frozen/architecture_control_rankings_20260721.jsonl.gz` contains file-primary,
 file-fusion-then-projection, and projected-entity-RRF rankings for all 500
 instances. `frozen/architecture_control_manifest_20260721.json` records their

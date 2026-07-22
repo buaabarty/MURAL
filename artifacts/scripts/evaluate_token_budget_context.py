@@ -187,6 +187,13 @@ def pack_entities(
 
 
 def changed_base_lines(patch_text: str) -> dict[str, set[int]]:
+    """Map each patch hunk to base-side changed-line anchors.
+
+    Removed lines retain their original base line. A pure addition uses the
+    insertion cursor in the base file; contiguous added lines share that
+    anchor. This makes insertion-only patches measurable without pretending
+    that added post-patch lines already exist in the base snapshot.
+    """
     output: dict[str, set[int]] = defaultdict(set)
     for patched_file in PatchSet(patch_text):
         path = str(patched_file.path).replace("\\", "/")
@@ -238,7 +245,10 @@ def write_tsv(path: Path, rows: list[dict[str, Any]]) -> None:
             lineterminator="\n",
         )
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(
+            {key: 'NA' if value == '' else value for key, value in row.items()}
+            for row in rows
+        )
 
 
 def parse_args() -> argparse.Namespace:

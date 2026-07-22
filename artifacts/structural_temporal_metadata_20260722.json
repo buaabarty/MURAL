@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "artifact": "issue#25384",
+      "repository": "django/django",
+      "url": "https://code.djangoproject.com/ticket/25384",
+      "created_at": "2015-09-11T15:11:53Z",
+      "last_modified_at": "2015-09-12T11:35:59Z",
+      "source": "Django Trac ticket header and timeline links"
+    }
+  ]
+}

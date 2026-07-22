@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "artifacts" / "results"
 LOCALIZATION = RESULTS / "strict_localization_summary_20260719.tsv"
+SOURCE_COMBINATIONS = RESULTS / "source_combinations_top20_summary_20260722.tsv"
 TARGETS = RESULTS / "strict_reference_targets_20260719.json"
 MAIN_OUTPUT = RESULTS / "paper_main_results_20260722.tsv"
 PROFILE_OUTPUT = RESULTS / "paper_dataset_profile_20260722.tsv"
@@ -23,6 +24,8 @@ MAIN_ROWS = (
     ("Structural entities", "Structural_entities"),
     ("Structural adapter", "Structural_adapter"),
     ("MURAL w/o Dense", "MURAL_2src"),
+    ("BM25 + Dense", "BM25_Dense"),
+    ("Structural + Dense", "Structural_Dense"),
     ("MURAL", "MURAL"),
 )
 
@@ -41,9 +44,22 @@ def write_tsv(path: Path, fieldnames: list[str], rows: list[dict[str, object]]) 
 
 def build_main_results() -> None:
     strict = {row["approach"]: row for row in read_tsv(LOCALIZATION)}
+    combinations = {row["approach"]: row for row in read_tsv(SOURCE_COMBINATIONS)}
+    source_rows = dict(strict)
+    source_rows.update(
+        {
+            "BM25_Dense": combinations["BM25_Dense"],
+            "Structural_Dense": combinations["Structural_Dense"],
+        }
+    )
     output: list[dict[str, object]] = []
     for paper_label, source_approach in MAIN_ROWS:
-        row = strict[source_approach]
+        row = source_rows[source_approach]
+        source_ledger = (
+            SOURCE_COMBINATIONS
+            if source_approach in {"BM25_Dense", "Structural_Dense"}
+            else LOCALIZATION
+        )
         output.append(
             {
                 "paper_label": paper_label,
@@ -55,7 +71,7 @@ def build_main_results() -> None:
                 "mrr": f'{float(row["mrr"]):.1f}',
                 "hit_at_20": f'{float(row["hit"]):.1f}',
                 "ref_complete": f'{float(row["complete"]):.1f}',
-                "source_ledger": LOCALIZATION.relative_to(ROOT).as_posix(),
+                "source_ledger": source_ledger.relative_to(ROOT).as_posix(),
             }
         )
     write_tsv(

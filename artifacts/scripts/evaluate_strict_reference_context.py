@@ -203,7 +203,10 @@ def write_tsv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames, delimiter="\t", lineterminator="\n")
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(
+            {key: 'NA' if value == '' else value for key, value in row.items()}
+            for row in rows
+        )
 
 
 def main() -> int:
