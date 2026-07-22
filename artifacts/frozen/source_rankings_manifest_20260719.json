@@ -82,7 +82,8 @@
     ],
     "repository_snapshot": "official base commit",
     "source_generation_command": "python3 artifacts/scripts/export_text_baselines.py --instance-ids artifacts/frozen/swebench_verified_ids_20260719.txt --dataset-arrow SWE_BENCH_VERIFIED_ARROW --repos-dir BASE_COMMIT_REPOSITORIES --output SOURCE_RUNS --top-k 50 --fusion-depth 200",
-    "temporal_audit": "artifacts/results/structural_temporal_provenance_20260722.json"
+    "temporal_audit": "artifacts/results/structural_temporal_provenance_20260722.json",
+    "static_history_ablation": "artifacts/results/structural_static_ablation_summary_20260722.json"
   },
   "schema_version": 2,
   "top_k": 50

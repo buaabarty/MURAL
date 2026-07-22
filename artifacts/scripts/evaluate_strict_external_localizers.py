@@ -44,7 +44,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--workspace-root", type=Path, required=True)
     parser.add_argument("--top-k", type=int, default=20)
     parser.add_argument("--primary-prefix", type=int, default=10)
-    parser.add_argument("--secondary-pool", type=int, default=20)
     parser.add_argument("--bootstrap", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--output-summary", type=Path, required=True)
@@ -99,15 +98,9 @@ def fuse_candidates_exact(
     primary: list[dict],
     secondary: list[dict],
     primary_prefix: int,
-    secondary_pool: int,
     top_k: int,
 ) -> list[dict]:
-    merged = fill_unique_exact(primary[:primary_prefix], secondary[:secondary_pool], top_k)
-    if len(merged) < top_k:
-        merged = fill_unique_exact(merged, primary[primary_prefix:], top_k)
-    if len(merged) < top_k:
-        merged = fill_unique_exact(merged, secondary[secondary_pool:], top_k)
-    return merged[:top_k]
+    return fill_unique_exact(primary[:primary_prefix], secondary, top_k)
 
 
 def canonical_external_label(candidate: dict) -> str:
@@ -279,7 +272,7 @@ def main() -> int:
         "LocAgent": args.external_root / "locagent" / "locagent_qwen_coder_32b_func.jsonl",
         "OrcaLoca": args.external_root / "orcaloca" / "orcaloca_qwen_coder_32b_func.jsonl",
     }
-    tail_limit = max(args.top_k, args.secondary_pool)
+    tail_limit = args.top_k
     if args.rankings_archive:
         tail = load_archive_tail(args.rankings_archive, "MURAL", tail_limit)
     else:
@@ -344,7 +337,6 @@ def main() -> int:
                 prefix[instance_id],
                 tail[instance_id],
                 args.primary_prefix,
-                args.secondary_pool,
                 args.top_k,
             )
             for instance_id in ids

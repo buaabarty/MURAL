@@ -31,12 +31,15 @@ def append_unique(output: list[dict], candidates: list[dict], limit: int) -> Non
             return
 
 
-def fuse(primary: list[dict], secondary: list[dict], budget: int, primary_prefix: int, secondary_pool: int) -> list[dict]:
+def fuse(
+    primary: list[dict],
+    secondary: list[dict],
+    budget: int,
+    primary_prefix: int,
+) -> list[dict]:
     output: list[dict] = []
     append_unique(output, primary[:primary_prefix], budget)
-    append_unique(output, secondary[:secondary_pool], budget)
-    append_unique(output, primary[primary_prefix:], budget)
-    append_unique(output, secondary[secondary_pool:], budget)
+    append_unique(output, secondary, budget)
     for rank, item in enumerate(output, start=1):
         item["similarity"] = float(2.0 - 0.01 * (rank - 1))
     return output[:budget]
@@ -53,7 +56,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--budget", type=int, default=20)
     parser.add_argument("--primary-prefix", type=int)
-    parser.add_argument("--secondary-pool", type=int)
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
@@ -61,9 +63,8 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     prefix = args.primary_prefix if args.primary_prefix is not None else (args.budget + 1) // 2
-    secondary_pool = args.secondary_pool if args.secondary_pool is not None else args.budget
-    if args.budget <= 0 or not 0 <= prefix <= args.budget or secondary_pool <= 0:
-        raise ValueError("Require budget > 0, 0 <= primary-prefix <= budget, and secondary-pool > 0")
+    if args.budget <= 0 or not 0 <= prefix <= args.budget:
+        raise ValueError("Require budget > 0 and 0 <= primary-prefix <= budget")
     primary_ids = {path.stem for path in args.primary_dir.glob("*.json")}
     secondary_ids = {path.stem for path in args.secondary_dir.glob("*.json")}
     instance_ids = sorted(primary_ids & secondary_ids)
@@ -82,7 +83,6 @@ def main() -> int:
             ranked_methods(secondary_payload),
             args.budget,
             prefix,
-            secondary_pool,
         )
         primary_entities = primary_payload.get("related_entities") or {}
         secondary_entities = secondary_payload.get("related_entities") or {}
@@ -97,7 +97,6 @@ def main() -> int:
                 "strategy": "fixed_primary_prefix_secondary_tail",
                 "budget": args.budget,
                 "primary_prefix": prefix,
-                "secondary_pool": secondary_pool,
                 "primary_dir": str(args.primary_dir),
                 "secondary_dir": str(args.secondary_dir),
             },

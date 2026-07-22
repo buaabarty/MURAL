@@ -1,0 +1,9 @@
+{
+  "historical_candidates_removed": 2,
+  "instances": 500,
+  "instances_with_history_candidates": 1,
+  "rrf_k": 60,
+  "top20_changed_instances": 1,
+  "top50_changed_instances": 1,
+  "top_k": 50
+}

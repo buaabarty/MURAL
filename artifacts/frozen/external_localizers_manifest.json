@@ -13,6 +13,9 @@
     "class": "exact eligible entity or direct canonical member expansion",
     "deduplication": "normalized path, entity kind, and qualified symbol",
     "prefix_limit": 10,
-    "evaluation": "artifacts/results/strict_external_localizer_summary_20260722.tsv"
+    "evaluations": [
+      "artifacts/results/strict_external_localizer_summary_20260722.tsv",
+      "artifacts/results/external_token_completion_summary_20260722.tsv"
+    ]
   }
 }

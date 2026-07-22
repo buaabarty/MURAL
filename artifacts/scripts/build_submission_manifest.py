@@ -15,8 +15,11 @@ CRITICAL_FILES = [
     "artifacts/README.md",
     "artifacts/RESULT_TRACEABILITY.md",
     "artifacts/scripts/analyze_clustered_repair_stats.py",
+    "artifacts/scripts/analyze_human_window_strata.py",
+    "artifacts/scripts/analyze_primary_cluster_randomization.py",
+    "artifacts/scripts/analyze_target_fallback_evidence.py",
+    "artifacts/scripts/analyze_token_candidate_exhaustion.py",
     "artifacts/scripts/analyze_changed_line_strata.py",
-    "artifacts/scripts/analyze_repair_context_alignment.py",
     "artifacts/scripts/analyze_repair_outcomes.py",
     "artifacts/scripts/analyze_source_combinations.py",
     "artifacts/scripts/analyze_human_strict_alignment.py",
@@ -36,6 +39,8 @@ CRITICAL_FILES = [
     "artifacts/scripts/evaluate_java_retrieve_localize.py",
     "artifacts/scripts/evaluate_strict_external_localizers.py",
     "artifacts/scripts/evaluate_strict_reference_context.py",
+    "artifacts/scripts/export_external_localizer_completions.py",
+    "artifacts/scripts/export_static_structural_ablation.py",
     "artifacts/scripts/export_file_primary_ranking.py",
     "artifacts/scripts/export_file_rrf_seeds.py",
     "artifacts/scripts/evaluate_token_budget_context.py",
@@ -66,6 +71,7 @@ CRITICAL_FILES = [
     "test_entity_projection_ranking.py",
     "test_fusion_identity.py",
     "test_human_window_binding.py",
+    "test_no_llm_analysis.py",
     "test_strict_external_localizers.py",
     "test_strict_reference_evaluator.py",
     "test_strict_reference_target_builder.py",
@@ -101,7 +107,7 @@ def main() -> None:
         raise SystemExit(f"Missing manifest inputs: {missing}")
 
     manifest = {
-        "schema_version": 3,
+        "schema_version": 4,
         "frozen_date": "2026-07-22",
         "annotation_snapshot": "2026-07-21",
         "paper": {
@@ -128,6 +134,7 @@ def main() -> None:
             "fallback": "add an exact-file target for each changed path containing a region outside the candidate-unit contract; retain it with entity targets",
             "matching": "exact normalized file path, target kind, and qualified name",
             "target_file": "artifacts/results/strict_reference_targets_20260719.json",
+            "fallback_evidence": "artifacts/results/target_fallback_evidence_summary_20260722.tsv",
             "target_counts": {
                 "function_or_class_method": 836,
                 "assignment": 32,
@@ -148,8 +155,9 @@ def main() -> None:
             "fusion": "equal-weight reciprocal-rank fusion over canonical adapter rankings",
             "rrf_k": 60,
             "default_entity_budget": 20,
-            "prefix_policy": "preserve resolved prefix; scan secondary head, localizer remainder, then secondary remainder",
+            "prefix_policy": "preserve resolved prefix; fill remaining capacity from the selected secondary ranking",
             "frozen_rankings": "artifacts/frozen/strict_rankings_top50_20260719.jsonl.gz",
+            "token_candidate_exhaustion": "artifacts/results/token_candidate_exhaustion_summary_20260722.tsv",
         },
         "source_composition": {
             "sources": ["BM25", "structural", "dense"],
@@ -164,6 +172,7 @@ def main() -> None:
             ],
             "scenarios": ["standalone Top-20", "4,000 rendered tokens", "GLM-5 prefix completion"],
             "attribution": "artifacts/results/source_combination_attribution_20260722.tsv",
+            "external_localizer_token_completion": "artifacts/results/external_token_completion_summary_20260722.tsv",
         },
         "architecture_controls": {
             "frozen_rankings": "artifacts/frozen/architecture_control_rankings_20260721.jsonl.gz",
@@ -190,6 +199,9 @@ def main() -> None:
             "seed": 7,
             "binary_test": "two-sided exact McNemar",
             "confidence_level": 0.95,
+            "cluster_randomization": "exact sign flip over all 2^12 repository assignments",
+            "cluster_randomization_endpoints": ["Hit@20", "LineRecall@4000"],
+            "cluster_randomization_results": "artifacts/results/primary_cluster_signflip_summary_20260722.tsv",
         },
         "repair": {
             "generation_dates": ["2026-07-18", "2026-07-19"],
@@ -214,7 +226,6 @@ def main() -> None:
             "timeout_outcome": "unresolved",
             "prompt_hash_rows": 1000,
             "variants": ["bm25", "mural"],
-            "context_alignment": "artifacts/results/repair_context_alignment_summary_20260722.tsv",
         },
         "human_audit": {
             "judgments": 100,
@@ -226,6 +237,7 @@ def main() -> None:
             "window_binding": "artifacts/results/human_window_binding_20260719.tsv",
             "strict_window_evaluation": "artifacts/results/human_window_exact_instances_20260719.tsv",
             "source_workbook_provenance": "artifacts/results/human_window_provenance_20260718.tsv",
+            "stratified_unique_decisions": "artifacts/results/human_window_strata_summary_20260722.tsv",
             "paper_comparison": "RQ-1 source-composition comparison",
             "configurations": {
                 "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
@@ -260,6 +272,9 @@ def main() -> None:
             "time_ineligible_path_rows": 0,
             "changed_top20_windows": 0,
             "changed_4000_token_windows": 0,
+            "static_replay": "artifacts/results/structural_static_ablation_summary_20260722.json",
+            "history_derived_candidates_removed": 2,
+            "static_replay_target_metric_changes": 0,
         },
         "java_benchmark": {
             "name": "SWE-bench-Java Verified",

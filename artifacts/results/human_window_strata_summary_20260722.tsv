@@ -1,0 +1,6 @@
+stratum	audit_stratum_instances	audited_instances	judgments	aligned	opposed	neutral	no_consensus	directional_alignment_rate	exact_two_sided_p
+MURAL_only	37	37	45	31	3	3	0	0.911765	7.66012817621e-07
+BM25_only	12	12	14	9	0	1	2	1.000000	0.00390625
+both	18	18	24	0	0	18	0		
+neither	13	13	17	0	0	13	0		
+exclusive_combined	49	49	59	40	3	4	2	0.930233	3.02134139929e-09

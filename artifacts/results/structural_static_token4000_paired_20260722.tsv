@@ -1,0 +1,6 @@
+baseline	treatment	metric	delta	clustered_ci_low	clustered_ci_high	wins	losses	mcnemar_p
+MURAL_t4000	MURAL_static_t4000	file_hit	0.000000	0.000000	0.000000	0	0	1
+MURAL_t4000	MURAL_static_t4000	target_coverage	0.000000	0.000000	0.000000	NA	NA	NA
+MURAL_t4000	MURAL_static_t4000	hit	0.000000	0.000000	0.000000	0	0	1
+MURAL_t4000	MURAL_static_t4000	mrr	0.002778	0.000000	0.004839	NA	NA	NA
+MURAL_t4000	MURAL_static_t4000	complete	0.000000	0.000000	0.000000	0	0	1

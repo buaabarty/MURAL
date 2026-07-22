@@ -101,10 +101,9 @@ def test_fixed_prefix_uses_path_kind_symbol_identity():
         entity("pkg/a.py", "pkg.a.C.value(self, value)"),
         entity("pkg/a.py", "pkg.a.C.other(self)"),
     ]
-    result = PREFIX.fuse(primary, secondary, budget=4, primary_prefix=1, secondary_pool=2)
+    result = PREFIX.fuse(primary, secondary, budget=4, primary_prefix=1)
     identities = [PREFIX.entity_id(item) for item in result]
     assert identities == [
         PREFIX.entity_id(primary[0]),
         PREFIX.entity_id(secondary[1]),
-        PREFIX.entity_id(primary[1]),
     ]

@@ -28,7 +28,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mural-dir", type=Path, required=True)
     parser.add_argument("--top-k", type=int, default=20)
     parser.add_argument("--primary-prefix", type=int, default=10)
-    parser.add_argument("--secondary-pool", type=int, default=20)
     parser.add_argument(
         "--tail-label",
         default="MURAL",
@@ -229,15 +228,9 @@ def fuse_candidates(
     primary: list[dict[str, str]],
     secondary: list[dict[str, str]],
     primary_prefix: int,
-    secondary_pool: int,
     top_k: int,
 ) -> list[dict[str, str]]:
-    merged = fill_unique(primary[:primary_prefix], secondary[:secondary_pool], top_k)
-    if len(merged) < top_k:
-        merged = fill_unique(merged, primary[primary_prefix:], top_k)
-    if len(merged) < top_k:
-        merged = fill_unique(merged, secondary[secondary_pool:], top_k)
-    return merged[:top_k]
+    return fill_unique(primary[:primary_prefix], secondary, top_k)
 
 
 def evaluate_one(candidates: list[dict[str, str]], gt: dict[str, Any], top_k: int) -> dict[str, Any]:
@@ -386,7 +379,7 @@ def main() -> int:
     secondary = {
         instance_id: mural_candidates(
             args.mural_dir / f"{instance_id}.json",
-            max(args.top_k, args.secondary_pool),
+            args.top_k,
         )
         for instance_id in ids
     }
@@ -408,7 +401,6 @@ def main() -> int:
                 primary[instance_id],
                 secondary[instance_id],
                 args.primary_prefix,
-                args.secondary_pool,
                 args.top_k,
             )
             for instance_id in ids

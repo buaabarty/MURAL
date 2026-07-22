@@ -1,0 +1,13 @@
+source	token_budget	instances	candidate_cap	input_below_cap	packing_exhausted_input	selected_at_cap	max_selected
+BM25	2000	500	50	0	0	0	21
+Dense	2000	500	50	0	0	0	23
+MURAL	2000	500	50	0	0	0	19
+Structural	2000	500	50	116	78	0	34
+BM25	4000	500	50	0	0	0	42
+Dense	4000	500	50	0	0	0	47
+MURAL	4000	500	50	0	0	0	40
+Structural	4000	500	50	116	106	3	50
+BM25	8000	500	50	0	107	107	50
+Dense	8000	500	50	0	177	177	50
+MURAL	8000	500	50	0	100	100	50
+Structural	8000	500	50	116	283	167	50

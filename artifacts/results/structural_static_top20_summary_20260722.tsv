@@ -1,0 +1,3 @@
+approach	N	top_k	candidate_count_mean	file_hit	target_coverage	mrr	hit	complete
+MURAL	500	20	20.000000	83.000000	57.588463	37.950833	67.200000	49.600000
+MURAL_static	500	20	20.000000	83.000000	57.588463	37.953611	67.200000	49.600000

@@ -11,7 +11,8 @@ All paths below are relative to `artifacts/`.
 - Sources: BM25 and dense ranked-file projections plus the structural adapter, which canonically unifies native structural entities with its projected file branch.
 - Fusion: equal-weight RRF with `k=60`.
 - Statistics: 10,000 repository-clustered bootstrap resamples, seed 7;
-  two-sided exact McNemar for binary paired contrasts.
+  two-sided exact McNemar for binary paired contrasts; exact sign-flip tests
+  over all 12 repository clusters for Hit@20 and LineRecall.
 - Strict targets: 1,044 total, comprising 836 functions or class methods,
   32 assignments, and 176 exact-file fallbacks.
 
@@ -33,6 +34,7 @@ All paths below are relative to `artifacts/`.
 | Entity and rendered changed-line coverage by target stratum | `results/reference_coverage_strata_4000_20260721.tsv`, `results/line_coverage_{summary,instances}_4000_20260721.tsv` |
 | Complete GLM-prefix tail controls | `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv` |
 | Released localizer completion and granularity normalization | `results/strict_external_localizer_{summary,instances,paired}_20260722.tsv`, `results/external_localizer_resolution_20260722.tsv` |
+| Matched 4,000-token completion across four released localizers | `results/external_token_completion_{summary,instances,paired}_20260722.tsv`, `results/external_token_completion_packing_{summary,instances}_20260722.tsv` |
 | Entity budgets 5, 10, 20, and 40 | `results/strict_budget_b*_{summary,instances,paired}_20260719.tsv` |
 | RRF sensitivity | `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv` |
 | Opportunity-matched entity selection and shared-hit rank shifts | `results/strict_mechanism_analysis_20260719.tsv` |
@@ -41,14 +43,17 @@ All paths below are relative to `artifacts/`.
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
-| Alignment between context inclusion and repair outcomes | `results/repair_context_alignment_{summary,instances}_20260722.tsv` |
 | Strict structural-artifact temporal provenance | `results/structural_temporal_provenance_20260722.json`, `results/structural_temporal_provenance_instances_20260722.tsv`, `structural_temporal_metadata_20260722.json` |
+| Static-only structural replay | `results/structural_static_ablation_{summary,instances}_20260722.*`, `results/structural_static_top20_*_20260722.tsv`, `results/structural_static_token4000_*_20260722.tsv` |
+| Exact repository-cluster sign-flip tests | `results/primary_cluster_signflip_{summary,repositories}_20260722.tsv` |
+| Exact-file fallback evidence | `results/target_fallback_evidence_{summary,instances}_20260722.tsv` |
+| Token candidate-cap exhaustion | `results/token_candidate_exhaustion_summary_20260722.tsv` |
 | Patch-grounded target-consistency judgments and agreement | `results/human_window_*_20260718.*` |
 | Exact annotator-visible audit rankings | `frozen/human_window_rankings_20260712.jsonl.gz` |
 | Audit window-to-source binding | `results/human_window_binding_20260719.tsv` |
 | Exact-window strict evaluation | `results/human_window_exact_instances_20260719.tsv` |
 | Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
-| Unique-instance strict judgment alignment | `results/human_window_unique_strict_summary_20260719.tsv` |
+| Unique-instance strict judgment alignment | `results/human_window_unique_strict_summary_20260719.tsv`, `results/human_window_strata_{summary,instances}_20260722.tsv` |
 | Task-A construct audit | `results/human_construct_*_20260721.tsv` |
 | Task-B support-role audit | `results/human_support_*_20260721.tsv` |
 | Evidence-audit summary and provenance | `results/human_evidence_audit_*_20260721.*` |
@@ -229,11 +234,37 @@ python3 scripts/evaluate_strict_external_localizers.py \
   --external-root RELEASED_LOCALIZER_FILES \
   --mural-dir MURAL_PROJECTED \
   --workspace-root BENCHMARK_CHECKOUTS \
-  --top-k 20 --primary-prefix 10 --secondary-pool 20 \
+  --top-k 20 --primary-prefix 10 \
   --bootstrap 10000 --seed 7 \
   --output-summary strict_external_summary.tsv \
   --output-instances strict_external_instances.tsv \
   --output-paired strict_external_paired.tsv
+```
+
+For the equal-token comparison, first export the six completion strategies per
+localizer and then run the common renderer:
+
+```bash
+python3 scripts/export_external_localizer_completions.py \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --targets results/strict_reference_targets_20260719.json \
+  --external-root RELEASED_LOCALIZER_FILES \
+  --rankings-archive frozen/strict_rankings_top50_20260719.jsonl.gz \
+  --workspace-root BENCHMARK_CHECKOUTS \
+  --output-root ../temp_run/external_completion \
+  --primary-prefix 10 --max-candidates 50
+
+python3 scripts/evaluate_token_budget_context.py \
+  --source CoSIL_MURAL=../temp_run/external_completion/CoSIL__MURAL \
+  --source CoSIL_Dense=../temp_run/external_completion/CoSIL__Dense \
+  --compare CoSIL_Dense=CoSIL_MURAL --budget 4000 \
+  --ids-file frozen/swebench_verified_ids_20260719.txt \
+  --dataset-file SWE_BENCH_VERIFIED_ARROW \
+  --targets results/strict_reference_targets_20260719.json \
+  --output-root ../temp_run/external_packed \
+  --output-summary ../temp_run/external_summary.tsv \
+  --output-paired ../temp_run/external_paired.tsv \
+  --output-instances ../temp_run/external_instances.tsv
 ```
 
 ## Prompt and repair provenance
@@ -280,6 +311,12 @@ python3 scripts/analyze_human_strict_alignment.py \
 
 ```bash
 python3 scripts/analyze_human_evidence_audit.py
+
+python3 scripts/analyze_human_window_strata.py \
+  --judgments results/human_window_strict_judgments_20260719.tsv \
+  --audit-instances results/human_window_exact_instances_20260719.tsv \
+  --output-summary ../temp_run/human_strata_summary.tsv \
+  --output-instances ../temp_run/human_strata_instances.tsv
 ```
 
 The raw annotations and randomized A/B assignment remain exactly as supplied

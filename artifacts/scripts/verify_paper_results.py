@@ -47,11 +47,15 @@ EXPECTED_RESULTS = {
     "human_window_strict_judgments_20260719.tsv",
     "human_window_strict_summary_20260719.tsv",
     "human_window_unique_strict_summary_20260719.tsv",
+    "human_window_strata_instances_20260722.tsv",
+    "human_window_strata_summary_20260722.tsv",
     "human_window_summary_20260718.tsv",
     "issue_creation_cutoff_audit_20260719.json",
     "java_cross_language_instances_20260714.jsonl",
     "paper_dataset_profile_20260722.tsv",
     "paper_main_results_20260722.tsv",
+    "primary_cluster_signflip_repositories_20260722.tsv",
+    "primary_cluster_signflip_summary_20260722.tsv",
     "java_cross_language_paired_20260714.tsv",
     "java_cross_language_summary_20260714.tsv",
     "java_cross_language_targets_20260714.json",
@@ -69,6 +73,12 @@ EXPECTED_RESULTS = {
     "source_bearing_prompt_paired_20260719.tsv",
     "source_bearing_prompt_summary_20260719.tsv",
     "external_localizer_resolution_20260722.tsv",
+    "external_token_completion_instances_20260722.tsv",
+    "external_token_completion_packing_instances_20260722.tsv",
+    "external_token_completion_packing_summary_20260722.tsv",
+    "external_token_completion_paired_20260722.tsv",
+    "external_token_completion_resolution_20260722.tsv",
+    "external_token_completion_summary_20260722.tsv",
     "strict_external_localizer_instances_20260722.tsv",
     "strict_external_localizer_paired_20260722.tsv",
     "strict_external_localizer_summary_20260722.tsv",
@@ -97,6 +107,8 @@ EXPECTED_RESULTS = {
 STALE_RESULTS = {
     "retrieve_then_localize_top20_20260711.tsv",
     "tse_gt_mapping_v6.tsv",
+    "repair_context_alignment_instances_20260722.tsv",
+    "repair_context_alignment_summary_20260722.tsv",
 }
 for budget in (5, 10, 20, 40):
     for suffix in ("summary", "instances", "paired"):
@@ -107,8 +119,9 @@ EXPECTED_RESULTS.update(
         "changed_line_hunk_profile_20260722.tsv",
         "changed_line_strata_4000_20260722.tsv",
         "changed_line_strata_paired_4000_20260722.tsv",
-        "repair_context_alignment_instances_20260722.tsv",
-        "repair_context_alignment_summary_20260722.tsv",
+        "target_fallback_evidence_instances_20260722.tsv",
+        "target_fallback_evidence_summary_20260722.tsv",
+        "token_candidate_exhaustion_summary_20260722.tsv",
         "source_combination_attribution_20260722.tsv",
         "source_combinations_glm_prefix_instances_20260722.tsv",
         "source_combinations_glm_prefix_paired_20260722.tsv",
@@ -123,6 +136,16 @@ EXPECTED_RESULTS.update(
         "source_combinations_top20_summary_20260722.tsv",
         "structural_temporal_provenance_20260722.json",
         "structural_temporal_provenance_instances_20260722.tsv",
+        "structural_static_ablation_instances_20260722.tsv",
+        "structural_static_ablation_summary_20260722.json",
+        "structural_static_top20_instances_20260722.tsv",
+        "structural_static_top20_paired_20260722.tsv",
+        "structural_static_top20_summary_20260722.tsv",
+        "structural_static_token4000_instances_20260722.tsv",
+        "structural_static_token4000_packing_instances_20260722.tsv",
+        "structural_static_token4000_packing_summary_20260722.tsv",
+        "structural_static_token4000_paired_20260722.tsv",
+        "structural_static_token4000_summary_20260722.tsv",
     }
 )
 
@@ -1168,14 +1191,6 @@ def check_comprehensive_additions() -> None:
     close(min(leave_one_out), 2.6022304832713754, "CompleteLine LORO minimum")
     close(max(leave_one_out), 4.470588235294118, "CompleteLine LORO maximum")
 
-    repair = rows("repair_context_alignment_summary_20260722.tsv")
-    aligned = one(repair, context_metric="complete_line", context_transition="mural_only")
-    equal(int(aligned["N"]), 23, "MURAL-only CompleteLine instances")
-    equal(int(aligned["bm25_resolved"]), 9, "BM25 resolved in MURAL-only CompleteLine")
-    equal(int(aligned["mural_resolved"]), 12, "MURAL resolved in MURAL-only CompleteLine")
-    equal(int(aligned["repair_mural_only"]), 4, "repair MURAL-only alignment")
-    equal(int(aligned["repair_bm25_only"]), 1, "repair BM25-only alignment")
-
     temporal = json_file(RESULTS / "structural_temporal_provenance_20260722.json")
     equal(temporal["audit"], "strict_structural_artifact_time_boundary", "temporal audit kind")
     equal(temporal["configuration"]["instances"], 500, "temporal audit population")
@@ -1187,9 +1202,97 @@ def check_comprehensive_additions() -> None:
     equal(summary["packed_4000_changed_instances"], 0, "temporal packed changes")
 
 
+
+def check_no_llm_additions() -> None:
+    completion = rows("external_token_completion_summary_20260722.tsv")
+    equal(len(completion), 24, "matched external completion rows")
+    expected = {
+        "CoSIL_MURAL_t4000": (74.131818, 83.6, 65.0),
+        "Agentless_MURAL_t4000": (67.857590, 77.2, 59.0),
+        "LocAgent_MURAL_t4000": (71.434820, 81.4, 63.0),
+        "OrcaLoca_MURAL_t4000": (65.003463, 73.6, 57.8),
+        "CoSIL_Dense_t4000": (74.099596, 84.2, 64.2),
+        "Agentless_Dense_t4000": (67.421407, 76.4, 58.6),
+        "LocAgent_Dense_t4000": (70.880693, 80.8, 62.2),
+        "OrcaLoca_Dense_t4000": (65.358312, 74.2, 57.4),
+    }
+    for approach, values in expected.items():
+        row = one(completion, approach=approach)
+        for field, value in zip(("target_coverage", "hit", "complete"), values):
+            close(row[field], value, f"matched completion {approach} {field}")
+    for localizer, delta in {
+        "CoSIL": 2.0,
+        "Agentless": 3.0,
+        "LocAgent": 4.4,
+        "OrcaLoca": 5.0,
+    }.items():
+        row = pair(
+            "external_token_completion_paired_20260722.tsv",
+            f"{localizer}_BM25_t4000",
+            f"{localizer}_MURAL_t4000",
+            "hit",
+        )
+        close(row["delta"], delta, f"matched {localizer} MURAL vs BM25 Hit")
+
+    human = rows("human_window_strata_summary_20260722.tsv")
+    combined = one(human, stratum="exclusive_combined")
+    equal(int(combined["audit_stratum_instances"]), 49, "stratified audit instances")
+    for field, value in {
+        "aligned": 40,
+        "opposed": 3,
+        "neutral": 4,
+        "no_consensus": 2,
+    }.items():
+        equal(int(combined[field]), value, f"stratified audit {field}")
+    close(combined["directional_alignment_rate"], 0.930233, "stratified audit alignment")
+
+    clustered = rows("primary_cluster_signflip_summary_20260722.tsv")
+    hit = one(clustered, endpoint="Hit@20")
+    close(hit["delta"], 0.094, "clustered Hit delta")
+    close(hit["exact_cluster_signflip_p"], 0.0078125, "clustered Hit p")
+    line = one(clustered, endpoint="LineRecall@4000")
+    close(line["baseline"], 0.256841, "clustered LineRecall baseline")
+    close(line["treatment"], 0.313736, "clustered LineRecall treatment")
+    close(line["exact_cluster_signflip_p"], 0.00390625, "clustered LineRecall p")
+
+    fallback = rows("target_fallback_evidence_summary_20260722.tsv")
+    for category, count in {
+        "all_file_targets": 176,
+        "added_or_outer_scope": 155,
+        "base_scope": 75,
+        "patched_parse_failure": 5,
+        "new_or_missing_base_file": 1,
+        "non_python_change": 1,
+    }.items():
+        equal(int(one(fallback, category=category)["count"]), count, f"fallback {category}")
+
+    exhaustion = rows("token_candidate_exhaustion_summary_20260722.tsv")
+    mural_4000 = one(exhaustion, source="MURAL", token_budget="4000")
+    equal(int(mural_4000["candidate_cap"]), 50, "MURAL token candidate cap")
+    equal(int(mural_4000["selected_at_cap"]), 0, "MURAL 4000 selected at cap")
+    equal(int(mural_4000["max_selected"]), 40, "MURAL 4000 max selected")
+    mural_8000 = one(exhaustion, source="MURAL", token_budget="8000")
+    equal(int(mural_8000["selected_at_cap"]), 100, "MURAL 8000 selected at cap")
+
+    static = json_file(RESULTS / "structural_static_ablation_summary_20260722.json")
+    equal(static["instances"], 500, "static replay instances")
+    equal(static["instances_with_history_candidates"], 1, "static history instances")
+    equal(static["historical_candidates_removed"], 2, "static candidates removed")
+    top20 = rows("structural_static_top20_summary_20260722.tsv")
+    token = rows("structural_static_token4000_summary_20260722.tsv")
+    for ledger, labels in (
+        (top20, ("MURAL", "MURAL_static")),
+        (token, ("MURAL_t4000", "MURAL_static_t4000")),
+    ):
+        baseline = one(ledger, approach=labels[0])
+        replay = one(ledger, approach=labels[1])
+        for field in ("file_hit", "target_coverage", "hit", "complete"):
+            close(replay[field], float(baseline[field]), f"static replay {labels[1]} {field}")
+
+
 def check_manifest() -> None:
     manifest = json_file(MANIFEST)
-    equal(manifest["schema_version"], 3, "manifest schema")
+    equal(manifest["schema_version"], 4, "manifest schema")
     equal(
         manifest["paper"]["title"],
         "MURAL: Unifying Fault Localization and Bounded Context Construction for Repository Repair",
@@ -1264,9 +1367,34 @@ def check_manifest() -> None:
     )
     equal(len(manifest["source_composition"]["combinations"]), 7, "manifest source combinations")
     equal(
-        manifest["repair"]["context_alignment"],
-        "artifacts/results/repair_context_alignment_summary_20260722.tsv",
-        "manifest repair alignment",
+        manifest["source_composition"]["external_localizer_token_completion"],
+        "artifacts/results/external_token_completion_summary_20260722.tsv",
+        "manifest external token completion",
+    )
+    equal(
+        manifest["statistics"]["cluster_randomization_results"],
+        "artifacts/results/primary_cluster_signflip_summary_20260722.tsv",
+        "manifest cluster randomization",
+    )
+    equal(
+        manifest["human_audit"]["stratified_unique_decisions"],
+        "artifacts/results/human_window_strata_summary_20260722.tsv",
+        "manifest human strata",
+    )
+    equal(
+        manifest["structural_temporal_boundary"]["history_derived_candidates_removed"],
+        2,
+        "manifest static candidates removed",
+    )
+    equal(
+        manifest["strict_reference"]["fallback_evidence"],
+        "artifacts/results/target_fallback_evidence_summary_20260722.tsv",
+        "manifest fallback evidence",
+    )
+    equal(
+        manifest["mural"]["token_candidate_exhaustion"],
+        "artifacts/results/token_candidate_exhaustion_summary_20260722.tsv",
+        "manifest token candidate exhaustion",
     )
     for name, record in manifest["files"].items():
         path = ROOT / name
@@ -1280,7 +1408,11 @@ def check_instance_ledgers() -> None:
     for name in sorted(EXPECTED_RESULTS):
         if "_instances_" not in name or not name.endswith(".tsv"):
             continue
-        if name == "human_window_exact_instances_20260719.tsv":
+        if name in {
+            "human_window_exact_instances_20260719.tsv",
+            "human_window_strata_instances_20260722.tsv",
+            "target_fallback_evidence_instances_20260722.tsv",
+        }:
             continue
         items = rows(name)
         ids = {row["instance_id"] for row in items}
@@ -1318,6 +1450,7 @@ def main() -> None:
     check_repair()
     check_java_and_cost()
     check_comprehensive_additions()
+    check_no_llm_additions()
     check_removed_terms()
     check_manifest()
     print("MURAL paper artifact verification passed.")

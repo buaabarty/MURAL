@@ -44,7 +44,9 @@ base-side changed lines.
 
 Every Python comparison retains all 500 SWE-bench Verified instances. Confidence
 intervals use 10,000 repository-clustered bootstrap resamples with seed 7;
-binary paired contrasts use the two-sided exact McNemar test.
+binary paired contrasts use the two-sided exact McNemar test. Exact sign-flip
+tests enumerate all $2^{12}$ repository-cluster assignments for Hit@20 and
+LineRecall at 4,000 tokens.
 
 ## Core scripts
 
@@ -52,7 +54,13 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `build_strict_reference_targets.py`: independent Python-AST target builder.
 - `evaluate_strict_reference_context.py`: exact localization evaluator.
 - `evaluate_strict_external_localizers.py`: released-prefix completion with class-to-member granularity normalization.
+- `export_external_localizer_completions.py`: matched completion rankings for released localizer prefixes.
 - `evaluate_token_budget_context.py`: rendered-token packing.
+- `export_static_structural_ablation.py`: history-free structural replay.
+- `analyze_primary_cluster_randomization.py`: exact repository-cluster sign-flip tests.
+- `analyze_target_fallback_evidence.py`: exact-file fallback evidence accounting.
+- `analyze_token_candidate_exhaustion.py`: pre-render candidate-cap accounting.
+- `analyze_human_window_strata.py`: unique-instance audit decisions by exact-hit stratum.
 - `entity_identity.py`: shared canonical entity identity and deduplication.
 - `export_ranked_file_seeds.py`: ranked-file seed materialization.
 - `export_entity_projection.py`: projection entry point.
@@ -76,7 +84,6 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `analyze_clustered_repair_stats.py`: clustered repair statistics.
 - `analyze_source_combinations.py`: all single-source and pairwise source combinations.
 - `analyze_changed_line_strata.py`: changed-line coverage by patch-hunk type.
-- `analyze_repair_context_alignment.py`: context-transition and repair-outcome alignment.
 - `audit_structural_temporal_provenance.py`: strict created/last-modified provenance audit.
 - `evaluate_java_retrieve_localize.py`: complete Java evaluator.
 - `build_submission_manifest.py`: protocol and digest manifest.
@@ -97,6 +104,9 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `results/strict_prefix_tail_{summary,instances,paired}_20260719.tsv`
 - `results/strict_external_localizer_{summary,instances,paired}_20260722.tsv`
 - `results/external_localizer_resolution_20260722.tsv`
+- `results/external_token_completion_{summary,instances,paired}_20260722.tsv`
+- `results/external_token_completion_packing_{summary,instances}_20260722.tsv`
+- `results/external_token_completion_resolution_20260722.tsv`
 - `results/strict_rrf_sensitivity_{summary,instances,paired}_20260719.tsv`
 - `results/strict_mechanism_analysis_20260719.tsv`
 - `results/strict_target_multiplicity_20260719.tsv`
@@ -112,12 +122,21 @@ binary paired contrasts use the two-sided exact McNemar test.
 - `results/source_combination_attribution_20260722.tsv`
 - `results/structural_temporal_provenance_20260722.json`
 - `results/structural_temporal_provenance_instances_20260722.tsv`
+- `results/structural_static_ablation_{summary,instances}_20260722.*`
+- `results/structural_static_top20_{summary,instances,paired}_20260722.tsv`
+- `results/structural_static_token4000_{summary,instances,paired}_20260722.tsv`
+- `results/structural_static_token4000_packing_{summary,instances}_20260722.tsv`
+- `results/primary_cluster_signflip_{summary,repositories}_20260722.tsv`
+- `results/target_fallback_evidence_{summary,instances}_20260722.tsv`
+- `results/token_candidate_exhaustion_summary_20260722.tsv`
 - `structural_temporal_metadata_20260722.json`
 
 These ledgers enumerate all three single sources, all three pairwise fusions,
 and full MURAL at Top-20, under 4,000 rendered tokens, and after the fixed
 GLM-5 prefix. The temporal audit verifies both creation and last-modification
 times for every historical artifact observed in the frozen structural paths.
+The static replay removes all history-derived candidates before RRF and records
+the resulting Top-20 and 4,000-token metrics.
 
 ### Architecture and rendered-line controls
 
@@ -142,7 +161,6 @@ per-source projection followed by entity-level RRF.
 - `results/repair_equal4000_clustered_paired_20260719.tsv`
 - `results/repair_equal4000_strict_prediction_provenance_20260719.tsv`
 - `results/repair_equal4000_strict_regeneration_{bm25,mural}_20260719.tsv`
-- `results/repair_context_alignment_{summary,instances}_20260722.tsv`
 
 Nonempty, applicable, and resolved retain 500 instances per context in the
 denominator. The official rows are keyed by instance and patch SHA-256.
@@ -155,6 +173,7 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 - `results/human_window_exact_instances_20260719.tsv`
 - `results/human_window_strict_{judgments,summary}_20260719.tsv`
 - `results/human_window_unique_strict_summary_20260719.tsv`
+- `results/human_window_strata_{summary,instances}_20260722.tsv`
 - `frozen/human_window_rankings_20260712.jsonl.gz`
 - `frozen/human_window_rankings_manifest_20260719.json`
 - `results/human_construct_{annotations_raw,adjudicated}_20260721.tsv`
