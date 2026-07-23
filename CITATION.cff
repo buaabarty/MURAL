@@ -3,10 +3,10 @@ message: "如果您在研究中使用 MURAL，请引用下面的文章。"
 authors:
   - family-names: Yang
     given-names: Boyang
-  - family-names: Ren
-    given-names: Jiadong
-  - family-names: Jin
-    given-names: Shunfu
+  - family-names: Shao
+    given-names: Yibo
+  - family-names: Zou
+    given-names: Yang
   - family-names: Liu
     given-names: Yang
   - family-names: Liu
@@ -24,10 +24,10 @@ preferred-citation:
   authors:
     - family-names: Yang
       given-names: Boyang
-    - family-names: Ren
-      given-names: Jiadong
-    - family-names: Jin
-      given-names: Shunfu
+    - family-names: Shao
+      given-names: Yibo
+    - family-names: Zou
+      given-names: Yang
     - family-names: Liu
       given-names: Yang
     - family-names: Liu

@@ -252,7 +252,7 @@ def main() -> None:
             "stratified_unique_decisions": "artifacts/results/human_window_strata_summary_20260722.tsv",
             "paper_comparison": "RQ-1 source-composition comparison",
             "configurations": {
-                "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
+                "MURAL": "MURAL_2src (paper label: MURAL (BM25 + Structural))",
                 "BM25-local": "BM25_projection",
             },
             "construct_audit": {

@@ -133,7 +133,7 @@ def main() -> int:
         },
         "method_mapping": {
             "BM25-local": "BM25_projection",
-            "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
+            "MURAL": "MURAL_2src (paper label: MURAL (BM25 + Structural))",
         },
         "source_directories": {method: str(path) for method, path in sources.items()},
         "rankings": {

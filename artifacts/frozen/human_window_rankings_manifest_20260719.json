@@ -12,7 +12,7 @@
   },
   "method_mapping": {
     "BM25-local": "BM25_projection",
-    "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)"
+    "MURAL": "MURAL_2src (paper label: MURAL (BM25 + Structural))"
   },
   "packet_created_date": "2026-07-12",
   "random_seed": 20260712,

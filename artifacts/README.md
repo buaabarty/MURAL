@@ -8,7 +8,7 @@ its independently compiled supplement.
 
 - `results/paper_main_results_20260722.tsv` contains the rows and one-decimal
   values displayed in the main Top-20 localization table. In particular,
-  `MURAL w/o Dense` maps to `MURAL_2src`, while `MURAL` is the three-source
+  `MURAL (BM25 + Structural)` maps to `MURAL_2src`, while `MURAL` is the three-source
   configuration.
 - `results/paper_dataset_profile_20260722.tsv` contains the target strata and
   multiplicity counts displayed in the dataset table.
@@ -201,7 +201,7 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 Task C has 100 judgments over 80 instances, including 20 double-coded items.
 The packet is preserved without relabeling or replacing any annotator-visible
 window. It audits the main RQ-1 source-composition comparison: `MURAL` maps to
-`MURAL_2src` (the `MURAL w/o Dense` row), and `BM25-local` maps to
+`MURAL_2src` (the `MURAL (BM25 + Structural)` row), and `BM25-local` maps to
 `BM25_projection`. The exact 80-instance ranking snapshot is the sample-level
 record for that main experiment.
 `results/human_window_provenance_20260718.tsv` records the two anonymized

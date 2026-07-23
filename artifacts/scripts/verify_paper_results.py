@@ -318,16 +318,16 @@ def check_localization() -> None:
 
     paper = rows("paper_main_results_20260722.tsv")
     expected_mapping = [
-        ("BM25 entities", "BM25_entities"),
-        ("BM25 projection", "BM25_projection"),
-        ("Dense projection", "Dense_projection"),
+        ("Raw BM25 entities", "BM25_entities"),
+        ("MURAL (BM25)", "BM25_projection"),
+        ("MURAL (Dense)", "Dense_projection"),
         ("BLUiR", "BLUiR"),
-        ("CodeGraph", "CodeGraph"),
-        ("Structural entities", "Structural_entities"),
-        ("Structural adapter", "Structural_adapter"),
-        ("MURAL w/o Dense", "MURAL_2src"),
-        ("BM25 + Dense", "BM25_Dense"),
-        ("Structural + Dense", "Structural_Dense"),
+        ("StaticGraph", "CodeGraph"),
+        ("Raw structural entities", "Structural_entities"),
+        ("MURAL (Structural)", "Structural_adapter"),
+        ("MURAL (BM25 + Structural)", "MURAL_2src"),
+        ("MURAL (BM25 + Dense)", "BM25_Dense"),
+        ("MURAL (Structural + Dense)", "Structural_Dense"),
         ("MURAL", "MURAL"),
     ]
     equal(
@@ -879,7 +879,7 @@ def check_prompts_and_human() -> None:
         audit_manifest["method_mapping"],
         {
             "BM25-local": "BM25_projection",
-            "MURAL": "MURAL_2src (paper label: MURAL w/o Dense)",
+            "MURAL": "MURAL_2src (paper label: MURAL (BM25 + Structural))",
         },
         "human-audit method mapping",
     )
@@ -1415,7 +1415,7 @@ def check_manifest() -> None:
     )
     equal(
         manifest["human_audit"]["configurations"]["MURAL"],
-        "MURAL_2src (paper label: MURAL w/o Dense)",
+        "MURAL_2src (paper label: MURAL (BM25 + Structural))",
         "manifest human MURAL mapping",
     )
     equal(

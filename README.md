@@ -62,6 +62,10 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Official evaluation uses the installed `swebench==4.1.0` package. The tracked
+`swebench/` subset is a source snapshot retained for provenance and is not
+imported by the documented environment.
+
 Full source regeneration additionally requires benchmark repository checkouts,
 Neo4j for the structural adapter, and the pinned dense encoder. Hosted repair
 generation reads `AUTODL_API_KEY` from the environment; no credential is stored

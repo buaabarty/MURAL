@@ -1,12 +1,12 @@
 paper_label	source_approach	N	top_k	file_hit	target_coverage	mrr	hit_at_20	ref_complete	source_ledger
-BM25 entities	BM25_entities	500	20	77.0	47.2	32.1	57.2	40.2	artifacts/results/strict_localization_summary_20260719.tsv
-BM25 projection	BM25_projection	500	20	73.6	49.3	31.1	57.8	42.2	artifacts/results/strict_localization_summary_20260719.tsv
-Dense projection	Dense_projection	500	20	83.6	55.1	34.5	64.4	47.0	artifacts/results/strict_localization_summary_20260719.tsv
+Raw BM25 entities	BM25_entities	500	20	77.0	47.2	32.1	57.2	40.2	artifacts/results/strict_localization_summary_20260719.tsv
+MURAL (BM25)	BM25_projection	500	20	73.6	49.3	31.1	57.8	42.2	artifacts/results/strict_localization_summary_20260719.tsv
+MURAL (Dense)	Dense_projection	500	20	83.6	55.1	34.5	64.4	47.0	artifacts/results/strict_localization_summary_20260719.tsv
 BLUiR	BLUiR	500	20	55.6	46.7	38.2	52.4	41.8	artifacts/results/strict_localization_summary_20260719.tsv
-CodeGraph	CodeGraph	500	20	63.6	43.7	30.6	52.0	38.6	artifacts/results/strict_localization_summary_20260719.tsv
-Structural entities	Structural_entities	500	20	55.6	41.0	29.0	46.2	37.0	artifacts/results/strict_localization_summary_20260719.tsv
-Structural adapter	Structural_adapter	500	20	59.2	46.6	31.4	52.6	42.0	artifacts/results/strict_localization_summary_20260719.tsv
-MURAL w/o Dense	MURAL_2src	500	20	77.0	54.4	34.9	63.2	46.8	artifacts/results/strict_localization_summary_20260719.tsv
-BM25 + Dense	BM25_Dense	500	20	81.4	54.7	34.9	63.8	47.0	artifacts/results/source_combinations_top20_summary_20260722.tsv
-Structural + Dense	Structural_Dense	500	20	82.2	57.6	38.2	66.4	49.6	artifacts/results/source_combinations_top20_summary_20260722.tsv
+StaticGraph	CodeGraph	500	20	63.6	43.7	30.6	52.0	38.6	artifacts/results/strict_localization_summary_20260719.tsv
+Raw structural entities	Structural_entities	500	20	55.6	41.0	29.0	46.2	37.0	artifacts/results/strict_localization_summary_20260719.tsv
+MURAL (Structural)	Structural_adapter	500	20	59.2	46.6	31.4	52.6	42.0	artifacts/results/strict_localization_summary_20260719.tsv
+MURAL (BM25 + Structural)	MURAL_2src	500	20	77.0	54.4	34.9	63.2	46.8	artifacts/results/strict_localization_summary_20260719.tsv
+MURAL (BM25 + Dense)	BM25_Dense	500	20	81.4	54.7	34.9	63.8	47.0	artifacts/results/source_combinations_top20_summary_20260722.tsv
+MURAL (Structural + Dense)	Structural_Dense	500	20	82.2	57.6	38.2	66.4	49.6	artifacts/results/source_combinations_top20_summary_20260722.tsv
 MURAL	MURAL	500	20	83.0	57.6	38.0	67.2	49.6	artifacts/results/strict_localization_summary_20260719.tsv
