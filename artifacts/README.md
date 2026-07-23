@@ -46,7 +46,7 @@ Context records distinguish three objects: ranked candidates before rendering,
 metadata-visible candidates shown by path and symbol, and source-bearing
 candidates whose concrete excerpts enter the model input. Controlled RQ-1 and
 RQ-2 token analyses use deterministic strict-prefix packing. The archived RQ-3
-prompts and RQ-4 repair execution use the fixed rank-banded renderer, which may
+prompts and repair execution use the fixed rank-banded renderer, which may
 show metadata for more candidates than it supplies with excerpts. Prompt
 identity and changed-line metrics count only source-bearing candidates.
 

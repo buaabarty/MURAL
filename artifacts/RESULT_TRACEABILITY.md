@@ -278,8 +278,10 @@ python3 scripts/evaluate_token_budget_context.py \
 ## Prompt and repair provenance
 
 `results/source_bearing_prompt_instances_20260719.tsv` records the
-SHA-256 of every executed prompt and the exact source-bearing entities retained
-by the renderer. The executed renderer reserves excerpts for up to four
+SHA-256 of every executed prompt together with source-bearing entity counts and
+strict target-coverage outcomes. The exact renderer, complete prompt templates,
+and frozen candidate rankings are released alongside these hashes. The
+executed renderer reserves excerpts for up to four
 candidates from ranks 1 to 10 and four from ranks 11 to 20, with at most two
 excerpts per file in each band; other retained candidates remain metadata-only.
 Strict predictions and official evaluations are stored

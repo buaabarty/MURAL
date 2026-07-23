@@ -8,16 +8,20 @@ import csv
 from pathlib import Path
 
 import matplotlib as mpl
+
+mpl.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
 
 
 WIDTH = 3.45
 COLORS = {
-    "BM25": "#4D4D4D",
-    "Dense": "#0072B2",
+    "BM25": "#5F6670",
+    "Dense": "#168C8C",
     "MURAL": "#D55E00",
+    "Hit": "#2F6B9A",
     "Complete": "#D55E00",
+    "Grid": "#D9DDE2",
+    "Text": "#20242A",
 }
 
 
@@ -35,36 +39,29 @@ def read_tsv(path: Path) -> list[dict[str, str]]:
 
 
 def configure_matplotlib() -> None:
-    paper_fonts = [
-        Path(path) for path in font_manager.findSystemFonts() if Path(path).name.startswith("Tinos-")
-    ]
-    for path in paper_fonts:
-        font_manager.fontManager.addfont(path)
     mpl.rcParams.update(
         {
-            "font.family": "Tinos" if paper_fonts else "DejaVu Serif",
+            "font.family": "STIXGeneral",
+            "mathtext.fontset": "stix",
             "font.size": 8.0,
-            "axes.labelsize": 8.5,
-            "axes.linewidth": 0.7,
-            "axes.unicode_minus": False,
-            "xtick.labelsize": 7.8,
-            "ytick.labelsize": 7.8,
-            "xtick.major.width": 0.7,
-            "ytick.major.width": 0.7,
-            "legend.fontsize": 7.4,
-            "lines.linewidth": 1.6,
+            "axes.labelsize": 8.0,
+            "axes.edgecolor": COLORS["Text"],
+            "axes.linewidth": 0.65,
+            "xtick.labelsize": 7.5,
+            "ytick.labelsize": 7.5,
+            "xtick.major.width": 0.65,
+            "ytick.major.width": 0.65,
+            "legend.fontsize": 7.0,
             "pdf.fonttype": 42,
             "ps.fonttype": 42,
-            "mathtext.fontset": "stix",
         }
     )
 
 
-def finish_axes(ax: plt.Axes) -> None:
+def finish_axes(ax: plt.Axes, grid_axis: str) -> None:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-    ax.tick_params(direction="out", length=3.0, pad=2.0)
-    ax.grid(axis="y", color="#D9D9D9", linewidth=0.55, alpha=0.8, zorder=0)
+    ax.grid(axis=grid_axis, color=COLORS["Grid"], linewidth=0.55, zorder=0)
     ax.set_axisbelow(True)
 
 
@@ -91,13 +88,11 @@ def save_figure(fig: plt.Figure, output_stem: Path) -> None:
 
 
 def token_budget_values(rows: list[dict[str, str]]) -> dict[str, list[float]]:
-    budgets = (2000, 4000, 8000)
-    approaches = ("BM25", "Dense", "MURAL")
     indexed = {row["approach"]: row for row in rows}
     values: dict[str, list[float]] = {}
-    for approach in approaches:
+    for approach in ("BM25", "Dense", "MURAL"):
         values[approach] = []
-        for budget in budgets:
+        for budget in (2000, 4000, 8000):
             key = f"{approach}_t{budget}"
             if key not in indexed:
                 raise ValueError(f"Missing token-budget row: {key}")
@@ -107,59 +102,87 @@ def token_budget_values(rows: list[dict[str, str]]) -> dict[str, list[float]]:
 
 def plot_token_budget(rows: list[dict[str, str]], output_dir: Path) -> None:
     values = token_budget_values(rows)
-    x = [0, 1, 2]
-    styles = {
-        "BM25": ("s", "--", "BM25 projection"),
-        "Dense": ("^", "-.", "Dense projection"),
-        "MURAL": ("o", "-", "MURAL"),
-    }
-
+    x = [0.0, 1.0, 2.0]
+    width = 0.22
     fig, ax = plt.subplots(figsize=(WIDTH, 2.18))
-    for approach in ("BM25", "Dense", "MURAL"):
-        marker, linestyle, label = styles[approach]
-        ax.plot(
+
+    groups = (
+        ax.bar(
+            [position - width for position in x],
+            values["BM25"],
+            width,
+            label="MURAL (BM25)",
+            color="white",
+            edgecolor=COLORS["BM25"],
+            linewidth=0.9,
+            hatch="//",
+            zorder=3,
+        ),
+        ax.bar(
             x,
-            values[approach],
-            color=COLORS[approach],
-            linestyle=linestyle,
-            marker=marker,
-            markersize=5.1,
-            markerfacecolor=COLORS[approach] if approach == "MURAL" else "white",
-            markeredgewidth=1.0,
-            label=label,
-            zorder=3 if approach == "MURAL" else 2,
-        )
+            values["Dense"],
+            width,
+            label="MURAL (Dense)",
+            color=COLORS["Dense"],
+            edgecolor=COLORS["Dense"],
+            linewidth=0.7,
+            zorder=3,
+        ),
+        ax.bar(
+            [position + width for position in x],
+            values["MURAL"],
+            width,
+            label="MURAL",
+            color=COLORS["MURAL"],
+            edgecolor=COLORS["MURAL"],
+            linewidth=0.7,
+            zorder=3,
+        ),
+    )
+    for group in groups:
+        for rect in group:
+            value = rect.get_height()
+            ax.text(
+                rect.get_x() + rect.get_width() / 2,
+                value + 1.0,
+                f"{value:.1f}",
+                ha="center",
+                va="bottom",
+                fontsize=6.6,
+                color=COLORS["Text"],
+            )
 
     for position, mural, bm25 in zip(x, values["MURAL"], values["BM25"]):
+        gain = (mural / bm25 - 1.0) * 100.0
         ax.text(
             position,
-            mural + 1.55,
-            f"+{mural - bm25:.1f}",
-            color=COLORS["MURAL"],
-            fontsize=7.4,
-            fontweight="bold",
+            84.0,
+            f"+{gain:.1f}%",
             ha="center",
-            va="bottom",
+            va="center",
+            fontsize=7.0,
+            fontweight="bold",
+            color=COLORS["MURAL"],
         )
 
-    ax.set_xlim(-0.18, 2.18)
-    ax.set_ylim(40, 80)
-    ax.set_yticks([40, 50, 60, 70, 80])
-    ax.set_xticks(x, ["2k", "4k", "8k"])
-    ax.set_xlabel("Rendered-token budget")
-    ax.set_ylabel("Hit (%)")
+    ax.set_ylabel("PromptHit (%)")
+    ax.set_xlabel("Rendered-source budget")
+    ax.set_xticks(x)
+    ax.set_xticklabels(["2k", "4k", "8k"])
+    ax.set_ylim(0, 89)
+    ax.set_yticks([0, 20, 40, 60, 80])
     ax.legend(
-        loc="lower center",
-        bbox_to_anchor=(0.5, 1.015),
+        loc="upper left",
+        bbox_to_anchor=(0.0, 1.18),
         ncol=3,
         frameon=False,
-        handlelength=1.8,
+        handlelength=1.3,
         handletextpad=0.35,
         columnspacing=0.85,
         borderaxespad=0,
     )
-    finish_axes(ax)
-    fig.subplots_adjust(left=0.16, right=0.99, bottom=0.22, top=0.84)
+    finish_axes(ax, "y")
+    fig.subplots_adjust(left=0.14, right=0.995, bottom=0.22, top=0.82)
     save_figure(fig, output_dir / "token_budget_hit")
 
 
@@ -179,74 +202,90 @@ def multiplicity_values(
 
 def plot_target_multiplicity(rows: list[dict[str, str]], output_dir: Path) -> None:
     counts, hit, complete = multiplicity_values(rows)
-    x = [0, 1, 2]
+    labels = [
+        f"1 target\n(N={counts[0]})",
+        f"2 targets\n(N={counts[1]})",
+        f"3+ targets\n(N={counts[2]})",
+    ]
+    y = [2.0, 1.0, 0.0]
+    height = 0.25
+    fig, ax = plt.subplots(figsize=(WIDTH, 2.35))
 
-    fig, ax = plt.subplots(figsize=(WIDTH, 2.28))
-    ax.fill_between(x, complete, hit, color="#D9D9D9", alpha=0.45, zorder=1)
-    ax.plot(
-        x,
+    hit_bars = ax.barh(
+        [position + height / 1.8 for position in y],
         hit,
-        color=COLORS["Dense"],
-        linestyle="-",
-        marker="o",
-        markersize=5.2,
-        markerfacecolor=COLORS["Dense"],
-        label="Hit@20",
+        height,
+        label="At least one target (Hit@20)",
+        color=COLORS["Hit"],
+        edgecolor=COLORS["Hit"],
+        linewidth=0.6,
         zorder=3,
     )
-    ax.plot(
-        x,
+    complete_bars = ax.barh(
+        [position - height / 1.8 for position in y],
         complete,
+        height,
+        label="All targets (RefComplete)",
         color=COLORS["Complete"],
-        linestyle="--",
-        marker="s",
-        markersize=4.8,
-        markerfacecolor="white",
-        markeredgewidth=1.0,
-        label="RefComplete",
+        edgecolor=COLORS["Complete"],
+        linewidth=0.6,
         zorder=3,
     )
+    for group in (hit_bars, complete_bars):
+        for rect in group:
+            ax.text(
+                rect.get_width() + 1.2,
+                rect.get_y() + rect.get_height() / 2,
+                f"{rect.get_width():.1f}",
+                ha="left",
+                va="center",
+                fontsize=6.8,
+                color=COLORS["Text"],
+            )
 
-    ax.text(0, hit[0] + 4.0, f"{hit[0]:.1f} (both)", ha="center", va="bottom", fontsize=7.2)
-    for position in (1, 2):
-        ax.text(position, hit[position] + 3.0, f"{hit[position]:.1f}", ha="center", fontsize=7.2)
+    for position, low, high in zip(y, complete, hit):
+        gap = high - low
+        if gap < 0.1:
+            continue
+        ax.annotate(
+            "",
+            xy=(high, position),
+            xytext=(low, position),
+            arrowprops={
+                "arrowstyle": "|-|",
+                "color": COLORS["BM25"],
+                "linewidth": 0.75,
+                "shrinkA": 0,
+                "shrinkB": 0,
+            },
+        )
         ax.text(
+            105.0,
             position,
-            complete[position] - 8.5 if position == 1 else complete[position] + 3.8,
-            f"{complete[position]:.1f}",
-            color=COLORS["Complete"],
-            ha="center",
+            rf"$\Delta$ {gap:.1f}",
+            ha="right",
             va="center",
-            fontsize=7.2,
-        )
-        ax.text(
-            position + 0.05,
-            (hit[position] + complete[position]) / 2,
-            f"{hit[position] - complete[position]:.1f}-pt gap",
-            color="#555555",
-            ha="center",
-            va="center",
-            fontsize=6.9,
+            fontsize=6.8,
+            color=COLORS["Text"],
         )
 
-    ax.set_xlim(-0.18, 2.23)
-    ax.set_ylim(0, 100)
-    ax.set_yticks([0, 20, 40, 60, 80, 100])
-    ax.set_xticks(x, [f"1\n(N={counts[0]})", f"2\n(N={counts[1]})", f"3+\n(N={counts[2]})"])
-    ax.set_xlabel("Number of strict repair targets")
-    ax.set_ylabel("Instance coverage (%)")
+    ax.set_xlabel("Instances covered (%)")
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels)
+    ax.set_xlim(0, 108)
+    ax.set_xticks([0, 20, 40, 60, 80, 100])
     ax.legend(
-        loc="lower center",
-        bbox_to_anchor=(0.5, 1.015),
-        ncol=2,
+        loc="upper left",
+        bbox_to_anchor=(0.0, 1.21),
+        ncol=1,
         frameon=False,
-        handlelength=2.0,
+        handlelength=1.35,
         handletextpad=0.4,
-        columnspacing=1.3,
+        labelspacing=0.25,
         borderaxespad=0,
     )
-    finish_axes(ax)
-    fig.subplots_adjust(left=0.16, right=0.99, bottom=0.27, top=0.84)
+    finish_axes(ax, "x")
+    fig.subplots_adjust(left=0.22, right=0.995, bottom=0.2, top=0.75)
     save_figure(fig, output_dir / "target_multiplicity_gap")
 
 

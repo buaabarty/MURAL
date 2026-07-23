@@ -13,12 +13,12 @@
       "sha256": "6fa4561989dc95a23bebbdbd20c21553dd56553c405fb7b547d3d5ac3269bd47"
     },
     "artifacts/README.md": {
-      "bytes": 14237,
-      "sha256": "237ae4b0dbbff32c4ba2a4bd4d492d5d70dba05068b67a50ee9863810ba1803a"
+      "bytes": 14232,
+      "sha256": "36a26b2e492aae32a134aedd1f58a3680db140571db53492c4444df166410861"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 19023,
-      "sha256": "010ddb2f194823411c6f8321920a91be29dad6421e79bf0c2ae174c981c655f5"
+      "bytes": 19153,
+      "sha256": "22eb8a5784ff60a8715fa92f413b027119d41b2906e169668523304ec9d90c2c"
     },
     "artifacts/frozen/architecture_control_manifest_20260721.json": {
       "bytes": 2012,
@@ -61,12 +61,12 @@
       "sha256": "01c089fd5f39f2b236088a108ac7ae4786c686f3579736cc0afe1e50296c7ad6"
     },
     "artifacts/prompts/README.md": {
-      "bytes": 552,
-      "sha256": "c7b107684a49477e931d3fd782a4532836d530245b6be02ce651823c4d1e159c"
+      "bytes": 630,
+      "sha256": "f75e0edf5d87b9f527b3dc7cc571026881a38ffed8d326bfdab8f960df11b35f"
     },
     "artifacts/prompts/glm52_repair_prompt.md": {
-      "bytes": 3694,
-      "sha256": "1ab669fbbfd81d6de2b51ed06b151916561bc10fe394cc2c269b9dc031bc4bbf"
+      "bytes": 3692,
+      "sha256": "af4fcb20e3c15ecefcd765e412e92014e058bedb1ab7212d3de8108c72f113be"
     },
     "artifacts/prompts/llm_fault_location_prompt.md": {
       "bytes": 950,
@@ -657,8 +657,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 15237,
-      "sha256": "7a0ca25a6754112ee91bd0ed237f27bb2fbb14425beaff17c2ad86485e3f4297"
+      "bytes": 15286,
+      "sha256": "5df82ca6a4fe2375533b1457a8f306e0492a750d0ddb1af7b3f0a5efbb091b74"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -765,8 +765,8 @@
       "sha256": "c0a901fa521d44edf8f930794865784287412ab78e0882efc1bc2e5ee651a795"
     },
     "artifacts/scripts/plot_paper_findings.py": {
-      "bytes": 8017,
-      "sha256": "36c46af6e0afcb15f6ab5408184a43d39590f74c0e47482debb08ea05efb3660"
+      "bytes": 8592,
+      "sha256": "5e4015059ed065210efad12ff714afba183981c5f2ffc2b14d2e99b523afdaaf"
     },
     "artifacts/scripts/reanalyze_java_clustered_stats.py": {
       "bytes": 3366,
@@ -789,8 +789,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 70799,
-      "sha256": "f337e3d3a2d882ce53ec98e697ac56aab059c9fdc9082c8b6df866d759c590f2"
+      "bytes": 70931,
+      "sha256": "327d07cb3401b91eb87aa136a9b83c712aa2fd851a3de7df1cd5f9ffeaf077cd"
     },
     "artifacts/structural_temporal_metadata_20260722.json": {
       "bytes": 347,
@@ -941,6 +941,7 @@
     "coverage_unit": "only source-bearing candidate excerpts contribute prompt TargetCov and RefComplete",
     "enable_thinking": false,
     "endpoint": "https://www.autodl.art/api/v1",
+    "endpoint_request_alias": "glm-5.2",
     "failure_conditioned_retries": 1,
     "generation_dates": [
       "2026-07-18",

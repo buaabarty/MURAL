@@ -1402,6 +1402,11 @@ def check_manifest() -> None:
     equal(manifest["java_benchmark"]["evaluated_instances"], 91, "manifest Java population")
     equal(manifest["repair"]["prompt_hash_rows"], 1000, "manifest prompt hashes")
     equal(manifest["repair"]["model"], "GLM-5", "manifest repair model")
+    equal(
+        manifest["repair"]["endpoint_request_alias"],
+        "glm-5.2",
+        "manifest repair endpoint alias",
+    )
     equal(manifest["human_audit"]["judgments"], 100, "manifest human judgments")
     equal(
         manifest["human_audit"]["window_rankings"],

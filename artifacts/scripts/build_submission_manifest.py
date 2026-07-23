@@ -217,6 +217,7 @@ def main() -> None:
             "endpoint": "https://www.autodl.art/api/v1",
             "api_key_environment_variable": "AUTODL_API_KEY",
             "model": "GLM-5",
+            "endpoint_request_alias": "glm-5.2",
             "temperature": 0.0,
             "top_p": 0.95,
             "enable_thinking": False,
