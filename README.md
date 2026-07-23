@@ -36,7 +36,8 @@ digests, and every SHA-256 entry in the submission manifest.
   fixed-prefix completion;
 - four released Qwen2.5-32B localizer outputs completed through the same
   prefix-preserving interface;
-- all 91 SWE-bench-Java Verified instances across all six repositories;
+- all single-, pairwise-, and three-source configurations on all 91
+  SWE-bench-Java Verified instances across all six repositories;
 - 100 blinded judgments over 80 Python instances;
 - matched 4,000-token GLM-5 repair on all 500 Python instances, evaluated by
   the official SWE-bench harness.

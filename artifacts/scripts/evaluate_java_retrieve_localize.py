@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 """Evaluate retrieval, entity projection, and fusion on SWE-bench-Java Verified.
 
-The script rebuilds base-commit Java entities, runs BM25 file retrieval, projects
-ranked files into Java entities, adapts archived structural ranked-file seeds to
-the same contract, and fuses the completed rankings with equal-weight RRF.
-Official patches are read only after rankings are produced for patch-to-entity
-evaluation.
+The script rebuilds base-commit Java entities, runs BM25 and pinned dense
+retrieval, projects ranked files into Java entities, adapts archived structural
+ranked-file seeds to the same contract, and evaluates every single-, pairwise-,
+and three-source configuration with equal-weight RRF. Official patches are read
+only after rankings are produced for patch-to-entity evaluation.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import gc
 import gzip
 import hashlib
 import json
 import math
+import os
 import re
+import sqlite3
 import subprocess
 import tarfile
 from collections import Counter, defaultdict
@@ -31,10 +34,33 @@ from evaluate_strict_reference_context import cluster_bootstrap_ci
 
 CACHE_VERSION = 1
 SELECTOR_VERSION = "compact_title_exact_file_rank_ast_v1"
+DENSE_MODEL_NAME = "jinaai/jina-embeddings-v2-base-code"
+DENSE_MODEL_REVISION = "516f4baf13dec4ddddda8631e019b5737c8bc250"
 RRF_K = 60
 TOP_K = 20
 SOURCE_DEPTH = 50
 FILE_FALLBACK_TARGET = "__file_fallback__"
+JAVA_RANKING_NAMES = (
+    "Raw_BM25_entities",
+    "BM25_projection",
+    "Structural_projection",
+    "Dense_projection",
+    "MURAL_2src",
+    "BM25_Dense",
+    "Structural_Dense",
+    "MURAL",
+)
+JAVA_COMPARISONS = (
+    ("Raw_BM25_entities", "BM25_projection"),
+    ("BM25_projection", "MURAL_2src"),
+    ("Structural_projection", "MURAL_2src"),
+    ("BM25_projection", "MURAL"),
+    ("Structural_projection", "MURAL"),
+    ("Dense_projection", "MURAL"),
+    ("MURAL_2src", "MURAL"),
+    ("BM25_Dense", "MURAL"),
+    ("Structural_Dense", "MURAL"),
+)
 CLASS_NODE_TYPES = {
     "annotation_type_declaration",
     "class_declaration",
@@ -454,6 +480,160 @@ def bm25_rank(entities: list[dict[str, Any]], query: str) -> list[dict[str, Any]
     return [entities[int(index)] for index in ranked_indices]
 
 
+def dense_document_text(entity: dict[str, Any]) -> str:
+    return "\n".join(
+        [
+            str(entity.get("signature") or ""),
+            str(entity.get("file_path") or ""),
+            str(entity.get("doc_string") or ""),
+            str(entity.get("source_code") or "")[:3000],
+        ]
+    )
+
+
+class DenseEncoder:
+    """Pinned Jina encoder with cross-commit document-vector reuse."""
+
+    def __init__(self, batch_size: int, cache_database: Path | None = None) -> None:
+        os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+        os.environ.setdefault("HF_HUB_OFFLINE", "1")
+        import torch
+        from transformers import AutoModel
+
+        self.torch = torch
+        self.batch_size = max(1, batch_size)
+        self.database: sqlite3.Connection | None = None
+        self.cache: dict[bytes, np.ndarray] = {}
+        if cache_database is not None:
+            cache_database.parent.mkdir(parents=True, exist_ok=True)
+            self.database = sqlite3.connect(cache_database)
+            self.database.execute("PRAGMA journal_mode=WAL")
+            self.database.execute("PRAGMA synchronous=NORMAL")
+            self.database.execute(
+                "CREATE TABLE IF NOT EXISTS embeddings "
+                "(key BLOB PRIMARY KEY, vector BLOB NOT NULL)"
+            )
+            for key, vector in self.database.execute("SELECT key, vector FROM embeddings"):
+                self.cache[bytes(key)] = np.frombuffer(vector, dtype=np.float32).copy()
+            print(f"[dense] loaded {len(self.cache)} cached document vectors", flush=True)
+        self.model = AutoModel.from_pretrained(
+            DENSE_MODEL_NAME,
+            revision=DENSE_MODEL_REVISION,
+            trust_remote_code=True,
+            local_files_only=True,
+        )
+        if torch.cuda.is_available():
+            try:
+                self.model = self.model.to("cuda:0")
+            except Exception:
+                self.model = self.model.to("cpu")
+        else:
+            self.model = self.model.to("cpu")
+        self.model.eval()
+        print(
+            f"[dense] encoder={DENSE_MODEL_NAME}@{DENSE_MODEL_REVISION} "
+            f"device={next(self.model.parameters()).device}",
+            flush=True,
+        )
+
+    def _is_cuda(self) -> bool:
+        return next(self.model.parameters()).is_cuda
+
+    def _switch_to_cpu(self) -> None:
+        self.model = self.model.to("cpu")
+        if self.torch.cuda.is_available():
+            self.torch.cuda.empty_cache()
+        gc.collect()
+
+    def _encode_uncached(self, keys_and_texts: list[tuple[bytes, str]]) -> None:
+        offset = 0
+        dynamic_batch = self.batch_size
+        next_report = 512
+        while offset < len(keys_and_texts):
+            text_length = max(1, len(keys_and_texts[offset][1]))
+            effective_batch = min(dynamic_batch, max(1, 24000 // text_length))
+            chunk = keys_and_texts[offset : offset + effective_batch]
+            try:
+                vectors = np.asarray(
+                    self.model.encode(
+                        [value for _, value in chunk],
+                        batch_size=effective_batch,
+                        show_progress_bar=False,
+                    ),
+                    dtype=np.float32,
+                )
+            except RuntimeError as exc:
+                if "out of memory" not in str(exc).lower():
+                    raise
+                if self._is_cuda() and dynamic_batch > 1:
+                    dynamic_batch = max(1, dynamic_batch // 2)
+                    self.torch.cuda.empty_cache()
+                    continue
+                if self._is_cuda():
+                    self._switch_to_cpu()
+                    dynamic_batch = 1
+                    continue
+                raise
+            norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+            norms[norms == 0] = 1.0
+            vectors /= norms
+            for (key, _), vector in zip(chunk, vectors):
+                self.cache[key] = vector
+            if self.database is not None:
+                self.database.executemany(
+                    "INSERT OR REPLACE INTO embeddings(key, vector) VALUES (?, ?)",
+                    [(key, vector.tobytes()) for (key, _), vector in zip(chunk, vectors)],
+                )
+                self.database.commit()
+            offset += len(chunk)
+            if offset >= next_report or offset == len(keys_and_texts):
+                print(
+                    f"[dense] encoded {offset}/{len(keys_and_texts)} new vectors; "
+                    f"cache={len(self.cache)}",
+                    flush=True,
+                )
+                next_report = ((offset // 512) + 1) * 512
+
+    def encode_documents(self, texts: list[str]) -> np.ndarray:
+        keys = [hashlib.sha256(value.encode("utf-8")).digest() for value in texts]
+        missing: dict[bytes, str] = {}
+        for key, value in zip(keys, texts):
+            if key not in self.cache:
+                missing.setdefault(key, value)
+        if missing:
+            ordered = sorted(missing.items(), key=lambda item: len(item[1]))
+            self._encode_uncached(ordered)
+        return np.vstack([self.cache[key] for key in keys])
+
+    def encode_query(self, query: str) -> np.ndarray:
+        try:
+            vector = np.asarray(
+                self.model.encode([query], show_progress_bar=False)[0], dtype=np.float32
+            )
+        except RuntimeError as exc:
+            if "out of memory" not in str(exc).lower() or not self._is_cuda():
+                raise
+            self._switch_to_cpu()
+            vector = np.asarray(
+                self.model.encode([query], show_progress_bar=False)[0], dtype=np.float32
+            )
+        norm = float(np.linalg.norm(vector))
+        return vector if norm == 0 else vector / norm
+
+
+def dense_rank(
+    entities: list[dict[str, Any]],
+    query: str,
+    encoder: DenseEncoder,
+) -> list[dict[str, Any]]:
+    if not entities or not query:
+        return []
+    matrix = encoder.encode_documents([dense_document_text(entity) for entity in entities])
+    scores = matrix @ encoder.encode_query(query)
+    ranked_indices = np.argsort(-scores, kind="stable")
+    return [entities[int(index)] for index in ranked_indices]
+
+
 def ranked_file_evidence(ranking: list[dict[str, Any]], depth: int = SOURCE_DEPTH) -> dict[str, dict[str, Any]]:
     pool = ranking[:depth]
     support = Counter(item["file_path"] for item in pool)
@@ -754,7 +934,12 @@ def bootstrap_interval(differences: np.ndarray, seed: int, iterations: int) -> t
 def write_tsv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, delimiter="\t", fieldnames=fieldnames)
+        writer = csv.DictWriter(
+            handle,
+            delimiter="\t",
+            fieldnames=fieldnames,
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -772,6 +957,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--bootstrap-iters", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=7)
+    parser.add_argument("--dense-batch-size", type=int, default=32)
+    parser.add_argument("--dense-vector-cache", type=Path)
     return parser.parse_args()
 
 
@@ -785,6 +972,7 @@ def main() -> int:
     if not instance_ids:
         raise ValueError("No shared Java instances between dataset and structural results")
 
+    dense_encoder = DenseEncoder(args.dense_batch_size, args.dense_vector_cache)
     per_instance: list[dict[str, Any]] = []
     target_records: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
@@ -809,13 +997,24 @@ def main() -> int:
             bm25_original = {entity["id"]: rank for rank, entity in enumerate(bm25_ranking, start=1)}
             bm25_local = localize_files(entities, bm25_files, sections, bm25_original)
 
+            dense_full = dense_rank(entities, query, dense_encoder)
+            dense_ranking = dense_full[:SOURCE_DEPTH]
+            dense_files = ranked_file_evidence(dense_ranking)
+            dense_original = {
+                entity["id"]: rank for rank, entity in enumerate(dense_ranking, start=1)
+            }
+            dense_local = localize_files(entities, dense_files, sections, dense_original)
+
             kg_files = {
                 path: evidence
                 for path, evidence in kg_seed_rows[instance_id].items()
                 if path in by_file
             }
             kg_local = localize_files(entities, kg_files, sections, {})
-            mural = rrf_fuse(bm25_local, kg_local)
+            mural_2src = rrf_fuse(bm25_local, kg_local)
+            bm25_dense = rrf_fuse(bm25_local, dense_local)
+            structural_dense = rrf_fuse(kg_local, dense_local)
+            mural = rrf_fuse(bm25_local, kg_local, dense_local)
 
             targets, patched_files, file_fallback, unmapped_patched_files = map_targets(
                 str(item.get("fix_patch") or ""), by_file
@@ -824,7 +1023,11 @@ def main() -> int:
                 "Raw_BM25_entities": bm25_ranking,
                 "BM25_projection": bm25_local,
                 "Structural_projection": kg_local,
-                "Lexical_structural_fusion": mural,
+                "Dense_projection": dense_local,
+                "MURAL_2src": mural_2src,
+                "BM25_Dense": bm25_dense,
+                "Structural_Dense": structural_dense,
+                "MURAL": mural,
             }
             metrics = {
                 name: instance_metrics(
@@ -849,6 +1052,7 @@ def main() -> int:
                     "unmapped_patched_files": unmapped_patched_files,
                     "bm25_source_files": len(bm25_files),
                     "kg_source_files": len(kg_files),
+                    "dense_source_files": len(dense_files),
                     "metrics": metrics,
                     "top20": {
                         name: [entity["id"] for entity in ranking[:TOP_K]]
@@ -878,14 +1082,8 @@ def main() -> int:
     if not per_instance:
         raise RuntimeError(f"Every Java instance failed: {failures[:3]}")
 
-    names = [
-        "Raw_BM25_entities",
-        "BM25_projection",
-        "Structural_projection",
-        "Lexical_structural_fusion",
-    ]
     summary_rows: list[dict[str, Any]] = []
-    for name in names:
+    for name in JAVA_RANKING_NAMES:
         summary_rows.append(
             {
                 "name": name,
@@ -900,14 +1098,8 @@ def main() -> int:
             }
         )
 
-    comparisons = [
-        ("Raw_BM25_entities", "BM25_projection"),
-        ("BM25_projection", "Structural_projection"),
-        ("BM25_projection", "Lexical_structural_fusion"),
-        ("Structural_projection", "Lexical_structural_fusion"),
-    ]
     paired_rows: list[dict[str, Any]] = []
-    for baseline, treatment in comparisons:
+    for baseline, treatment in JAVA_COMPARISONS:
         for metric in ("file", "method", "mrr", "hit"):
             baseline_values = np.asarray(
                 [row["metrics"][baseline][metric] for row in per_instance], dtype=float
@@ -991,6 +1183,8 @@ def main() -> int:
             "top_k": TOP_K,
             "source_depth": SOURCE_DEPTH,
             "rrf_k": RRF_K,
+            "dense_encoder": f"{DENSE_MODEL_NAME}@{DENSE_MODEL_REVISION}",
+            "dense_batch_size": args.dense_batch_size,
             "bootstrap_iterations": args.bootstrap_iters,
             "seed": args.seed,
         },

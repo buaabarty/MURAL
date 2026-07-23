@@ -10,6 +10,8 @@
     "top_k": 20,
     "source_depth": 50,
     "rrf_k": 60,
+    "dense_encoder": "jinaai/jina-embeddings-v2-base-code@516f4baf13dec4ddddda8631e019b5737c8bc250",
+    "dense_batch_size": 64,
     "bootstrap_iterations": 10000,
     "seed": 7
   },

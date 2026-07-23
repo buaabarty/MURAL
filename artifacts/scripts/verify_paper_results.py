@@ -1112,17 +1112,63 @@ def check_java_and_cost() -> None:
         "Raw_BM25_entities": (61.5384615, 19.9258342, 13.4988129, 34.0659341),
         "BM25_projection": (67.0329670, 31.9343477, 24.1405226, 47.2527473),
         "Structural_projection": (63.7362637, 34.7318549, 24.3507117, 51.6483516),
-        "Lexical_structural_fusion": (70.3296703, 34.6052152, 25.9345240, 54.9450549),
+        "Dense_projection": (74.7252747, 31.3374492, 23.9172635, 48.3516484),
+        "MURAL_2src": (70.3296703, 34.6052152, 25.9345240, 54.9450549),
+        "BM25_Dense": (71.4285714, 32.6849112, 23.8760013, 50.5494505),
+        "Structural_Dense": (71.4285714, 36.6607238, 25.5835265, 56.0439560),
+        "MURAL": (72.5274725, 37.0595842, 26.4979869, 57.1428571),
     }
+    equal(len(java), len(expected), "Java summary rows")
     for name, values in expected.items():
         row = one(java, name=name)
         equal(int(row["N"]), 91, f"Java {name} N")
         for field, value in zip(("file_rate", "method_or_entity_rate", "mrr", "hit_rate"), values):
             close(100 * float(row[field]), value, f"Java {name} {field}", 1e-5)
+    bm25_java = one(java, name="BM25_projection")
+    mural_java = one(java, name="MURAL")
+    mural_2src_java = one(java, name="MURAL_2src")
+    close(
+        round(100 * (float(mural_java["method_or_entity_rate"]) / float(bm25_java["method_or_entity_rate"]) - 1), 1),
+        16.0,
+        "Java MURAL relative TargetCov improvement",
+    )
+    close(
+        round(100 * (float(mural_java["mrr"]) / float(bm25_java["mrr"]) - 1), 1),
+        9.8,
+        "Java MURAL relative MRR improvement",
+    )
+    close(
+        round(100 * (float(mural_java["hit_rate"]) / float(bm25_java["hit_rate"]) - 1), 1),
+        20.9,
+        "Java MURAL relative Hit improvement",
+    )
+    close(
+        round(100 * (float(mural_java["hit_rate"]) / float(mural_2src_java["hit_rate"]) - 1), 1),
+        4.0,
+        "Java dense-source incremental Hit improvement",
+    )
     instances = jsonl(RESULTS / "java_cross_language_instances_20260714.jsonl")
     equal(len(instances), 91, "Java instance count")
     equal(len({row["instance_id"] for row in instances}), 91, "Java unique IDs")
     equal(len({row["repo"] for row in instances}), 6, "Java repository count")
+    java_sources = ("BM25_projection", "Structural_projection", "Dense_projection")
+    expected_exclusive = {
+        "BM25_projection": 4,
+        "Structural_projection": 8,
+        "Dense_projection": 1,
+    }
+    for source, expected_count in expected_exclusive.items():
+        others = [candidate for candidate in java_sources if candidate != source]
+        observed = sum(
+            int(row["metrics"][source]["hit"] == 1)
+            for row in instances
+            if all(row["metrics"][candidate]["hit"] == 0 for candidate in others)
+        )
+        equal(observed, expected_count, f"Java {source} exclusive hits")
+    targets = json_file(RESULTS / "java_cross_language_targets_20260714.json")
+    equal(targets["meta"]["N"], 91, "Java target-ledger population")
+    equal(targets["meta"]["failure_count"], 0, "Java target-ledger failures")
+    equal(len(targets["items"]), 91, "Java target-ledger rows")
 
     paired = rows("java_cross_language_paired_20260714.tsv")
     row = one(paired, baseline="Raw_BM25_entities", treatment="BM25_projection", metric="mrr")
@@ -1130,6 +1176,11 @@ def check_java_and_cost() -> None:
     close(100 * float(row["ci95_low"]), 3.9955544, "Java BM25 projection MRR low")
     row = one(paired, baseline="Raw_BM25_entities", treatment="BM25_projection", metric="hit")
     close(row["exact_mcnemar_p"], 0.0576126729138, "Java BM25 projection Hit p")
+    row = one(paired, baseline="BM25_projection", treatment="MURAL", metric="hit")
+    close(100 * float(row["delta"]), 9.8901099, "Java MURAL Hit delta")
+    equal(int(row["wins"]), 12, "Java MURAL Hit wins")
+    equal(int(row["losses"]), 3, "Java MURAL Hit losses")
+    close(row["exact_mcnemar_p"], 0.03515625, "Java MURAL Hit p")
 
     java_manifest = json_file(
         ROOT / "artifacts" / "inputs" / "java_cross_language_manifest_20260714.json"

@@ -218,7 +218,9 @@ Task-B annotations as auxiliary records; manuscript findings do not use their
 labels.
 
 The Java evaluation retains all 91 instances pinned by
-`inputs/java_cross_language_manifest_20260714.json`.
+`inputs/java_cross_language_manifest_20260714.json` and reports raw BM25,
+all three projected single sources, all three pairwise fusions, and the full
+three-source MURAL configuration.
 
 ## Frozen rankings and provenance
 

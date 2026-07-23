@@ -9,12 +9,12 @@
   },
   "files": {
     "README.md": {
-      "bytes": 3192,
-      "sha256": "d520e166cb7d47d8ee77ace86e81842e8051b52b5e56756a354da6f3121d66af"
+      "bytes": 3253,
+      "sha256": "0d561a8bd6eb2436912687af134eec42c289135e3bcda1fbed776f224000fe69"
     },
     "artifacts/README.md": {
-      "bytes": 14252,
-      "sha256": "8a580b03358bb1af0337c727dfb67317775cc1e5c25faad565620d72fe110abb"
+      "bytes": 14384,
+      "sha256": "16af01e44afbe94517a259c69219341dadc3f4c73ed8599e075c265d0cbe6111"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
       "bytes": 19164,
@@ -53,8 +53,8 @@
       "sha256": "a6b0fd7c8c2969a0eef892e032250adcfa6d32362d395c246930e61b575ac9b9"
     },
     "artifacts/inputs/java_cross_language_manifest_20260714.json": {
-      "bytes": 3552,
-      "sha256": "522b0a9544541b6de974f3d0d596e0ec940bbc1e790de68703cfda44c5c2b697"
+      "bytes": 4381,
+      "sha256": "3b3c0b1a58e83b0231832d67ed9a042cef55722f721c2d6a09ead6b78aa84e97"
     },
     "artifacts/inputs/java_kg_ranked_file_seeds_20260714.jsonl": {
       "bytes": 111020,
@@ -225,20 +225,20 @@
       "sha256": "f089317a2664d962b5c9776880c17a9a86324fdb3f2156e9e15d6a1ea3066534"
     },
     "artifacts/results/java_cross_language_instances_20260714.jsonl": {
-      "bytes": 1203742,
-      "sha256": "1897392ddc1131381fa015c0f3295750fd697798e797a291cfa367ce4b86549d"
+      "bytes": 2401480,
+      "sha256": "c0086a777cfb741c43d8979588b16113c31a31c1a0a91cf109c708f72ed85740"
     },
     "artifacts/results/java_cross_language_paired_20260714.tsv": {
-      "bytes": 2764,
-      "sha256": "a175c2ebd42b5ca0d5d49309491f58927c9e6f189dc4b3a663ed82e4363ced5b"
+      "bytes": 5469,
+      "sha256": "f62830f5b3ad2028df549f79ffd72c25d05a8f0f521cd82cc520d84e461af452"
     },
     "artifacts/results/java_cross_language_summary_20260714.tsv": {
-      "bytes": 477,
-      "sha256": "3aa2dd962bf663d97b898a7faa57b6dba9f2149bc16271e927c7d8e37e28eae5"
+      "bytes": 845,
+      "sha256": "4981e17e6de3ac3b9ad9bcf1789b5ebaca6e1f3fb5ef47faad74b70feae32e0c"
     },
     "artifacts/results/java_cross_language_targets_20260714.json": {
-      "bytes": 89480,
-      "sha256": "36c9bf6e082ee85bbcab41637d48489a6a326027e8413d0570aae59b2d291147"
+      "bytes": 89609,
+      "sha256": "1c0236874faff1d8f854e8234ae3b2295dc0601d58ff4f2ac7b71c060b0abeb7"
     },
     "artifacts/results/line_coverage_instances_4000_20260721.tsv": {
       "bytes": 74528,
@@ -657,8 +657,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 15296,
-      "sha256": "b090a6a6c474afe487de95efd429d1dcb3f12de6f162a9386894fbe46687abe4"
+      "bytes": 15849,
+      "sha256": "b10b1e9f038053a42ef1fe7d70cbcc42180b1e7bd5d21ed5c4387588c99e64d2"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -673,8 +673,8 @@
       "sha256": "91cf3f45434a62ba780a88c4e40dc4a6b585530b0e56a619d17216bc2f661a94"
     },
     "artifacts/scripts/evaluate_java_retrieve_localize.py": {
-      "bytes": 36225,
-      "sha256": "81486d440c1675ad13720a1001e7d2d61861fdda96e63dddf1c79b4417a66212"
+      "bytes": 44082,
+      "sha256": "934d410e55f1c47fc25921711c6471b7bb9f7a075101c8cebbf4a687e1c40823"
     },
     "artifacts/scripts/evaluate_strict_external_localizers.py": {
       "bytes": 16620,
@@ -769,8 +769,8 @@
       "sha256": "5e4015059ed065210efad12ff714afba183981c5f2ffc2b14d2e99b523afdaaf"
     },
     "artifacts/scripts/reanalyze_java_clustered_stats.py": {
-      "bytes": 3366,
-      "sha256": "ae3c3f36820bcbe7446f811093905c591cb0447fd0f23a4c1dd80a78e25c4fe2"
+      "bytes": 3161,
+      "sha256": "1ba0fcbad0e673fda7eadaa79dc72fb22bc25819959df84e89d07fd53a82ec5b"
     },
     "artifacts/scripts/reprocess_repair_attempts.py": {
       "bytes": 6060,
@@ -789,8 +789,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 70981,
-      "sha256": "632ec1ee4a9faf730ad8a4d6f14f28fd3532eb0fda203b36bdd75f10f3438c08"
+      "bytes": 73432,
+      "sha256": "07d8371e0276dd7f85ab7716c6a8071e686ef80633ed262c01ca960e461c04ee"
     },
     "artifacts/structural_temporal_metadata_20260722.json": {
       "bytes": 347,
@@ -867,12 +867,29 @@
     "window_rankings": "artifacts/frozen/human_window_rankings_20260712.jsonl.gz"
   },
   "java_benchmark": {
+    "configurations": [
+      "Raw_BM25_entities",
+      "BM25_projection",
+      "Structural_projection",
+      "Dense_projection",
+      "MURAL_2src",
+      "BM25_Dense",
+      "Structural_Dense",
+      "MURAL"
+    ],
+    "dense_encoder": "jinaai/jina-embeddings-v2-base-code@516f4baf13dec4ddddda8631e019b5737c8bc250",
     "evaluated_instances": 91,
     "excluded_instances": 0,
+    "fusion": "equal-weight reciprocal-rank fusion with k=60",
     "manifest": "artifacts/inputs/java_cross_language_manifest_20260714.json",
     "name": "SWE-bench-Java Verified",
     "official_instances": 91,
-    "repositories": 6
+    "repositories": 6,
+    "sources": [
+      "BM25",
+      "structural",
+      "dense"
+    ]
   },
   "mural": {
     "context_objects": {

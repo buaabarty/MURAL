@@ -13,16 +13,10 @@ from statistics import mean
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from evaluate_java_retrieve_localize import exact_mcnemar  # noqa: E402
+from evaluate_java_retrieve_localize import JAVA_COMPARISONS, exact_mcnemar  # noqa: E402
 from evaluate_strict_reference_context import cluster_bootstrap_ci  # noqa: E402
 
 
-COMPARISONS = (
-    ("Raw_BM25_entities", "BM25_projection"),
-    ("BM25_projection", "Structural_projection"),
-    ("BM25_projection", "Lexical_structural_fusion"),
-    ("Structural_projection", "Lexical_structural_fusion"),
-)
 METRICS = ("file", "method", "mrr", "hit")
 
 
@@ -46,7 +40,7 @@ def main() -> int:
         raise ValueError("Java instance ledger is empty")
 
     output: list[dict] = []
-    for baseline, treatment in COMPARISONS:
+    for baseline, treatment in JAVA_COMPARISONS:
         for metric in METRICS:
             triples = [
                 (

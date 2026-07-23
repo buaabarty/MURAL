@@ -48,7 +48,7 @@
   },
   "evaluation": {
     "script": "artifacts/scripts/evaluate_java_retrieve_localize.py",
-    "script_sha256": "81486d440c1675ad13720a1001e7d2d61861fdda96e63dddf1c79b4417a66212",
+    "script_sha256": "934d410e55f1c47fc25921711c6471b7bb9f7a075101c8cebbf4a687e1c40823",
     "dataset_schema": "official repo/base_commit/problem_statement/patch",
     "target_source": "official patch, read after rankings are frozen",
     "target_mapping": "Map changed lines to base-commit Java entities. Auxiliary files and newly added entities do not enlarge an otherwise mapped target set; use one file-level fallback only if the entire patch has no mapped base-commit entity.",
@@ -63,11 +63,36 @@
     "completed_instances": 91,
     "failures": 0,
     "output_sha256": {
-      "summary": "3aa2dd962bf663d97b898a7faa57b6dba9f2149bc16271e927c7d8e37e28eae5",
-      "paired": "a175c2ebd42b5ca0d5d49309491f58927c9e6f189dc4b3a663ed82e4363ced5b",
-      "targets": "36c9bf6e082ee85bbcab41637d48489a6a326027e8413d0570aae59b2d291147",
-      "instances": "1897392ddc1131381fa015c0f3295750fd697798e797a291cfa367ce4b86549d"
+      "summary": "4981e17e6de3ac3b9ad9bcf1789b5ebaca6e1f3fb5ef47faad74b70feae32e0c",
+      "paired": "f62830f5b3ad2028df549f79ffd72c25d05a8f0f521cd82cc520d84e461af452",
+      "targets": "1c0236874faff1d8f854e8234ae3b2295dc0601d58ff4f2ac7b71c060b0abeb7",
+      "instances": "c0086a777cfb741c43d8979588b16113c31a31c1a0a91cf109c708f72ed85740"
     },
-    "selector_version": "compact_title_exact_file_rank_ast_v1"
+    "selector_version": "compact_title_exact_file_rank_ast_v1",
+    "sources": [
+      "BM25",
+      "structural",
+      "dense"
+    ],
+    "configurations": [
+      "Raw_BM25_entities",
+      "BM25_projection",
+      "Structural_projection",
+      "Dense_projection",
+      "MURAL_2src",
+      "BM25_Dense",
+      "Structural_Dense",
+      "MURAL"
+    ],
+    "dense_encoder": "jinaai/jina-embeddings-v2-base-code@516f4baf13dec4ddddda8631e019b5737c8bc250",
+    "dense_document": "qualified signature, repository-relative path, docstring, and first 3,000 source characters of each base-commit Java entity",
+    "dense_query": "official issue title and body",
+    "dense_runtime": {
+      "transformers": "4.49.0",
+      "torch": "2.7.0+cu126",
+      "numpy": "1.26.4",
+      "batch_size": 64
+    },
+    "fusion": "Equal-weight reciprocal-rank fusion over canonical projected entity rankings."
   }
 }
