@@ -175,7 +175,7 @@ python3 scripts/analyze_reference_coverage_strata.py \
   --targets results/strict_reference_targets_20260719.json \
   --row BM25=../temp_run/line4000/BM25_t4000 \
   --row MURAL=../temp_run/line4000/MURAL_t4000 \
-  --budget-label 4000-token \
+  --budget-label 4000-token --top-k 50 \
   --packing-instances ../temp_run/line4000_packing_instances.tsv \
   --output ../temp_run/reference_coverage_strata_4000.tsv
 ```
