@@ -19,8 +19,8 @@ COMPLETION = load("external_completion", "export_external_localizer_completions.
 HUMAN = load("human_window_strata", "analyze_human_window_strata.py")
 CLUSTER = load("cluster_randomization", "analyze_primary_cluster_randomization.py")
 FALLBACK = load("fallback_evidence", "analyze_target_fallback_evidence.py")
-REPAIR_CONTEXT = load(
-    "repair_context_completeness", "analyze_repair_context_completeness.py"
+REPAIR_COVERAGE = load(
+    "repair_target_coverage", "analyze_repair_target_coverage.py"
 )
 
 
@@ -70,12 +70,20 @@ def test_fallback_evidence_flags_are_exact_tokens():
     assert flags["patched_parse_failure"] == 0
 
 
-def test_repair_context_completeness_joins_by_instance_and_variant():
+def test_repair_target_coverage_joins_and_bins_by_variant():
     prompts = [
-        {"instance_id": "repo__x-1", "variant": "bm25", "source_complete": "0"},
-        {"instance_id": "repo__x-2", "variant": "bm25", "source_complete": "1"},
-        {"instance_id": "repo__x-1", "variant": "mural", "source_complete": "0"},
-        {"instance_id": "repo__x-2", "variant": "mural", "source_complete": "1"},
+        {
+            "instance_id": instance_id,
+            "repository": "repo__x",
+            "variant": variant,
+            "target_count": "2",
+            "source_target_coverage": coverage,
+        }
+        for instance_id, coverage in (
+            ("repo__x-1", "0"),
+            ("repo__x-2", "1"),
+        )
+        for variant in ("bm25", "mural")
     ]
     outcomes = [
         {"instance_id": "repo__x-2", "variant": "mural", "resolved": "1"},
@@ -83,20 +91,23 @@ def test_repair_context_completeness_joins_by_instance_and_variant():
         {"instance_id": "repo__x-2", "variant": "bm25", "resolved": "1"},
         {"instance_id": "repo__x-1", "variant": "mural", "resolved": "0"},
     ]
-    rows = REPAIR_CONTEXT.summarize(prompts, outcomes, {"repo__x-2"})
-    assert len(rows) == 8
+    joined = REPAIR_COVERAGE.join_rows(prompts, outcomes)
+    assert len(joined) == 4
+    assert {row["target_band"] for row in joined} == {"multi"}
+
+    rows = REPAIR_COVERAGE.summarize_two_target_bins(joined)
     indexed = {
-        (row["stratum"], row["variant"], row["source_complete"]): row
+        (row["variant"], row["coverage_bin"]): row
         for row in rows
     }
-    assert indexed[("all", "bm25", 0)]["resolved_rate"] == 0.0
-    assert indexed[("all", "bm25", 1)]["resolved_rate"] == 100.0
-    assert indexed[("entity_only", "mural", 0)]["N"] == 0
-    assert indexed[("entity_only", "mural", 1)] == {
-        "stratum": "entity_only",
+    assert indexed[("bm25", "zero")]["resolved_rate"] == "0.000000"
+    assert indexed[("bm25", "complete")]["resolved_rate"] == "100.000000"
+    assert indexed[("mural", "partial")]["N"] == 0
+    assert indexed[("mural", "complete")] == {
+        "target_count": 2,
         "variant": "mural",
-        "source_complete": 1,
+        "coverage_bin": "complete",
         "N": 1,
         "resolved": 1,
-        "resolved_rate": 100.0,
+        "resolved_rate": "100.000000",
     }

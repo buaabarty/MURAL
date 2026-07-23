@@ -1,0 +1,5 @@
+target_band	variant	N	unresolved_N	unresolved_target_coverage	resolved_N	resolved_target_coverage	delta_points	clustered_ci_low	clustered_ci_high	bootstrap_valid_draws
+single	bm25	319	217	42.396313	102	83.333333	40.937020	31.764678	54.493043	10000
+single	mural	319	215	46.046512	104	81.730769	35.684258	23.953276	42.252910	10000
+multi	bm25	181	160	37.628653	21	66.825397	29.196744	7.727032	36.799444	10000
+multi	mural	181	157	39.829804	24	64.861111	25.031307	1.478371	33.438316	10000

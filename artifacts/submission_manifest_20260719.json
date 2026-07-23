@@ -13,12 +13,12 @@
       "sha256": "6fa4561989dc95a23bebbdbd20c21553dd56553c405fb7b547d3d5ac3269bd47"
     },
     "artifacts/README.md": {
-      "bytes": 14019,
-      "sha256": "1712bddda934a250a4e2eb178df85f0348da3d8e1e37c2774d22146fa8b93ee3"
+      "bytes": 14237,
+      "sha256": "237ae4b0dbbff32c4ba2a4bd4d492d5d70dba05068b67a50ee9863810ba1803a"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 18908,
-      "sha256": "ac0b3a545fa14047b835e11a8861cc2f89fbfc42a0d699e3c05d6cfe2e7036b6"
+      "bytes": 19023,
+      "sha256": "010ddb2f194823411c6f8321920a91be29dad6421e79bf0c2ae174c981c655f5"
     },
     "artifacts/frozen/architecture_control_manifest_20260721.json": {
       "bytes": 2012,
@@ -268,10 +268,6 @@
       "bytes": 860,
       "sha256": "73831721eb77675eb62f1d3359fa538d97f77aec4ee75723bd20a31c2e0d59d9"
     },
-    "artifacts/results/repair_context_completeness_20260723.tsv": {
-      "bytes": 357,
-      "sha256": "c6deda0814390f74bf3ea44fd357e272ec85c0c68ad638d4a2b8e27003763f46"
-    },
     "artifacts/results/repair_equal4000_clustered_paired_20260719.tsv": {
       "bytes": 308,
       "sha256": "b2ec8bde2ca9ff3cef5e222135f677881d7f633fb2edae51dc4d2db2b7b8383f"
@@ -311,6 +307,14 @@
     "artifacts/results/repair_equal4000_strict_summary_20260719.tsv": {
       "bytes": 698,
       "sha256": "9b90ed8f8b2eff7ee2b5a1f9f0364b868718b20d9f050cf425db9d8ed67c7dca"
+    },
+    "artifacts/results/repair_target_coverage_outcome_20260723.tsv": {
+      "bytes": 484,
+      "sha256": "0b41bf47487763a9c9bc7e5fff43855e5e9229aabe808a9e212fbe99a8a4cb95"
+    },
+    "artifacts/results/repair_two_target_coverage_bins_20260723.tsv": {
+      "bytes": 235,
+      "sha256": "db2bec59c707b847c325c01d2d8ce5acc6da84c2b7a5d324474a1abb846141c6"
     },
     "artifacts/results/source_bearing_prompt_instances_20260719.tsv": {
       "bytes": 133247,
@@ -604,13 +608,13 @@
       "bytes": 6612,
       "sha256": "a1bb1fb13efd1352e62538dab7911c5fbcaaf761774234fce054e04d8cc0584a"
     },
-    "artifacts/scripts/analyze_repair_context_completeness.py": {
-      "bytes": 3541,
-      "sha256": "ade039f8fc849fb9a40eff99d4c518bdc36d05789eb54da1eb6b00a57057d914"
-    },
     "artifacts/scripts/analyze_repair_outcomes.py": {
       "bytes": 10622,
       "sha256": "58aa7787d609bb992f8867dca2d9ac116e99cb7584ebd7020a9d881d24ea44fd"
+    },
+    "artifacts/scripts/analyze_repair_target_coverage.py": {
+      "bytes": 8272,
+      "sha256": "40a2e5aee2b4ed1d1e64efd25713fc6e4453ba0160550a1085e0a44e8d0377ee"
     },
     "artifacts/scripts/analyze_source_bearing_prompt_coverage.py": {
       "bytes": 14664,
@@ -653,8 +657,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 15127,
-      "sha256": "2f3a6abd76cf3d7ae8cac5eed3198250015cdbb4efa7f2d31fa6558f7871722e"
+      "bytes": 15237,
+      "sha256": "7a0ca25a6754112ee91bd0ed237f27bb2fbb14425beaff17c2ad86485e3f4297"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -785,8 +789,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 69246,
-      "sha256": "139f0ca9ba282cfa57dd3592c85c7c151d0c0387ffdc84a64dd88b0c5959d309"
+      "bytes": 70799,
+      "sha256": "f337e3d3a2d882ce53ec98e697ac56aab059c9fdc9082c8b6df866d759c590f2"
     },
     "artifacts/structural_temporal_metadata_20260722.json": {
       "bytes": 347,
@@ -809,8 +813,8 @@
       "sha256": "7454d18f062d80b94805a41f3ee5a4132fc37de61dcb732dd2650b7163a8eecd"
     },
     "test_no_llm_analysis.py": {
-      "bytes": 3655,
-      "sha256": "b898585ea746445530651270bbd643f5e9ced5f71e4507ca5210da67e2566986"
+      "bytes": 3778,
+      "sha256": "436969d7e22adb5e7b2b5ed2e6eb67d5f2eca9f2c63e25dbd772e59d9f1d9f4b"
     },
     "test_strict_external_localizers.py": {
       "bytes": 1774,
@@ -934,7 +938,6 @@
     "api_style": "OpenAI-compatible",
     "assistant_response_prefill": false,
     "candidate_entity_budget": 20,
-    "context_completeness": "artifacts/results/repair_context_completeness_20260723.tsv",
     "coverage_unit": "only source-bearing candidate excerpts contribute prompt TargetCov and RefComplete",
     "enable_thinking": false,
     "endpoint": "https://www.autodl.art/api/v1",
@@ -953,16 +956,18 @@
     "renderer": "rank-banded excerpts: up to four candidates from ranks 1-10 and four from ranks 11-20, at most two excerpts per file in each band",
     "request_timeout_seconds": 600,
     "selection": "first applicable patch",
+    "target_coverage_by_outcome": "artifacts/results/repair_target_coverage_outcome_20260723.tsv",
     "temperature": 0.0,
     "test_timeout_seconds": 1800,
     "timeout_outcome": "unresolved",
     "top_p": 0.95,
+    "two_target_coverage_bins": "artifacts/results/repair_two_target_coverage_bins_20260723.tsv",
     "variants": [
       "bm25",
       "mural"
     ]
   },
-  "schema_version": 5,
+  "schema_version": 6,
   "source_composition": {
     "attribution": "artifacts/results/source_combination_attribution_20260722.tsv",
     "combinations": [

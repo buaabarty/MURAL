@@ -48,7 +48,7 @@ All paths below are relative to `artifacts/`.
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
-| Repair yield by source-visible target completeness | `results/repair_context_completeness_20260723.tsv` |
+| Target coverage by repair outcome and fixed two-target bins | `results/repair_target_coverage_outcome_20260723.tsv`, `results/repair_two_target_coverage_bins_20260723.tsv` |
 | Strict structural-artifact temporal provenance | `results/structural_temporal_provenance_20260722.json`, `results/structural_temporal_provenance_instances_20260722.tsv`, `structural_temporal_metadata_20260722.json` |
 | Static-only structural replay | `results/structural_static_ablation_{summary,instances}_20260722.*`, `results/structural_static_top20_*_20260722.tsv`, `results/structural_static_token4000_*_20260722.tsv` |
 | Exact repository-cluster sign-flip tests | `results/primary_cluster_signflip_{summary,repositories}_20260722.tsv` |
@@ -299,11 +299,12 @@ python3 scripts/analyze_clustered_repair_stats.py \
 Relate the executed prompt contents to official repair outcomes:
 
 ```bash
-python3 scripts/analyze_repair_context_completeness.py \
+python3 scripts/analyze_repair_target_coverage.py \
   --prompts results/source_bearing_prompt_instances_20260719.tsv \
   --outcomes results/repair_equal4000_strict_outcomes_20260719.tsv \
-  --targets results/strict_reference_targets_20260719.json \
-  --output results/repair_context_completeness_20260723.tsv
+  --bootstrap 10000 --seed 7 \
+  --output-outcome results/repair_target_coverage_outcome_20260723.tsv \
+  --output-bins results/repair_two_target_coverage_bins_20260723.tsv
 ```
 
 Hosted generation reads `AUTODL_API_KEY` from the environment. No credential is

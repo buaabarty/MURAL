@@ -1,0 +1,7 @@
+target_count	variant	coverage_bin	N	resolved	resolved_rate
+2	bm25	zero	27	1	3.703704
+2	bm25	partial	27	2	7.407407
+2	bm25	complete	32	9	28.125000
+2	mural	zero	26	2	7.692308
+2	mural	partial	27	5	18.518519
+2	mural	complete	33	8	24.242424

@@ -192,8 +192,11 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 - `results/java_cross_language_{summary,paired}_20260714.tsv`
 - `results/java_cross_language_instances_20260714.jsonl`
 - `results/java_cross_language_targets_20260714.json`
-- `results/repair_context_completeness_20260723.tsv`
-- `scripts/analyze_repair_context_completeness.py`
+- `results/repair_target_coverage_outcome_20260723.tsv`
+- `results/repair_two_target_coverage_bins_20260723.tsv`
+- `scripts/analyze_repair_target_coverage.py`
+- repository-clustered coverage/outcome intervals use 10,000 resamples (seed 7)
+- two-target coverage bins hold reference-target multiplicity fixed at exactly two
 
 Task C has 100 judgments over 80 instances, including 20 double-coded items.
 The packet is preserved without relabeling or replacing any annotator-visible

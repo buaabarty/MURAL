@@ -21,7 +21,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_token_candidate_exhaustion.py",
     "artifacts/scripts/analyze_changed_line_strata.py",
     "artifacts/scripts/analyze_repair_outcomes.py",
-    "artifacts/scripts/analyze_repair_context_completeness.py",
+    "artifacts/scripts/analyze_repair_target_coverage.py",
     "artifacts/scripts/analyze_source_combinations.py",
     "artifacts/scripts/analyze_human_strict_alignment.py",
     "artifacts/scripts/analyze_reference_coverage_strata.py",
@@ -108,7 +108,7 @@ def main() -> None:
         raise SystemExit(f"Missing manifest inputs: {missing}")
 
     manifest = {
-        "schema_version": 5,
+        "schema_version": 6,
         "frozen_date": "2026-07-23",
         "annotation_snapshot": "2026-07-21",
         "paper": {
@@ -235,7 +235,8 @@ def main() -> None:
             "timeout_outcome": "unresolved",
             "prompt_hash_rows": 1000,
             "variants": ["bm25", "mural"],
-            "context_completeness": "artifacts/results/repair_context_completeness_20260723.tsv",
+            "target_coverage_by_outcome": "artifacts/results/repair_target_coverage_outcome_20260723.tsv",
+            "two_target_coverage_bins": "artifacts/results/repair_two_target_coverage_bins_20260723.tsv",
         },
         "human_audit": {
             "judgments": 100,

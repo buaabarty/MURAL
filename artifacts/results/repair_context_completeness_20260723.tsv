@@ -1,9 +1,0 @@
-stratum	variant	source_complete	N	resolved	resolved_rate
-all	bm25	0	290	29	10.0
-all	bm25	1	210	94	44.76190476190476
-entity_only	bm25	0	183	19	10.382513661202186
-entity_only	bm25	1	166	80	48.19277108433735
-all	mural	0	280	35	12.5
-all	mural	1	220	93	42.27272727272727
-entity_only	mural	0	177	24	13.559322033898304
-entity_only	mural	1	172	80	46.51162790697674

@@ -69,7 +69,8 @@ EXPECTED_RESULTS = {
     "repair_equal4000_strict_regeneration_bm25_20260719.tsv",
     "repair_equal4000_strict_regeneration_mural_20260719.tsv",
     "repair_equal4000_strict_summary_20260719.tsv",
-    "repair_context_completeness_20260723.tsv",
+    "repair_target_coverage_outcome_20260723.tsv",
+    "repair_two_target_coverage_bins_20260723.tsv",
     "source_bearing_prompt_instances_20260719.tsv",
     "source_bearing_prompt_paired_20260719.tsv",
     "source_bearing_prompt_summary_20260719.tsv",
@@ -1008,24 +1009,62 @@ def check_repair() -> None:
         ):
             close(summary_row[field], value, f"repair summary {metric} {field}", 1e-9)
 
-    context_rows = rows("repair_context_completeness_20260723.tsv")
-    expected_context = {
-        ("all", "bm25", "0"): (290, 29, 10.0),
-        ("all", "bm25", "1"): (210, 94, 44.761905),
-        ("all", "mural", "0"): (280, 35, 12.5),
-        ("all", "mural", "1"): (220, 93, 42.272727),
-        ("entity_only", "bm25", "0"): (183, 19, 10.382514),
-        ("entity_only", "bm25", "1"): (166, 80, 48.192771),
-        ("entity_only", "mural", "0"): (177, 24, 13.559322),
-        ("entity_only", "mural", "1"): (172, 80, 46.511628),
+    coverage_rows = rows("repair_target_coverage_outcome_20260723.tsv")
+    expected_coverage = {
+        ("single", "bm25"): (
+            319, 217, 42.396313, 102, 83.333333,
+            40.937020, 31.764678, 54.493043, 10000,
+        ),
+        ("single", "mural"): (
+            319, 215, 46.046512, 104, 81.730769,
+            35.684258, 23.953276, 42.252910, 10000,
+        ),
+        ("multi", "bm25"): (
+            181, 160, 37.628653, 21, 66.825397,
+            29.196744, 7.727032, 36.799444, 10000,
+        ),
+        ("multi", "mural"): (
+            181, 157, 39.829804, 24, 64.861111,
+            25.031307, 1.478371, 33.438316, 10000,
+        ),
     }
-    equal(len(context_rows), len(expected_context), "repair context strata rows")
-    for (stratum, variant, complete), (n, resolved, rate) in expected_context.items():
-        row = one(context_rows, stratum=stratum, variant=variant, source_complete=complete)
-        label = f"{stratum} {variant} complete={complete}"
+    equal(len(coverage_rows), len(expected_coverage), "repair coverage/outcome rows")
+    for (target_band, variant), values in expected_coverage.items():
+        row = one(coverage_rows, target_band=target_band, variant=variant)
+        label = f"{target_band} {variant}"
+        for field, value in zip(
+            (
+                "N",
+                "unresolved_N",
+                "unresolved_target_coverage",
+                "resolved_N",
+                "resolved_target_coverage",
+                "delta_points",
+                "clustered_ci_low",
+                "clustered_ci_high",
+                "bootstrap_valid_draws",
+            ),
+            values,
+        ):
+            close(row[field], value, f"{label} {field}", 1e-6)
+
+    bin_rows = rows("repair_two_target_coverage_bins_20260723.tsv")
+    expected_bins = {
+        ("bm25", "zero"): (27, 1, 3.703704),
+        ("bm25", "partial"): (27, 2, 7.407407),
+        ("bm25", "complete"): (32, 9, 28.125000),
+        ("mural", "zero"): (26, 2, 7.692308),
+        ("mural", "partial"): (27, 5, 18.518519),
+        ("mural", "complete"): (33, 8, 24.242424),
+    }
+    equal(len(bin_rows), len(expected_bins), "two-target coverage-bin rows")
+    for (variant, coverage_bin), (n, resolved, rate) in expected_bins.items():
+        row = one(bin_rows, variant=variant, coverage_bin=coverage_bin)
+        label = f"{variant} {coverage_bin}"
+        equal(int(row["target_count"]), 2, f"{label} target count")
         equal(int(row["N"]), n, f"{label} N")
         equal(int(row["resolved"]), resolved, f"{label} resolved")
-        close(row["resolved_rate"], rate, f"{label} rate", 1e-6)
+        close(row["resolved_rate"], rate, f"{label} resolved rate", 1e-6)
 
     provenance = rows("repair_equal4000_strict_prediction_provenance_20260719.tsv")
     equal(len(provenance), 1000, "repair provenance rows")
@@ -1291,7 +1330,7 @@ def check_no_llm_additions() -> None:
 
 def check_manifest() -> None:
     manifest = json_file(MANIFEST)
-    equal(manifest["schema_version"], 5, "manifest schema")
+    equal(manifest["schema_version"], 6, "manifest schema")
     equal(manifest["frozen_date"], "2026-07-23", "manifest frozen date")
     equal(
         manifest["paper"]["title"],
@@ -1319,9 +1358,14 @@ def check_manifest() -> None:
         "manifest repair coverage unit",
     )
     equal(
-        manifest["repair"]["context_completeness"],
-        "artifacts/results/repair_context_completeness_20260723.tsv",
-        "manifest repair context completeness",
+        manifest["repair"]["target_coverage_by_outcome"],
+        "artifacts/results/repair_target_coverage_outcome_20260723.tsv",
+        "manifest repair target coverage by outcome",
+    )
+    equal(
+        manifest["repair"]["two_target_coverage_bins"],
+        "artifacts/results/repair_two_target_coverage_bins_20260723.tsv",
+        "manifest two-target coverage bins",
     )
     equal(
         manifest["architecture_controls"]["manifest"],
