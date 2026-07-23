@@ -21,6 +21,7 @@ CRITICAL_FILES = [
     "artifacts/scripts/analyze_token_candidate_exhaustion.py",
     "artifacts/scripts/analyze_changed_line_strata.py",
     "artifacts/scripts/analyze_repair_outcomes.py",
+    "artifacts/scripts/analyze_repair_context_completeness.py",
     "artifacts/scripts/analyze_source_combinations.py",
     "artifacts/scripts/analyze_human_strict_alignment.py",
     "artifacts/scripts/analyze_reference_coverage_strata.py",
@@ -107,8 +108,8 @@ def main() -> None:
         raise SystemExit(f"Missing manifest inputs: {missing}")
 
     manifest = {
-        "schema_version": 4,
-        "frozen_date": "2026-07-22",
+        "schema_version": 5,
+        "frozen_date": "2026-07-23",
         "annotation_snapshot": "2026-07-21",
         "paper": {
             "title": "MURAL: Unifying Fault Localization and Bounded Context Construction for Repository Repair",
@@ -234,6 +235,7 @@ def main() -> None:
             "timeout_outcome": "unresolved",
             "prompt_hash_rows": 1000,
             "variants": ["bm25", "mural"],
+            "context_completeness": "artifacts/results/repair_context_completeness_20260723.tsv",
         },
         "human_audit": {
             "judgments": 100,
@@ -260,15 +262,7 @@ def main() -> None:
                 "exact_entity_only_instances": 26,
                 "instances_using_file_fallback": 34,
             },
-            "support_role_audit": {
-                "judgments": 120,
-                "unique_pairs": 100,
-                "double_coded_pairs": 20,
-                "adjudicated_labels": "artifacts/results/human_support_adjudicated_20260721.tsv",
-                "strong_or_required": 14,
-            },
             "evidence_audit_provenance": "artifacts/results/human_evidence_audit_provenance_20260721.tsv",
-            "evidence_audit_summary": "artifacts/results/human_evidence_audit_summary_20260721.tsv",
         },
         "structural_temporal_boundary": {
             "cutoff": "target issue created_at",

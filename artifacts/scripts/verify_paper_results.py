@@ -69,6 +69,7 @@ EXPECTED_RESULTS = {
     "repair_equal4000_strict_regeneration_bm25_20260719.tsv",
     "repair_equal4000_strict_regeneration_mural_20260719.tsv",
     "repair_equal4000_strict_summary_20260719.tsv",
+    "repair_context_completeness_20260723.tsv",
     "source_bearing_prompt_instances_20260719.tsv",
     "source_bearing_prompt_paired_20260719.tsv",
     "source_bearing_prompt_summary_20260719.tsv",
@@ -925,7 +926,7 @@ def check_prompts_and_human() -> None:
         equal(int(row["count"]), count, f"exclusive judgment {decision}")
 
 
-def check_human_evidence_audit() -> None:
+def check_human_construct_audit() -> None:
     construct_raw = rows("human_construct_annotations_raw_20260721.tsv")
     equal(len(construct_raw), 80, "construct-audit judgments")
     equal(Counter(row["annotator"] for row in construct_raw), Counter({"A": 40, "B": 40}), "construct annotators")
@@ -947,27 +948,6 @@ def check_human_evidence_audit() -> None:
     equal(sum(int(row["fallback_regions"]) == 0 for row in construct_final), 26, "construct exact-only instances")
     equal(sum(int(row["fallback_regions"]) > 0 for row in construct_final), 34, "construct fallback instances")
 
-    support_raw = rows("human_support_annotations_raw_20260721.tsv")
-    equal(len(support_raw), 120, "support-audit judgments")
-    equal(Counter(row["annotator"] for row in support_raw), Counter({"A": 60, "B": 60}), "support annotators")
-    support_counts = Counter(row["annotation_id"] for row in support_raw)
-    equal(len(support_counts), 100, "support unique pairs")
-    equal(Counter(support_counts.values()), Counter({1: 80, 2: 20}), "support coding multiplicity")
-    shared_support = [
-        [row for row in support_raw if row["annotation_id"] == annotation_id]
-        for annotation_id, count in support_counts.items()
-        if count == 2
-    ]
-    equal(sum(pair[0]["support_role"] == pair[1]["support_role"] for pair in shared_support), 0, "support role agreement")
-    equal(sum(pair[0]["exact_receiver"] == pair[1]["exact_receiver"] for pair in shared_support), 11, "support receiver agreement")
-
-    support_final = rows("human_support_adjudicated_20260721.tsv")
-    equal(len(support_final), 100, "support adjudicated pairs")
-    equal(
-        Counter(row["final_role"] for row in support_final),
-        Counter({"irrelevant": 68, "weak": 18, "strong": 12, "required": 2}),
-        "support adjudicated roles",
-    )
     provenance = rows("human_evidence_audit_provenance_20260721.tsv")
     equal(len(provenance), 2, "evidence-audit provenance rows")
     expected_hashes = {
@@ -1027,6 +1007,25 @@ def check_repair() -> None:
             values,
         ):
             close(summary_row[field], value, f"repair summary {metric} {field}", 1e-9)
+
+    context_rows = rows("repair_context_completeness_20260723.tsv")
+    expected_context = {
+        ("all", "bm25", "0"): (290, 29, 10.0),
+        ("all", "bm25", "1"): (210, 94, 44.761905),
+        ("all", "mural", "0"): (280, 35, 12.5),
+        ("all", "mural", "1"): (220, 93, 42.272727),
+        ("entity_only", "bm25", "0"): (183, 19, 10.382514),
+        ("entity_only", "bm25", "1"): (166, 80, 48.192771),
+        ("entity_only", "mural", "0"): (177, 24, 13.559322),
+        ("entity_only", "mural", "1"): (172, 80, 46.511628),
+    }
+    equal(len(context_rows), len(expected_context), "repair context strata rows")
+    for (stratum, variant, complete), (n, resolved, rate) in expected_context.items():
+        row = one(context_rows, stratum=stratum, variant=variant, source_complete=complete)
+        label = f"{stratum} {variant} complete={complete}"
+        equal(int(row["N"]), n, f"{label} N")
+        equal(int(row["resolved"]), resolved, f"{label} resolved")
+        close(row["resolved_rate"], rate, f"{label} rate", 1e-6)
 
     provenance = rows("repair_equal4000_strict_prediction_provenance_20260719.tsv")
     equal(len(provenance), 1000, "repair provenance rows")
@@ -1292,7 +1291,8 @@ def check_no_llm_additions() -> None:
 
 def check_manifest() -> None:
     manifest = json_file(MANIFEST)
-    equal(manifest["schema_version"], 4, "manifest schema")
+    equal(manifest["schema_version"], 5, "manifest schema")
+    equal(manifest["frozen_date"], "2026-07-23", "manifest frozen date")
     equal(
         manifest["paper"]["title"],
         "MURAL: Unifying Fault Localization and Bounded Context Construction for Repository Repair",
@@ -1317,6 +1317,11 @@ def check_manifest() -> None:
         manifest["repair"]["coverage_unit"],
         "only source-bearing candidate excerpts contribute prompt TargetCov and RefComplete",
         "manifest repair coverage unit",
+    )
+    equal(
+        manifest["repair"]["context_completeness"],
+        "artifacts/results/repair_context_completeness_20260723.tsv",
+        "manifest repair context completeness",
     )
     equal(
         manifest["architecture_controls"]["manifest"],
@@ -1371,8 +1376,6 @@ def check_manifest() -> None:
     )
     equal(manifest["human_audit"]["construct_audit"]["judgments"], 80, "manifest construct judgments")
     equal(manifest["human_audit"]["construct_audit"]["covered_instances"], 60, "manifest construct coverage")
-    equal(manifest["human_audit"]["support_role_audit"]["judgments"], 120, "manifest support judgments")
-    equal(manifest["human_audit"]["support_role_audit"]["strong_or_required"], 14, "manifest strong support")
     equal(
         manifest["human_audit"]["evidence_audit_provenance"],
         "artifacts/results/human_evidence_audit_provenance_20260721.tsv",
@@ -1466,7 +1469,7 @@ def main() -> None:
     check_controls_and_budgets()
     check_external()
     check_prompts_and_human()
-    check_human_evidence_audit()
+    check_human_construct_audit()
     check_repair()
     check_java_and_cost()
     check_comprehensive_additions()

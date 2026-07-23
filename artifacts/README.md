@@ -192,6 +192,8 @@ denominator. The official rows are keyed by instance and patch SHA-256.
 - `results/java_cross_language_{summary,paired}_20260714.tsv`
 - `results/java_cross_language_instances_20260714.jsonl`
 - `results/java_cross_language_targets_20260714.json`
+- `results/repair_context_completeness_20260723.tsv`
+- `scripts/analyze_repair_context_completeness.py`
 
 Task C has 100 judgments over 80 instances, including 20 double-coded items.
 The packet is preserved without relabeling or replacing any annotator-visible
@@ -203,17 +205,14 @@ record for that main experiment.
 source-workbook SHA-256 values and 50 Task-C rows per annotator. A row-wise
 source check found no mismatch across all 100 released judgments.
 
-Tasks A and B retain both annotators' 80 construct judgments over 60 instances
-and 120 support-role judgments over 100 candidate pairs. Evidence
-adjudication binds the construct records to the current strict target ledger:
+Task A retains both annotators' 80 construct judgments over 60 instances.
+Evidence adjudication binds these records to the current strict target ledger:
 all 60 audited instances are covered, 26 entirely by exact entity targets and
-34 through at least one explicit exact-file fallback. The support-role ledger
-retains every independent label and the final B1--B4 evidence decision. Its 100
-adjudicated pairs contain 68 irrelevant, 18 weak, 12 strong, and two required
-candidates. The two source-workbook SHA-256 values and 100 Task-A/B rows per
-annotator are recorded in `human_evidence_audit_provenance_20260721.tsv`.
-Run `python3 scripts/analyze_human_evidence_audit.py` to recompute the counts and
-shared-item reliability values.
+34 through at least one explicit exact-file fallback. The two source-workbook
+SHA-256 values are recorded in
+`human_evidence_audit_provenance_20260721.tsv`. The release also preserves the
+Task-B annotations as auxiliary records; manuscript findings do not use their
+labels.
 
 The Java evaluation retains all 91 instances pinned by
 `inputs/java_cross_language_manifest_20260714.json`.

@@ -19,6 +19,9 @@ COMPLETION = load("external_completion", "export_external_localizer_completions.
 HUMAN = load("human_window_strata", "analyze_human_window_strata.py")
 CLUSTER = load("cluster_randomization", "analyze_primary_cluster_randomization.py")
 FALLBACK = load("fallback_evidence", "analyze_target_fallback_evidence.py")
+REPAIR_CONTEXT = load(
+    "repair_context_completeness", "analyze_repair_context_completeness.py"
+)
 
 
 def candidate(name: str) -> dict:
@@ -65,3 +68,35 @@ def test_fallback_evidence_flags_are_exact_tokens():
     assert flags["base_scope"] == 1
     assert flags["added_or_outer_scope"] == 1
     assert flags["patched_parse_failure"] == 0
+
+
+def test_repair_context_completeness_joins_by_instance_and_variant():
+    prompts = [
+        {"instance_id": "repo__x-1", "variant": "bm25", "source_complete": "0"},
+        {"instance_id": "repo__x-2", "variant": "bm25", "source_complete": "1"},
+        {"instance_id": "repo__x-1", "variant": "mural", "source_complete": "0"},
+        {"instance_id": "repo__x-2", "variant": "mural", "source_complete": "1"},
+    ]
+    outcomes = [
+        {"instance_id": "repo__x-2", "variant": "mural", "resolved": "1"},
+        {"instance_id": "repo__x-1", "variant": "bm25", "resolved": "0"},
+        {"instance_id": "repo__x-2", "variant": "bm25", "resolved": "1"},
+        {"instance_id": "repo__x-1", "variant": "mural", "resolved": "0"},
+    ]
+    rows = REPAIR_CONTEXT.summarize(prompts, outcomes, {"repo__x-2"})
+    assert len(rows) == 8
+    indexed = {
+        (row["stratum"], row["variant"], row["source_complete"]): row
+        for row in rows
+    }
+    assert indexed[("all", "bm25", 0)]["resolved_rate"] == 0.0
+    assert indexed[("all", "bm25", 1)]["resolved_rate"] == 100.0
+    assert indexed[("entity_only", "mural", 0)]["N"] == 0
+    assert indexed[("entity_only", "mural", 1)] == {
+        "stratum": "entity_only",
+        "variant": "mural",
+        "source_complete": 1,
+        "N": 1,
+        "resolved": 1,
+        "resolved_rate": 100.0,
+    }

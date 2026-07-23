@@ -13,12 +13,12 @@
       "sha256": "6fa4561989dc95a23bebbdbd20c21553dd56553c405fb7b547d3d5ac3269bd47"
     },
     "artifacts/README.md": {
-      "bytes": 14212,
-      "sha256": "36e2a2db739e676707c23d7ce8f3fe2d6a88a41db64bf97db9828a893fe4185b"
+      "bytes": 14019,
+      "sha256": "1712bddda934a250a4e2eb178df85f0348da3d8e1e37c2774d22146fa8b93ee3"
     },
     "artifacts/RESULT_TRACEABILITY.md": {
-      "bytes": 18435,
-      "sha256": "d3db2f1f086d04064179fdd81887615cf2c8319026e2d2effdd31211399a2614"
+      "bytes": 18908,
+      "sha256": "ac0b3a545fa14047b835e11a8861cc2f89fbfc42a0d699e3c05d6cfe2e7036b6"
     },
     "artifacts/frozen/architecture_control_manifest_20260721.json": {
       "bytes": 2012,
@@ -267,6 +267,10 @@
     "artifacts/results/reference_coverage_strata_4000_20260721.tsv": {
       "bytes": 860,
       "sha256": "73831721eb77675eb62f1d3359fa538d97f77aec4ee75723bd20a31c2e0d59d9"
+    },
+    "artifacts/results/repair_context_completeness_20260723.tsv": {
+      "bytes": 357,
+      "sha256": "c6deda0814390f74bf3ea44fd357e272ec85c0c68ad638d4a2b8e27003763f46"
     },
     "artifacts/results/repair_equal4000_clustered_paired_20260719.tsv": {
       "bytes": 308,
@@ -600,6 +604,10 @@
       "bytes": 6612,
       "sha256": "a1bb1fb13efd1352e62538dab7911c5fbcaaf761774234fce054e04d8cc0584a"
     },
+    "artifacts/scripts/analyze_repair_context_completeness.py": {
+      "bytes": 3541,
+      "sha256": "ade039f8fc849fb9a40eff99d4c518bdc36d05789eb54da1eb6b00a57057d914"
+    },
     "artifacts/scripts/analyze_repair_outcomes.py": {
       "bytes": 10622,
       "sha256": "58aa7787d609bb992f8867dca2d9ac116e99cb7584ebd7020a9d881d24ea44fd"
@@ -645,8 +653,8 @@
       "sha256": "c1bad2585d04ccb5df54d307cac42d762fdbf4e00c72a9b11aa2e7ed36f187d0"
     },
     "artifacts/scripts/build_submission_manifest.py": {
-      "bytes": 15370,
-      "sha256": "19e047b668e2a83c87b45f0780911949c95575d617bb0942460c8620c537fe16"
+      "bytes": 15127,
+      "sha256": "2f3a6abd76cf3d7ae8cac5eed3198250015cdbb4efa7f2d31fa6558f7871722e"
     },
     "artifacts/scripts/collect_swebench_reports.py": {
       "bytes": 7237,
@@ -777,8 +785,8 @@
       "sha256": "eac1d6a5d4c43a72eda8192be791411632ba12e19279c0528da28079e048ddfe"
     },
     "artifacts/scripts/verify_paper_results.py": {
-      "bytes": 69353,
-      "sha256": "f30e728095f46330574aea3a35feb291e3a8a680fb55df23d138ecae70c792c9"
+      "bytes": 69246,
+      "sha256": "139f0ca9ba282cfa57dd3592c85c7c151d0c0387ffdc84a64dd88b0c5959d309"
     },
     "artifacts/structural_temporal_metadata_20260722.json": {
       "bytes": 347,
@@ -801,8 +809,8 @@
       "sha256": "7454d18f062d80b94805a41f3ee5a4132fc37de61dcb732dd2650b7163a8eecd"
     },
     "test_no_llm_analysis.py": {
-      "bytes": 2193,
-      "sha256": "35aba8ab1f4b7ae23934c965a86bb1ba01b907a825c8c4370d05b8c6a097d5f6"
+      "bytes": 3655,
+      "sha256": "b898585ea746445530651270bbd643f5e9ced5f71e4507ca5210da67e2566986"
     },
     "test_strict_external_localizers.py": {
       "bytes": 1774,
@@ -821,7 +829,7 @@
       "sha256": "a47e5344894d42a7c7f415a89f4d778a9ffcecaa3f229c1a5f0af5431c6f68d9"
     }
   },
-  "frozen_date": "2026-07-22",
+  "frozen_date": "2026-07-23",
   "human_audit": {
     "audit_scope": "patch-grounded target consistency",
     "configurations": {
@@ -845,19 +853,11 @@
     ],
     "double_coded_instances": 20,
     "evidence_audit_provenance": "artifacts/results/human_evidence_audit_provenance_20260721.tsv",
-    "evidence_audit_summary": "artifacts/results/human_evidence_audit_summary_20260721.tsv",
     "judgments": 100,
     "paper_comparison": "RQ-1 source-composition comparison",
     "source_workbook_provenance": "artifacts/results/human_window_provenance_20260718.tsv",
     "stratified_unique_decisions": "artifacts/results/human_window_strata_summary_20260722.tsv",
     "strict_window_evaluation": "artifacts/results/human_window_exact_instances_20260719.tsv",
-    "support_role_audit": {
-      "adjudicated_labels": "artifacts/results/human_support_adjudicated_20260721.tsv",
-      "double_coded_pairs": 20,
-      "judgments": 120,
-      "strong_or_required": 14,
-      "unique_pairs": 100
-    },
     "unique_instances": 80,
     "window_binding": "artifacts/results/human_window_binding_20260719.tsv",
     "window_rankings": "artifacts/frozen/human_window_rankings_20260712.jsonl.gz"
@@ -934,6 +934,7 @@
     "api_style": "OpenAI-compatible",
     "assistant_response_prefill": false,
     "candidate_entity_budget": 20,
+    "context_completeness": "artifacts/results/repair_context_completeness_20260723.tsv",
     "coverage_unit": "only source-bearing candidate excerpts contribute prompt TargetCov and RefComplete",
     "enable_thinking": false,
     "endpoint": "https://www.autodl.art/api/v1",
@@ -961,7 +962,7 @@
       "mural"
     ]
   },
-  "schema_version": 4,
+  "schema_version": 5,
   "source_composition": {
     "attribution": "artifacts/results/source_combination_attribution_20260722.tsv",
     "combinations": [

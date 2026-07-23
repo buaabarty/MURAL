@@ -48,6 +48,7 @@ All paths below are relative to `artifacts/`.
 | Executed source-bearing prompts | `results/source_bearing_prompt_{summary,instances,paired}_20260719.tsv` |
 | Strict repair predictions and official outcomes | `results/repair_equal4000_strict_*_20260719.*` |
 | Clustered repair intervals | `results/repair_equal4000_clustered_paired_20260719.tsv` |
+| Repair yield by source-visible target completeness | `results/repair_context_completeness_20260723.tsv` |
 | Strict structural-artifact temporal provenance | `results/structural_temporal_provenance_20260722.json`, `results/structural_temporal_provenance_instances_20260722.tsv`, `structural_temporal_metadata_20260722.json` |
 | Static-only structural replay | `results/structural_static_ablation_{summary,instances}_20260722.*`, `results/structural_static_top20_*_20260722.tsv`, `results/structural_static_token4000_*_20260722.tsv` |
 | Exact repository-cluster sign-flip tests | `results/primary_cluster_signflip_{summary,repositories}_20260722.tsv` |
@@ -60,10 +61,12 @@ All paths below are relative to `artifacts/`.
 | Strict re-stratification of those judgments | `results/human_window_strict_*_20260719.tsv` |
 | Unique-instance strict judgment alignment | `results/human_window_unique_strict_summary_20260719.tsv`, `results/human_window_strata_{summary,instances}_20260722.tsv` |
 | Task-A construct audit | `results/human_construct_*_20260721.tsv` |
-| Task-B support-role audit | `results/human_support_*_20260721.tsv` |
-| Evidence-audit summary and provenance | `results/human_evidence_audit_*_20260721.*` |
 | Complete Java evaluation | `results/java_cross_language_*_20260714.*` |
 | Context-construction time | `results/context_construction_cost_20260716.tsv` |
+
+The release additionally preserves the Task-B annotation ledgers and their
+source provenance as auxiliary records; no manuscript aggregate depends on
+those labels.
 
 ## Reproduce the frozen source rows
 
@@ -293,6 +296,16 @@ python3 scripts/analyze_clustered_repair_stats.py \
   --output ../temp_run/repair_clustered.tsv
 ```
 
+Relate the executed prompt contents to official repair outcomes:
+
+```bash
+python3 scripts/analyze_repair_context_completeness.py \
+  --prompts results/source_bearing_prompt_instances_20260719.tsv \
+  --outcomes results/repair_equal4000_strict_outcomes_20260719.tsv \
+  --targets results/strict_reference_targets_20260719.json \
+  --output results/repair_context_completeness_20260723.tsv
+```
+
 Hosted generation reads `AUTODL_API_KEY` from the environment. No credential is
 stored in the artifact.
 
@@ -330,10 +343,10 @@ python3 scripts/analyze_human_window_strata.py \
 The raw annotations and randomized A/B assignment remain exactly as supplied
 to the annotators. They audit the main RQ-1 `BM25_projection` versus
 `MURAL_2src` comparison. Strict alignment is computed from the exact windows
-the annotators inspected. The accompanying ledgers retain all Task-A
-construct and Task-B support-role judgments, bind Task A to the current strict
-target ledger, and record the evidence-adjudicated Task-B labels without
-overwriting either annotator's original decisions.
+the annotators inspected. The accompanying ledgers retain all Task-A construct
+judgments, bind them to the current strict target ledger, and preserve the
+auxiliary Task-B records without overwriting either annotator's original
+decisions.
 
 ## Regenerate the stratified analyses
 
